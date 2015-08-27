@@ -25,7 +25,7 @@ module.exports = function(unparsedURL) {
   // if hash seems legit path, return parsed url with hash
   if (parsedURL.hash && '/!'.indexOf(parsedURL.hash[1]) !== -1) {
     // remove ? 
-    return parsedURL.host + parsedURL.pathname + parsedURL.hash;
+    return parsedURL.host + parsedURL.pathname + parsedURL.hash + '/';
   }
 
   // return parsed url
