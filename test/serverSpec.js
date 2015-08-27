@@ -1,11 +1,11 @@
 // IMPORT REQUIRED MODULES
-var utils = require('../server/utils');
+//var utils = require('../server/utils');
 
 // TEST MODULES
 var tap = require('tap');
 var test = require('tape');
 
-// TO RUN TEST:
+// NOTE: To run test:
 // node serverSpec.js
 
 // DEFINE TESTS
@@ -15,27 +15,29 @@ test('-- Server Tests --', function (t) {
     // GET request to our server through our API
       // Get all data from server (might be nothing there to start)
       // Look for 200 response
-    t.pass('Test passed!'); // Says that test past. Useful for debugging.
+    t.equal(200, 200, 'GET request successful!');
 
     // POST request to our server through our API
       // Create a new user or URL?
       // Look for 201 response
-    t.pass('Test passed!'); // Says that test past. Useful for debugging.
+    t.equal(201, 201, 'POST request successful');
     
     // PUT request to our server through our API
+      // NOTE: Probably need to test for user authentication!
       // Update user or URL added above?
       // Look for a 201 response? (https://developer.mozilla.org/en-US/docs/Web/HTTP/Response_codes)
-    t.pass('Test passed!'); // Says that test past. Useful for debugging.
+    t.equal(201, 201, 'PUT request successful');
     
     // DELETE request to our server through our API 
+      // NOTE: Probably need to test for user authentication!
       // Delete user or URL added above?
       // Look for a 410 response (https://developer.mozilla.org/en-US/docs/Web/HTTP/Response_codes) 
-    t.pass('Test passed!'); // Says that test past. Useful for debugging.
+    t.equal(410, 410, 'DELETE request successful');
 
 });
 
 test('-- Database Tests --', function (t) {
-  t.plan(3);
+  t.plan(3); // Number of tests that we plan to run
 
   // Connect to database
   t.pass('Test passed!'); // Says that test past. Useful for debugging.
@@ -49,32 +51,30 @@ test('-- Database Tests --', function (t) {
 });
 
 test('-- URL Parsing Tests --', function (t) {
-  t.plan(4);
-
-  utils.parseURL('')
+  t.plan(5); // Number of tests that we plan to run
 
   // Strips http:// and https:// from
-  t.pass('Test passed!'); // Says that test past. Useful for debugging.
+  t.equal('https://google.com', 'google.com', 'Removed \'https://\'');
+  t.equal('http://google.com', 'google.com', 'Removed \'http://\'');
   
   // Strips 'www' subdomain
-  t.pass('Test passed!'); // Says that test past. Useful for debugging.
+  t.equal('https://www.google.com', 'google.com', 'Removed \'www\' subdomain');
 
   // Removes query strings from end of URL? (Thoughts?!)
-  t.pass('Test passed!'); // Says that test past. Useful for debugging.
-  
+  t.equal('https://www.google.com', 'google.com', 'Removed \'www\' subdomain');
+
   // Ignores non-http paths (such as file://)
-  t.pass('Test passed!'); // Says that test past. Useful for debugging.
-  
+  t.equal('file://test/test.html', 'Error', 'Ignored \'file://\'');
 });
 
 test('-- User Creation --', function (t) {
-  t.plan(4);
+  t.plan(4); // Number of tests that we plan to run
 
   // Create new user
-  t.pass('Test passed!'); // Says that test past. Useful for debugging.
+  t.equal(200, 200, 'New user created!');
   
   // Check if user exists
-  t.pass('Test passed!'); // Says that test past. Useful for debugging.
+  t.equal(200, 200, 'User exists!');
   
   // Update some user info (e.g., new email address)
   t.pass('Test passed!'); // Says that test past. Useful for debugging.
@@ -86,7 +86,7 @@ test('-- User Creation --', function (t) {
 });
 
 test('-- Comment Tests --', function (t) {
-  t.plan(6);
+  t.plan(6); // Number of tests that we plan to run
 
   // Create a new comment with a user account?
   t.pass('Test passed!'); // Says that test past. Useful for debugging.
@@ -108,16 +108,3 @@ test('-- Comment Tests --', function (t) {
   t.pass('Test passed!'); // Says that test past. Useful for debugging.
 
 });
-
-
-// test('assert a string type', function (t) {
-//   // Amount of assertions we plan to run.
-//   // will throw if count doesn't match.
-//   t.plan(2)
-
-//   const bar = 'foo'
-   t.equal(typeof bar, 'string', 'assert `bar` type')
-
-//   const err = false
-//   t.ifError(err, 'should not be an error')
-// });
