@@ -1,10 +1,9 @@
 var config = {
   production: {},
   staging: {},
-  development: {},
-  default: {}
+  development: {}
 }
 
 exports.get = function get(env) {
-  return config[env] || config.default;
+  return config[env] || config.development;
 }
