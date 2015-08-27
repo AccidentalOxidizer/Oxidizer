@@ -56,7 +56,7 @@ test('-- URL Parsing Tests --', function(t) {
   // NOTE: As of now, query strings (?q=1&a=2) are not 
   // removed if after hash(#). This SHOULD pass.
 
-  var msg = 'passed';
+  var msg = 'URL parsed: ';
   var passingUrlTests = {
     'http://www.google.com': 'google.com/',
     'https://google.com': 'google.com/',
@@ -72,7 +72,7 @@ test('-- URL Parsing Tests --', function(t) {
   }
 
   for (var key in passingUrlTests) {
-    t.equal(utils.parseURL(key), passingUrlTests[key], msg)
+    t.equal(utils.parseURL(key), passingUrlTests[key], msg + key)
   }
 
   // TEST FOR BLACKLISTED URLs

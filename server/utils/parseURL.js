@@ -17,7 +17,7 @@ module.exports = function(unparsedURL) {
     parsedURL.host = parsedURL.host.replace('www.', '');
   }
   // if url is blacklisted return new Error
-  console.log(parsedURL.host);
+  // console.log(parsedURL.host);
   if (blacklisted.hasOwnProperty(parsedURL.host + '/')) {
     return new Error('URL blacklisted');
   }
