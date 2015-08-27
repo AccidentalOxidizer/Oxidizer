@@ -18,4 +18,4 @@ module.exports = function(app) {
   app.delete('/api/users/:id', function() {
     // Delete a user!
   });
-};
+}
