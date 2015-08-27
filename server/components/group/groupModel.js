@@ -2,13 +2,13 @@ var config = require('../../config').get().dbconfig;
 var Sequelize = require('sequelize');
 var sequelize = new Sequelize( config.name, config.username, config.password);
 
-var Url = sequelize.define('Url', {
-  path: {
+var Group = sequelize.define('Group', {
+  name: {
     type: Sequelize.STRING,
     unique: true
-  }
+  },
+  privacy: Sequelize.BOOLEAN,
 });
+Group.hasMany(Comment, {as: 'Comments'});
 
-Url.hasMany(Comment, {as: 'Comments'});
-
-module.exports = Url;
+module.exports = Group;
