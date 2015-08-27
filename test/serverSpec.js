@@ -25,11 +25,9 @@ var test = require('tape');
  * node test/serverSpec.js
  */
 
-
-
 // DEFINE TESTS
 test('\n\n----- Server Tests -----', function(t) {
-  t.plan(4); // Number of tests that we plan to run
+  t.plan(6); // Number of tests that we plan to run
 
   // GET request to our server through our API
   // Get all data from server (might be nothing there to start)
@@ -46,6 +44,12 @@ test('\n\n----- Server Tests -----', function(t) {
   // Update user or URL added above?
   // Look for a 201 response? (https://developer.mozilla.org/en-US/docs/Web/HTTP/Response_codes)
   t.equal(201, 201, 'PUT request successful');
+
+  // Look for 403 response for routes that are forbidden to visit without authentication
+  t.equal(403, 403, 'Prevent visiting a forbidden path');
+
+  // Look for 404 response for routes that don't exist
+  t.equal(404, 404, 'Return 404 for routes that don\'t exist');
 
   // DELETE request to our server through our API 
   // NOTE: Probably need to test for user authentication!
