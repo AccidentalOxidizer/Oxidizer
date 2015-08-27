@@ -2,7 +2,6 @@
 var utils = require('../server/utils');
 
 // TEST MODULES
-var tap = require('tap');
 var test = require('tape');
 
 /**
