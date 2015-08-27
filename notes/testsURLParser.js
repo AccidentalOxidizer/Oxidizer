@@ -77,7 +77,6 @@ var url = require('url');
 // URL PARSE TESTS
 
 // Note: as of now query strings (?q=1&a=2) are not removed if after hash (#)
-
 // should pass
 var msg = 'passed';
 var passingUrlTests = {
