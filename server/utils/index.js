@@ -1,0 +1,1 @@
+exports.parseURL = require('./parseURL');

@@ -10,12 +10,12 @@ var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var middleware = require('./middleware');
 
+// UTILITIES
+var utils = require('./utils');
+
 // CONFIG
 var config = require('./config.js').get(process.env.NODE_ENV);
 var port = process.env.PORT || 3000;
 
 // ROUTES
 var routes = require('./routes');
-
-
-
