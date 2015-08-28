@@ -6,7 +6,7 @@ var error = require('./errorRouter');
 module.exports = function(app) {
   //home
   app.get('/', function(req, res, next) {
-    res.send(200);
+    res.sendStatus(200);
   });
 
   // routes
