@@ -1,6 +1,7 @@
 var user = require('./userRouter');
 var url = require('./urlRouter');
 var comment = require('./commentRouter');
+var group = require('./groupRouter');
 var error = require('./errorRouter');
 var bodyParser = require('body-parser');
 
@@ -27,7 +28,8 @@ module.exports = function(app) {
   user(app);
   url(app);
   comment(app);
+  group(app);
 
   // error handling
   error(app);
-}
+};
