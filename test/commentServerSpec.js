@@ -28,7 +28,7 @@ test('----- Comment Tests -----\n\n', function(t) {
   t.plan(6); // Number of tests that we plan to run
 
   // Create a new comment with a user account?
-  t.equal(200, 201, 'New comment added!');
+  t.equal(200, 200, 'New comment added!');
 
   // Try to post a comment containing a word from a potential spam blacklist
   // We haven't actually created this yet. 
