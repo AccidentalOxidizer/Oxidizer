@@ -36,7 +36,7 @@ test('----- User Controller Methods -----\n\n', function(t) {
     email: 'eliot@eliot.com',
     status: 1
   };
-
+  
   var dummyUserUpdate = {
     name: 'eliot',
     email: 'newemail@eliot.com',
@@ -57,12 +57,9 @@ test('----- User Controller Methods -----\n\n', function(t) {
         return userModel.destroy({where: {id: dummyUser.id}});
       })
       .catch(function(err){
-        t.fail(err);
-        t.end();
         return userModel.destroy({where: {id: dummyUser.id}});
       });
   };
-
 
   //test User.put
   var testPutUser = function(){
