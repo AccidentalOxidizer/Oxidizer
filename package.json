@@ -4,7 +4,7 @@
   "description": "A commenting system for the entire internet.",
   "main": "app.js",
   "scripts": {
-    "test": "node test/serverSpec.js | faucet"
+    "test": "faucet"
   },
   "repository": {
     "type": "git",
