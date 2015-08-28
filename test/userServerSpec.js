@@ -1,5 +1,6 @@
 // IMPORT REQUIRED MODULES FROM SERVER
 var utils = require('../server/utils');
+var User = require('../server/components/user');
 
 // TEST MODULES
 var test = require('tape');
@@ -24,16 +25,33 @@ var test = require('tape');
  * node test/serverSpec.js
  */
 
-test('----- User Creation -----\n\n', function(t) {
+test('----- User Controller Methods -----\n\n', function(t) {
+
   t.plan(4); // Number of tests that we plan to run
 
-  // Create new user through POST request
-  // Look for 200 response
-  t.equal(200, 200, 'New user created!');
+  // User.post(userobject) posts to the database
+  var dummyUser = {
+    name: 'eliot',
+    email: 'eliot@eliot.com',
+    status: 1
+  };
 
-  // Check if user exists through GET request
-  // Look for 200 response
-  t.equal(200, 200, 'User exists!');
+  User.post(dummyUser)
+    .then(function(user){
+      t.equal(user.email, 'eliot@eliot.com', 'User.post posts to db!');
+      return User.remove(user.id);
+    })
+    .then(function(){
+      t.pass('User deleted');
+    })
+    .catch(function(err){
+      t.fail('db error: ' + err);
+      t.end();
+    });
+
+  // User.get(userid) returns the user with id: userid
+
+  t.equal(typeof User.get, 'function', 'New user created!');
 
   // Update some user info (e.g., new email address) through PUT request
   // Look for 201 response
@@ -45,3 +63,27 @@ test('----- User Creation -----\n\n', function(t) {
   t.equal(410, 410, 'User account deleted');
 
 });
+
+// test('----- User Servers -----\n\n', function(t) {
+
+//   t.plan(4); // Number of tests that we plan to run
+
+//   // Create new user through POST request
+//   // Look for 200 response
+
+//   t.equal(200, 200, 'New user created!');
+
+//   // Check if user exists through GET request
+//   // Look for 200 response
+//   t.equal(200, 200, 'User exists!');
+
+//   // Update some user info (e.g., new email address) through PUT request
+//   // Look for 201 response
+//   t.equal(201, 201, 'User account updated');
+
+//   // Delete user. We actually might not want to do this? 
+//   // Or if so, make sure we delete all associated user data.
+//   // Look for 410 response
+//   t.equal(410, 410, 'User account deleted');
+
+// });
