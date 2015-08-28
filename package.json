@@ -4,7 +4,7 @@
   "description": "A commenting system for the entire internet.",
   "main": "app.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "node test/serverSpec.js | faucet"
   },
   "repository": {
     "type": "git",
@@ -28,6 +28,7 @@
     "serve-favicon": "^2.3.0"
   },
   "devDependencies": {
+    "faucet": "0.0.1",
     "tape": "^4.2.0"
   }
 }

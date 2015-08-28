@@ -25,7 +25,7 @@ var test = require('tape');
  */
 
 // DEFINE TESTS
-test('\n\n----- Server Tests -----', function(t) {
+test('----- Server Tests -----\n\n', function(t) {
   t.plan(6); // Number of tests that we plan to run
 
   // GET request to our server through our API
@@ -58,7 +58,7 @@ test('\n\n----- Server Tests -----', function(t) {
 
 });
 
-test('\n\n----- Database Tests -----', function(t) {
+test('----- Database Tests -----\n\n', function(t) {
   t.plan(3); // Number of tests that we plan to run
 
   // Connect to database
@@ -72,7 +72,7 @@ test('\n\n----- Database Tests -----', function(t) {
 
 });
 
-test('\n\n----- URL Parsing Tests -----', function(t) {
+test('----- URL Parsing Tests -----\n\n', function(t) {
   t.plan(12); // Number of tests that we plan to run
 
   // NOTE: As of now, query strings (?q=1&a=2) are not 
@@ -117,7 +117,7 @@ test('\n\n----- URL Parsing Tests -----', function(t) {
   */
 });
 
-test('\n\n----- User Creation -----', function(t) {
+test('----- User Creation -----\n\n', function(t) {
   t.plan(4); // Number of tests that we plan to run
 
   // Create new user through POST request
@@ -139,11 +139,11 @@ test('\n\n----- User Creation -----', function(t) {
 
 });
 
-test('\n\n----- Comment Tests -----', function(t) {
+test('----- Comment Tests -----\n\n', function(t) {
   t.plan(6); // Number of tests that we plan to run
 
   // Create a new comment with a user account?
-  t.equal(200, 200, 'New comment added!');
+  t.equal(200, 201, 'New comment added!');
 
   // Try to post a comment containing a word from a potential spam blacklist
   // We haven't actually created this yet. 
