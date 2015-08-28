@@ -1,7 +1,9 @@
+var concat = require('gulp-concat');
 var gulp = require('gulp');
 var jshint = require('gulp-jshint');
 var stylish = require('jshint-stylish');
 var tape = require('gulp-tape');
+var uglify = require('gulp-uglify');
 
 // TEST TASKS
 gulp.task('test', function() {
