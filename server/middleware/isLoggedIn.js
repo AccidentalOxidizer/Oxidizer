@@ -11,6 +11,7 @@ module.exports = function(req, res, next) {
       // maybe we need res.json / res.send here ..  
       return false;
     }
+    req.decoded = decoded;
     next();
   });
 

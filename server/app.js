@@ -23,6 +23,7 @@ var routes = require('./routes');
 
 // connect to DB here and do following in callback:
 
+
 routes(app);
 
 app.listen(port, function() {
