@@ -2,6 +2,7 @@ var user = require('./userRouter');
 var url = require('./urlRouter');
 var comment = require('./commentRouter');
 var error = require('./errorRouter');
+var group = require('./errorRouter');
 
 module.exports = function(app) {
   //home
@@ -13,7 +14,8 @@ module.exports = function(app) {
   user(app);
   url(app);
   comment(app);
+  group(app);
 
   // error handling
   error(app);
-}
+};
