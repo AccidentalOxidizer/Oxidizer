@@ -12,26 +12,27 @@ test('----- URL Controller Methods -----\n\n', function(t) {
 
   // Fake data for tests
   var fakeURL1 = {
-    url: 'http://google.com'
+    path: 'http://ggle.com'
   };
 
   var fakeURL2 = {
-    url: 'http://www.hackreactor.com'
+    path: 'http://www.hackreactor.com'
   };
 
   var fakeURL3 = {
-    url: 'https://www.codecademy.com/en/tracks/javascript'
+    path: 'https://www.codecademy.com/en/tracks/javascript'
   };
 
   var fakeUrls = [fakeURL1, fakeURL2, fakeURL3];
 
-  t.plan(3);
-
+  t.plan(0);
   /** 
    * HELPER FUNCTION
    * Use this for the tests down below.
    */
-  var testGetUser = function(fakeUrl) {
+  /*
+  var testGetUrl = function(fakeUrl) {
+    console.log("We test?");
     var testUrl = urlModel.build(fakeUrl);
     return testUrl.save()
       .then(function() {
@@ -44,24 +45,50 @@ test('----- URL Controller Methods -----\n\n', function(t) {
             path: fakeUrl.url
           }
         });
-      });
+      })
+      .catch(function(err) {
+        console.log("ERROR (48)! ", err);
+      })
   };
+  */
 
-  // run tests! use map so that we run the same 
-  Promise.map(fakeUrls, function(url) {
-      return testHelpers.testPost(Url.post, url, urlModel, t);
-    })
+  var resultUrl;
+  var testGetUrl = function(url) {
+    var saveTestUrl = urlModel.build(url);
+    return saveTestUrl.save()
+      .then(function() {
+        console.log("DATA SAVED!!!");
+        Url.get(url)
+          .then(function(result) {
+            console.log("RESULT 63: ", result);
+          })
+          //return resultUrl;
+      })
+      .catch(function(err) {
+        console.log("Awwww, error.", err);
+      })
+  }
+
+  Promise.promisify(testGetUrl);
+  testGetUrl(fakeURL1)
     .then(function() {
-      return Promise.map(fakeUrls, function(url) {
-        testGetUrl(url);
-      });
+      console.log("Saved: ", resultUrl);
     })
-    .spread(function() {
-      //return testRemoveUser();
-    })
-    .catch(function(err) {
-      console.log(err);
-      t.end();
-    });
 
-})
+  t.end();
+  // run tests! use map so that we run the same 
+  // Promise.map(fakeUrls, function(url) {
+  //     console.log("We get here?");
+  //     return testHelpers.testPost(Url.post, url, urlModel, t);
+  //   })
+  //   .then(function() {
+  //     return Promise.map(fakeUrls, function(url) {
+  //       testGetUrl(url);
+  //     });
+  //   })
+  //   .catch(function(err) {
+  //     console.log(err);
+  //     t.end();
+  //   });
+
+});

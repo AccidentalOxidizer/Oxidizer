@@ -8,8 +8,14 @@ var Url = require('../').Url;
 // GET a URL from the database
 var get = function(searchObject) {
   return Url.findOne({
-    where: searchObject
-  });
+      where: searchObject
+    })
+    .then(function(result) {
+      return result.get('path');
+    })
+    .catch(function(err) {
+      console.log("GET url error: ", err);
+    })
 };
 
 // Write a new URL to the database
