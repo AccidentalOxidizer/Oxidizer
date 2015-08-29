@@ -1,3 +1,4 @@
+var auth = require('./authRouter');
 var user = require('./userRouter');
 var url = require('./urlRouter');
 var comment = require('./commentRouter');
@@ -9,7 +10,7 @@ var urlEncodedParser = bodyParser.urlencoded({
   extended: true
 });
 
-module.exports = function(app) {
+module.exports = function(app, passport) {
   //home
   app.get('/', urlEncodedParser, function(req, res, next) {
     res.sendStatus(200);
@@ -25,6 +26,7 @@ module.exports = function(app) {
   }
 
   // routes
+  auth(app, passport);
   user(app);
   url(app);
   comment(app);

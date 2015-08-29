@@ -59,6 +59,8 @@ var sequelize = models.sequelize;
   });
   m.Url.hasMany(m.Comment);
 
-  sequelize.sync();
-
 })(models);
+
+module.exports.Sequelize = Sequelize;
+module.exports.sequelize = sequelize;
+
