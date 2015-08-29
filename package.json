@@ -33,6 +33,7 @@
     "express-session": "^1.11.3",
     "jsonwebtoken": "^5.0.5",
     "morgan": "^1.6.1",
+    "mysql": "^2.9.0",
     "request": "^2.61.0",
     "mysql": "^2.9.0",
     "passport": "^0.3.0",
