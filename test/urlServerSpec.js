@@ -57,12 +57,11 @@ test('----- URL Controller Methods -----\n\n', function(t) {
     var saveTestUrl = urlModel.build(url);
     return saveTestUrl.save()
       .then(function() {
-        console.log("DATA SAVED!!!");
-        Url.get(url)
-          .then(function(result) {
-            console.log("RESULT 63: ", result);
-          })
-          //return resultUrl;
+        //console.log("DATA SAVED!!!");
+        return Url.get(url);
+      })
+      .then(function(result) {
+        console.log("RESULT 64: ", result);
       })
       .catch(function(err) {
         console.log("Awwww, error.", err);

@@ -1,12 +1,32 @@
 var Url = require('../').Url;
+var parseUrl = require('../../utils/parseURL.js');
 
 /** 
  *  This controller is responsible for getting and 
  *  adding URLs from specific webpages to our database.
+ *
+ *  This controller is expecting to receive data in the
+ *  following format:
+ *  
+ *  url = {
+ *    path: "http://somethingsomething.com"
+ *  }
  */
+
+var fixUrl = function(obj) {
+  console.log('Check Obj: ', obj)
+  if (obj.path) {
+    console.log("BEFORE FIX PATH: ", obj.path);
+    obj.path = parseUrl(obj.path);
+    console.log("After FIX PATH: ", obj.path);
+  }
+
+  return obj;
+}
 
 // GET a URL from the database
 var get = function(searchObject) {
+  searchObject = fixUrl(searchObject);
   return Url.findOne({
       where: searchObject
     })
@@ -20,6 +40,8 @@ var get = function(searchObject) {
 
 // Write a new URL to the database
 var post = function(urlObject) {
+  urlObject = fixUrl(urlObject);
+  console.log('Hi Dave, POST URL: ', urlObject);
   return User.findOrCreate({
       where: urlObject
     })
