@@ -37,9 +37,6 @@ var uglify = require('gulp-uglify');
 // TEST TASKS
 gulp.task('test', function() {
   return gulp.src('test/**/*.js')
-    .pipe(plumber({
-      errorHandler: notify.onError("Error: <%= error.message %>")
-    }))
     .pipe(tape());
 });
 
@@ -47,11 +44,8 @@ gulp.task('test', function() {
 gulp.task('linter', function() {
   // place code for your default task here
   return gulp.src(['server/**/*.js'])
-    .pipe(plumber({
-      errorHandler: notify.onError("Error: <%= error.message %>")
-    }))
     .pipe(jshint())
-    .pipe(jshint.reporter(stylish));
+    .pipe(jshint.reporter(stylish))
 });
 
 // DEFAULT TASKS
