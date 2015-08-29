@@ -77,11 +77,10 @@ test('----- User Controller Methods -----\n\n', function(t) {
     email: 'newemail@emily.com',
     status: 2
   };
-
   
   var dummyUsers = [dummyUser1, dummyUser2, dummyUser3, dummyUser4];
   
-  t.plan(dummyUsers.length); // Number of tests that we plan to run
+  t.plan(11); // Number of tests that we plan to run
   
   // So that we don't get lost in async confusion, each test scenario will be a function. Tests run inside the function. The test function deletes any data that has been added to the database, and returns a promise. After defining all of our test functions, we call them in order (see below) 
 
@@ -99,33 +98,18 @@ test('----- User Controller Methods -----\n\n', function(t) {
         return userModel.destroy({where: {name: dummyUser.name}});
       })
       .catch(function(err){
+        // if we get an error while posting or counting, we console.log, then delete the user if it was made
         console.log(err, ' deleting user');
-        return userModel.destroy({where: {name: user.id}});
-      })
-      .then(function(){
-        console.log('users deleted');
-      })
-      .catch(function(err){
-        console.log(err, ' unable to delete users...');
+        return userModel.destroy({where: {name: user.id}})
+          .then(function(){
+            console.log('users deleted');
+          })
+          .catch(function(err){
+            console.log(err, ' unable to delete users...');
+          });
       });
   };
 
-  Promise.map(dummyUsers, function(user){
-    return testPostUser(user);
-  })
-    // .then(function(){
-    //   return testPutUser();
-    // })
-    // .then(function(){
-    //   return testRemoveUser();
-    // })
-    .then(function(){
-      t.end();
-    })
-    .catch(function(err){
-      console.log(err);
-      t.end();
-    });
   //test User.put
   var testPutUser = function(){
     return User.post(dummyUser1)
@@ -148,6 +132,19 @@ test('----- User Controller Methods -----\n\n', function(t) {
       });
   };
 
+  var testGetUser = function(dummyUser){
+    var testUser = userModel.build(dummyUser);
+    return testUser.save()
+      .then(function(){
+        return User.get(dummyUser);
+      })
+      .then(function(user){
+        t.equal(user.name, dummyUser.name, 'successfully gets from db');
+        return userModel.destroy({where: {name: dummyUser.name}});
+      });
+
+  };
+
   var testRemoveUser = function(){
     return User.post(dummyUser1)
       .then(function(user){
@@ -166,7 +163,28 @@ test('----- User Controller Methods -----\n\n', function(t) {
       });
   };
 
-  // run tests
+  // run tests! use map so that we run the same 
+  Promise.map(dummyUsers, function(user){
+    return testPostUser(user);
+  })
+    .then(function(){
+      return Promise.map(dummyUsers, function(user){
+        testGetUser(user);
+      });
+    })
+    .then(function(){
+      return testPutUser();
+    })
+    .then(function(){
+      return testRemoveUser();
+    })
+    .then(function(){
+      t.end();
+    })
+    .catch(function(err){
+      console.log(err);
+      t.end();
+    });
 });
 
 // test('----- User Servers -----\n\n', function(t) {

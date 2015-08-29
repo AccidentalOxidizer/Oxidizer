@@ -1,7 +1,7 @@
 var User = require('../').User;
 
-var get = function(userId){
-  return User.findById(userId);
+var get = function(searchObject){
+  return User.findOne({where: searchObject});
 };
 
 // 
