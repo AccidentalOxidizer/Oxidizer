@@ -28,7 +28,9 @@ var post = function(urlObject) {
 
 // DELETE a URL from the database.
 // TODO: We should also probably delete any 
-// associated comments from the database as well.
+// associated comments from the database as well,
+// but this might not matter since we won't display
+// them anyway.
 var remove = function(urlId) {
   return Url.destroy({
       where: {
