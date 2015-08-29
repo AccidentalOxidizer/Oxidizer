@@ -1,10 +1,10 @@
 var LocalStrategy = require('passport-local').Strategy;
 // var GoogleStrategy = require('passport-google-oauth').OAuth2Strategy;
 // var FacebookStrategy = require('passport-facebook').Strategy;
-var User = require('../components')['User'];
+var User = require('../index')['User'];
 
 module.exports = function(passport, config) {
-  // Using sessions for now -> req serialization support 
+  // Using sessions for now -> req serialization support
   // Probably will switch to tokens later.
   passport.serializeUser(function(user, done) {
     done(null, user.id);
@@ -21,17 +21,17 @@ module.exports = function(passport, config) {
 
   // Local Strategy
   passport.use('local', new LocalStrategy({
-      usernameField: 'name',
+      usernameField: 'email', 
       passwordField: 'password',
       passReqToCallback: true,
       // session: false
     }, 
-    function(req, name, password, done) {
+    function(req, email, password, done) {
       console.log('Passport: using LocalStrategy');
-      User.findOne({name: name})
+      User.findOne({email: email})
         .then(function(user) {
           if (!user) {
-            return done(null, false, { message: 'Invalid username.' });
+            return done(null, false, { message: 'Invalid email address.' });
           }
           // found user -> check if password is correct
           if (!user.validPassword(password)) {

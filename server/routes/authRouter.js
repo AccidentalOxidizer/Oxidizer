@@ -7,12 +7,12 @@ module.exports = function(app, passport) {
     failureRedirect: '/login'
   }));
 
-  app.get('/api/auth/google', passport.authenticate('google', {
+  app.get('/api/auth/google', jsonParser, passport.authenticate('google', {
     successRedirect: '/',
     failureRedirect: '/login'
   }));
 
-  app.get('/api/auth/facebook', passport.authenticate('facebook', {
+  app.get('/api/auth/facebook', jsonParser, passport.authenticate('facebook', {
     successRedirect: '/',
     failureRedirect: '/login'
   }));

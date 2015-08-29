@@ -22,7 +22,7 @@ var config = require('./config.js').get(process.env.NODE_ENV);
 var port = process.env.PORT || 3000;
 
 // initialize passport settings
-require('./middleware/passport')(passport, config);
+require('./components/user/passport')(passport, config);
 
 // initialize database
 require('./components/dbconfig');
@@ -34,9 +34,6 @@ var routes = require('./routes');
 sequelize.sync().then(function() {
   app.use(morgan('dev'));
   app.use(cookieParser());
-
-  // EE: using overall for now for testing ...
-  app.use(bodyParser.json());
 
   // using sessions for auth for now
   app.use(session({
