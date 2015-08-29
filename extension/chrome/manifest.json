@@ -3,15 +3,19 @@
   "description": "The Commenting System of the Internet",
   "version": "0.1",
   "permissions": [
+    "http://localhost:3000/test/comments",
+    "http://127.0.0.1:3000/test/comments",
     "activeTab",
     "webNavigation",
     "tabs",
+    "background",
     "storage",
     "http://*/*",
     "https://*/*",
     "file:///*/*",
     "*://*/*",
-    "<all_urls>"
+    "<all_urls>",
+    "http://localhost:3000/*"
   ],
   "background": {
     "scripts": ["rust.js"],
@@ -30,11 +34,11 @@
     "chrome_style": true
   },
   "web_accessible_resources": [
-    "cleanslate.css"
+    "cleanslate.css",
+    "http://localhost:3000/*"
   ],
   "content_scripts": [{
-    "css": ["cleanslate.css"],
-    "js": ["comment.js"],
+    "css": ["cleanslate.css", "comment.css"],
     "matches": ["*://*/*"]
   }],
   "manifest_version": 2

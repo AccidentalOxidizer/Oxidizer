@@ -25,4 +25,5 @@ module.exports = function(app) {
   app.delete('/api/comments/:id', jsonParser, auth.isAuthorized, function(req, res, next) {
     // Delete a comment!
   });
+
 }
