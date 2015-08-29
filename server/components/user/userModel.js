@@ -57,12 +57,9 @@ module.exports = function(sequelize, dataTypes) {
           });
       },
       validPassword: function(password) {
-        // TODO EE: Change this back ... just checking exact passwords
-        // right now for testing
-        // var compare = Promise.promisify(bcrypt.compare);
+        var compare = Promise.promisify(bcrypt.compare);
 
-        // return compare(password, this.password);
-        return (password === this.password);
+        return compare(password, this.password);
       },
     },
     indexes: [{
