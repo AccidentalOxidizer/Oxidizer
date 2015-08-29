@@ -1,4 +1,5 @@
 // IMPORT REQUIRED MODULES FROM SERVER
+var request = require('request');
 var utils = require('../server/utils');
 
 // TEST MODULES
@@ -31,7 +32,14 @@ test('----- Server Tests -----\n\n', function(t) {
   // GET request to our server through our API
   // Get all data from server (might be nothing there to start)
   // Look for 200 response
-  t.equal(200, 200, 'GET request successful!');
+  var serverStatusCode = null;
+  request('http://localhost:3000', function(err, res, body) {
+    if (err) throw err;
+    console.log("STATUS CODE: ", res.statusCode)
+    serverStatusCode = res.statusCode;
+  });
+  //console.log("REQUEST ---- ", requestResult);
+  t.equal(serverStatusCode, 200, 'GET request successful!');
 
   // POST request to our server through our API
   // Create a new user or URL?
