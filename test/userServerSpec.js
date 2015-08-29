@@ -2,7 +2,7 @@
 var utils = require('../server/utils');
 var User = require('../server/components/user');
 var userModel = require('../server/components').User;
-
+var Promise = require('bluebird');
 // TEST MODULES
 var test = require('tape');
 
@@ -86,47 +86,46 @@ test('----- User Controller Methods -----\n\n', function(t) {
   // So that we don't get lost in async confusion, each test scenario will be a function. Tests run inside the function. The test function deletes any data that has been added to the database, and returns a promise. After defining all of our test functions, we call them in order (see below) 
 
   // tests User.post in user controller
-  var testPostUser = function(){
-        console.log('hey');
-    
-    // helper function so we can use Promise.all to test multiple users  
-    var postUser = function(dummyUser){
-      return User.post(dummyUser)
-        .then(function(user){
-          // save the id on the dummy so that we can l
-          dummyUser.id = user.id;
-          // checks if the user was added using a sequelize method
-          return userModel.findAndCountAll(dummyUser);
-        })
-        .then(function(result){
-          // check if findAndCountAll returned the one record we added
-          t.equal(result.count, 1, 'User.post posted ' + dummyUser +' to db!');
-        });
-      };
-    
-    return Promise.all(dummyUsers, function(user){
-        return postUser(user);
+  var testPostUser = function(dummyUser){
+    return User.post(dummyUser)
+      .then(function(user){
+        // checks if the user was added using a sequelize method
+        return userModel.findAndCountAll({where: {name: dummyUser.name}});
       })
-      .then(function(userArray){
+      .then(function(result){
+        // check if findAndCountAll returned the one record we added
+        t.equal(result.count, 1, 'User.post posted ' + dummyUser.name +' to db!');
         // clean up - remove the data we posted in our test  
-        return Promise.all(userArray, function(user){userModel.destroy({where: {id: user.id}});
-        });
+        return userModel.destroy({where: {name: dummyUser.name}});
       })
       .catch(function(err){
-        console.log(err, ' deleting users');
-        Promise.all(dummyUsers, function(user){
-          userModel.destroy({where: {name: user.id}});
-        })
-        .then(function(){
-          console.log('users deleted');
-          return Promise();
-        })
-        .catch(function(err){
-          console.log(err, ' unable to delete users...');
-        });
+        console.log(err, ' deleting user');
+        return userModel.destroy({where: {name: user.id}});
+      })
+      .then(function(){
+        console.log('users deleted');
+      })
+      .catch(function(err){
+        console.log(err, ' unable to delete users...');
       });
   };
 
+  Promise.map(dummyUsers, function(user){
+    return testPostUser(user);
+  })
+    // .then(function(){
+    //   return testPutUser();
+    // })
+    // .then(function(){
+    //   return testRemoveUser();
+    // })
+    .then(function(){
+      t.end();
+    })
+    .catch(function(err){
+      console.log(err);
+      t.end();
+    });
   //test User.put
   var testPutUser = function(){
     return User.post(dummyUser1)
@@ -168,20 +167,6 @@ test('----- User Controller Methods -----\n\n', function(t) {
   };
 
   // run tests
-  testPostUser()
-    // .then(function(){
-    //   return testPutUser();
-    // })
-    // .then(function(){
-    //   return testRemoveUser();
-    // })
-    .then(function(){
-      t.end();
-    })
-    .catch(function(err){
-      console.log(err);
-      t.end();
-    });
 });
 
 // test('----- User Servers -----\n\n', function(t) {
