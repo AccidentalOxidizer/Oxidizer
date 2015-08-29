@@ -23,6 +23,8 @@ test('----- URL Controller Methods -----\n\n', function(t) {
     url: 'https://www.codecademy.com/en/tracks/javascript'
   };
 
+  var fakeUrls = [fakeURL1, fakeURL2, fakeURL3];
+
   t.plan(3);
 
   /** 
@@ -46,11 +48,11 @@ test('----- URL Controller Methods -----\n\n', function(t) {
   };
 
   // run tests! use map so that we run the same 
-  Promise.map(fakeURL1, function(url) {
+  Promise.map(fakeUrls, function(url) {
       return testHelpers.testPost(Url.post, url, urlModel, t);
     })
     .then(function() {
-      return Promise.map(fakeURL1, function(url) {
+      return Promise.map(fakeUrls, function(url) {
         testGetUrl(url);
       });
     })
