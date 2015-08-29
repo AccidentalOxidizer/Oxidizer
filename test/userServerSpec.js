@@ -28,69 +28,135 @@ var test = require('tape');
 
 test('----- User Controller Methods -----\n\n', function(t) {
 
-  t.plan(4); // Number of tests that we plan to run
 
-  // User.post(userobject) posts to the database
-  var dummyUser = {
-    name: 'eliot',
+  // dummy info for tests
+  var dummyUser1 = {
+    name: 'eliotdummy',
     email: 'eliot@eliot.com',
     status: 1
   };
+
+  var dummyUser2 = {
+    name: 'davedummy',
+    email: 'dave@dave.com',
+    status: 1
+  };
   
-  var dummyUserUpdate = {
-    name: 'eliot',
+  var dummyUser3 = {
+    name: 'matthiasdummy',
+    email: 'matthias@matthias.com',
+    status: 1
+  };
+
+  var dummyUser4 = {
+    name: 'emilydummy',
+    email: 'emily@emily.com',
+    status: 1
+  };
+
+  var dummyUser1Update = {
+    name: 'eliotdummy',
     email: 'newemail@eliot.com',
+    status: 2
+  };  
+
+  var dummyUser2Update = {
+    name: 'davedummy',
+    email: 'newemail@dave.com',
     status: 2
   };
 
-  // test User.post
+  var dummyUser3Update = {
+    name: 'matthiasdummy',
+    email: 'newemail@matthias.com',
+    status: 2
+  };
+  
+  var dummyUser4Update = {
+    name: 'emilydummy',
+    email: 'newemail@emily.com',
+    status: 2
+  };
+
+  
+  var dummyUsers = [dummyUser1, dummyUser2, dummyUser3, dummyUser4];
+  
+  t.plan(dummyUsers.length); // Number of tests that we plan to run
+  
+  // So that we don't get lost in async confusion, each test scenario will be a function. Tests run inside the function. The test function deletes any data that has been added to the database, and returns a promise. After defining all of our test functions, we call them in order (see below) 
+
+  // tests User.post in user controller
   var testPostUser = function(){
-    return User.post(dummyUser)
-      .then(function(user){
-        // save the id on the dummy for the update test
-        dummyUser.id = user.id;
-        return userModel.findAndCountAll(dummyUser);
+        console.log('hey');
+    
+    // helper function so we can use Promise.all to test multiple users  
+    var postUser = function(dummyUser){
+      return User.post(dummyUser)
+        .then(function(user){
+          // save the id on the dummy so that we can l
+          dummyUser.id = user.id;
+          // checks if the user was added using a sequelize method
+          return userModel.findAndCountAll(dummyUser);
+        })
+        .then(function(result){
+          // check if findAndCountAll returned the one record we added
+          t.equal(result.count, 1, 'User.post posted ' + dummyUser +' to db!');
+        });
+      };
+    
+    return Promise.all(dummyUsers, function(user){
+        return postUser(user);
       })
-      .then(function(result){
-        // test #1 posts to database
-        t.equal(result.count, 1, 'User.post posts to db!');
-        return userModel.destroy({where: {id: dummyUser.id}});
+      .then(function(userArray){
+        // clean up - remove the data we posted in our test  
+        return Promise.all(userArray, function(user){userModel.destroy({where: {id: user.id}});
+        });
       })
       .catch(function(err){
-        return userModel.destroy({where: {id: dummyUser.id}});
+        console.log(err, ' deleting users');
+        Promise.all(dummyUsers, function(user){
+          userModel.destroy({where: {name: user.id}});
+        })
+        .then(function(){
+          console.log('users deleted');
+          return Promise();
+        })
+        .catch(function(err){
+          console.log(err, ' unable to delete users...');
+        });
       });
   };
 
   //test User.put
   var testPutUser = function(){
-    return User.post(dummyUser)
+    return User.post(dummyUser1)
       .then(function(user){
         // save the id on the dummy for the update test
-        dummyUser.id = user.id;
-        return User.put(dummyUserUpdate);
+        dummyUser1.id = user.id;
+        return User.put(dummyUser1Update);
       })
       .then(function(){  
-        return userModel.findById(dummyUser.id);
+        return userModel.findById(dummyUser1.id);
       })
       .then(function(user){
-        t.equal(user.email, dummyUser.email, 'User.put updates email');
-        t.equal(user.status, dummyUser.status, 'User.put updates status');
+        t.equal(user.email, dummyUser1.email, 'User.put updates email');
+        t.equal(user.status, dummyUser1.status, 'User.put updates status');
         return userModel.destroy({where: {id: user.id}});
       })
       .catch(function(err){
         console.log(err);
-        return userModel.destroy({where: {id: dummyUser.id}});
+        return userModel.destroy({where: {id: dummyUser1.id}});
       });
   };
 
   var testRemoveUser = function(){
-    return User.post(dummyUser)
+    return User.post(dummyUser1)
       .then(function(user){
-        dummyUser.id = user.id;
+        dummyUser1.id = user.id;
         return User.remove(user.id);
       })
       .then(function(){
-        return userModel.findAndCountAll({where: {id: dummyUser.id}});
+        return userModel.findAndCountAll({where: {id: dummyUser1.id}});
       })
       .then(function(result){
         t.equal(result.count, 0, 'User.remove deletes from db!');
@@ -103,12 +169,12 @@ test('----- User Controller Methods -----\n\n', function(t) {
 
   // run tests
   testPostUser()
-    .then(function(){
-      return testPutUser();
-    })
-    .then(function(){
-      return testRemoveUser();
-    })
+    // .then(function(){
+    //   return testPutUser();
+    // })
+    // .then(function(){
+    //   return testRemoveUser();
+    // })
     .then(function(){
       t.end();
     })
