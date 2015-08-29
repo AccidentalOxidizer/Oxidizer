@@ -4,7 +4,8 @@ var config = {
   development: {
     dbconfig: {
       name: 'db name',
-      username: 'username'
+      username: 'username',
+      password: ''
     },
     secret: 'development'
   }
