@@ -31,49 +31,134 @@ var test = require('tape');
  */
 
 test('----- Comment Controller Tests -----\n\n', function(t) {
-  t.plan(6); // Number of tests that we plan to run
+  t.plan(4); // Number of tests that we plan to run
+
+  var dummyUser = {
+    name: 'eliotdummy',
+    email: 'eliot@eliot.com',
+    status: 1
+  };
+  
+  var dummyUrl = {
+    path: 'www.rustedserverwfunnycomments.io'
+  };
 
   var dummyComment = {
     text: 'funny comment about the web',
     isPrivate: false
   };
 
-
   // save a user and url concurrently so that we can create a comment
   var testCommentPost = function(dummyComment, t){
     var testUserId;
     var testUrlId;
-
-    var dummyUser = {
-      name: 'eliotdummy',
-      email: 'eliot@eliot.com',
-      status: 1
-    };
-    
-    var dummyUrl = {
-      path: 'www.rustedserverwfunnycomments.io'
-    };
     
     var testUser = userModel.build(dummyUser);
     var testUrl = urlModel.build(dummyUrl);
 
     return Promise.all([testUser.save(), testUrl.save()])
       .then(function(data){
-        var testUser = data[0];
-        var testUrl = data[1];
+        testUserId = testUser.get('id');
+        testUrlId = testUrl.get('id');
         
         var dummyCommentCopy = {
           text: dummyComment.text,
           isPrivate: dummyComment.isPrivate,
-          UserId: {
-            id: testUser.get('id')
-          },
-          UrlId: {id: testUrl.get('id')}
+          UserId: testUser.get('id'),
+          UrlId: testUrl.get('id')
         };
 
         return testHelpers.testPost(Comment.post, dummyCommentCopy, commentModel, t);
       })
       // cleanup everything
+      .then(function(){
+        return Promise.all([
+          userModel.destroy({where: {id: testUserId}}),
+          urlModel.destroy({where: {id: testUrlId}})
+        ])
+        .catch(function(err){
+
+          throw err;
+        });
+      })
+      .catch(function(err){        
+        userModel.destroy({where: {id: testUserId}});
+        urlModel.destroy({where: {id: testUrlId}});
+        throw err;
+      });
+  };
+  
+  var testPutComment = function(dummyComment, t){
+    var testUserId;
+    var testUrlId;
+    
+    var testUser = userModel.build(dummyUser);
+    var testUrl = urlModel.build(dummyUrl);
+
+    return Promise.all([testUser.save(), testUrl.save()])
+      .then(function(data){
+        testUserId = testUser.get('id');
+        testUrlId = testUrl.get('id');
+        
+        var dummyCommentCopy = {
+          text: dummyComment.text,
+          isPrivate: dummyComment.isPrivate,
+          UserId: testUserId,
+          UrlId: testUrlId
+        };
+
+        var dummyCommentUpdate = {
+          isPrivate: true
+        };
+
+        return testHelpers.testPut(Comment.put, dummyCommentCopy, dummyCommentUpdate, commentModel, t);
+      })
+      // cleanup everything
+      .then(function(){
+        return Promise.all([
+          userModel.destroy({where: {id: testUserId}}),
+          urlModel.destroy({where: {id: testUrlId}})
+        ])
+        .catch(function(err){
+
+          throw err;
+        });
+      })
+      .catch(function(err){        
+        userModel.destroy({where: {id: testUserId}});
+        urlModel.destroy({where: {id: testUrlId}});
+        throw err;
+      });
+  };
+
+  var testGetComment = function(t){
+    var testUserId;
+    var testUrlId;
+    
+    var testUser = userModel.build(dummyUser);
+    var testUrl = urlModel.build(dummyUrl);
+
+    return Promise.all([testUser.save(), testUrl.save()])
+      .then(function(data){
+        testUserId = testUser.get('id');
+        testUrlId = testUrl.get('id');
+        
+        var dummyCommentCopy = {
+          text: dummyComment.text,
+          isPrivate: dummyComment.isPrivate,
+          UserId: testUser.get('id'),
+          UrlId: testUrl.get('id')
+        };
+
+        var newComment = commentModel.build(dummyCommentCopy);
+        return newComment.save();
+      })
+      .then(function(commentInstance){
+        return Comment.get(commentInstance);
+      })
+      .then(function(comments){
+        t.equal(comments.length, 1, 'get returns an object');
+      })
       .then(function(){
         return Promise.all([
           userModel.destroy({where: {id: testUserId}}),
@@ -89,8 +174,66 @@ test('----- Comment Controller Tests -----\n\n', function(t) {
         throw err;
       });
   };
-  
+
+  var testRemoveComment = function(){
+    var testUserId;
+    var testUrlId;
+    var testCommentId;
+    var testUser = userModel.build(dummyUser);
+    var testUrl = urlModel.build(dummyUrl);
+
+    return Promise.all([testUser.save(), testUrl.save()])
+      .then(function(data){
+        testUserId = testUser.get('id');
+        testUrlId = testUrl.get('id');
+        
+        var dummyCommentCopy = {
+          text: dummyComment.text,
+          isPrivate: dummyComment.isPrivate,
+          UserId: testUser.get('id'),
+          UrlId: testUrl.get('id')
+        };
+
+        var newComment = commentModel.build(dummyCommentCopy);
+        return newComment.save();
+      })
+      .then(function(comment){
+        testCommentId = comment.get('id');
+        return Comment.remove(testCommentId);
+      })
+      .then(function(){
+        return commentModel.findAll({where: {id: testCommentId}});
+      })
+      .then(function(comment){
+        return t.equal(comment.length, 0, 'deletes a comment');
+      })
+      .then(function(){
+        return Promise.all([
+          userModel.destroy({where: {id: testUserId}}),
+          urlModel.destroy({where: {id: testUrlId}})
+        ])
+        .catch(function(err){
+
+          throw err;
+        });
+      })
+      .catch(function(err){        
+        userModel.destroy({where: {id: testUserId}});
+        urlModel.destroy({where: {id: testUrlId}});
+        throw err;
+      });
+  };
+
   testCommentPost(dummyComment, t)  
+    .then(function(){
+      return testPutComment(dummyComment, t);
+    })
+    .then(function(){
+      return testGetComment(t);
+    })
+    .then(function(){
+      return testRemoveComment(t);
+    })
     .catch(function(err){
       throw err;
     });

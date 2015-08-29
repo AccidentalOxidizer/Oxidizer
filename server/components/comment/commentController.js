@@ -6,9 +6,7 @@ var get = function(searchObject){
 
 // takes an object with the following format
 var post = function(commentObject){
-  console.log('//////////////', commentObject);
   var newComment = Comment.build(commentObject);
-  console.log('$$$$$$$$$$$$$$$$$$$$$$$$$$',Comment);
   return newComment.save() 
     .then(function(comment){
       return comment;

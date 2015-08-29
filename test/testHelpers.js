@@ -63,4 +63,4 @@ var testPut = function(putFunction, dummyObject, dummyUpdates, dbModel, t){
 module.exports = {
   testPost: testPost,
   testPut: testPut
-}
+};
