@@ -3,19 +3,42 @@ var bodyParser = require('body-parser');
 
 var jsonParser = bodyParser.json();
 
+var dummyData = {
+  comments: [{
+    id: 1,
+    id_user: 1,
+    id_url: 1,
+    timestamp: '2015-08-27 13:59:59',
+    text: "Hack Reactor is so awesome, woooo yeah dawg boy!",
+    privacy: false,
+    id_groups: 0
+  }, {
+    id: 2,
+    id_user: 1,
+    id_url: 1,
+    timestamp: '2015-08-27 14:59:59',
+    text: "Hack Reactor is so awesome, woooo yeah dawg boy!",
+    privacy: false,
+    id_groups: 0
+  }]
+}
+
 module.exports = function(app) {
   app.get('/dummyData', auth.isAuthorized, function(req, res, next) {
     // populate db with dummy data
   });
 
   app.post('/test/comments', jsonParser, function(req, res, next) {
-    res.sendStatus(201);
     console.log(req.body);
+    dummyData.comments.push(req.body);
+    console.log(dummyData);
+    res.status(201).send({
+      data: 'ok'
+    });
   });
 
   app.get('/test/comments', jsonParser, function(req, res, next) {
-    res.status(200).send({
-      test: 'test'
-    });
+    console.log(dummyData);
+    res.status(200).send(dummyData);
   });
 };

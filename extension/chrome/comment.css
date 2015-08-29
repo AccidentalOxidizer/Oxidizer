@@ -1,5 +1,12 @@
 .rust {
-  color: red !important;
+  /*color: red !important;*/
+  position: fixed !important;
+  bottom: 0px !important;
+  right: 0px !important;
+  background-color: white !important;
+  border:1px solid grey !important;
+  padding:5px !important;
+  margin:5px !important;
 }
 
 

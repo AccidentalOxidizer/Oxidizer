@@ -4,16 +4,14 @@
  **/
 
 // content script running for each chrome tab window injected by the extension rust.js
-console.log('comment.js loaded');
 var url = document.location.href;
 var dataAttribute = 'data-rust-identiy';
 var dataAttributeValue = 'identity';
 
 // remove DOM element from previous calls
 var cleanDOM = function() {
-  var old = document.getElementById('rust') || undefined;
+  var old = document.querySelector('[data-rust-identiy="identity"]') || undefined;
   if (old !== undefined) {
-    console.log('removing');
     document.body.removeChild(old);
   }
 }
@@ -23,7 +21,6 @@ var templating = function(comments) {
   var result = '<div>';
   for (var i = comments.length - 1; i >= 0; i--) {
     comment = comments[i];
-    console.log(comment);
     result += '<div id="' + comment['id'] + '"><div>' + comment['timestamp'] + '</div><div>' + comment['text'] + '</div></div>';
   };
   result += '</div>';
@@ -46,43 +43,38 @@ var appendToDOM = function(html) {
   document.body.appendChild(section);
 }
 
+// register all the events chrome needs to handle
 var registerEventListeners = function() {
   var rust = document.querySelector('[data-rust-identiy="identity"]');
-
   rust.querySelector('#rustsubmit').addEventListener('keydown', function(e) {
+    // if user hits enter key
     if (e.keyCode == 13) {
       var text = document.getElementById('rustsubmit').value;
-
-      var xhr = new XMLHttpRequest();
-      xhr.open('POST', 'http://localhost:3000/test/comments');
-      xhr.setRequestHeader('Content-Type', 'application/json');
-
-      xhr.onload = function() {
-        if (xhr.status === 201) {
-          console.log(xhr.responseText);
-        }
-      };
-
-      xhr.send(JSON.stringify({
-        name: 'Matthias',
-        age: 32,
-        text: text
-      }));
+      // send message to background script rust.js with new coment data tp be posted to server
+      chrome.runtime.sendMessage({
+        type: 'post',
+        comment: text
+      }, function(response) {
+        // background script rust.js should return the server response
+        console.log(response);
+        // todo: append new message to output html.. 
+      });
 
     }
   });
 }
 
-// send message to the chome extension (rust.js)
+/* MAGIC HAPPENS HERE */
+// send 'init' message with url to the chome extension (rust.js) when loaded
 chrome.runtime.sendMessage({
   type: 'init',
   url: url
 }, function(response) {
-  if (response.data) {
-    console.log(response);
+  if (response.data.comments) {
+    console.log('Response:', response);
     cleanDOM();
     // templating
-    var html = templating(response.data);
+    var html = templating(response.data.comments);
     // add input field
     var html = inputField(html);
     // append to document
@@ -90,5 +82,4 @@ chrome.runtime.sendMessage({
     // register event listeners for user input
     registerEventListeners();
   };
-
 });
