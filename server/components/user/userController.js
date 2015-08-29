@@ -9,24 +9,18 @@ var post = function(userObject){
   return User.findOrCreate({where: userObject})
     .spread(function(user, created){
       if (!created) {
-        throw new Error('User already exists');
+        throw new Error('Error posting to db');
       } else {
         return user;
       }
     });
 };
 
-// will throw error if no 
-var put = function(userObject){
-  return User.update(userObject, {where: {id: userObject.id}})
-    .then(function(affectedRows, usersUpdated){
-      if (affectedRows === 0) {
-        throw new Error('Update failed');
-      } else if (affectedRows > 1) {
-        throw new Error('Updated multiple records!!!', usersUpdated);
-      } else {
-        return usersUpdated;
-      }
+// will throw error if no id provided
+var put = function(userid, updatesObject){
+  return User.update(updatesObject, {where: {id: userid}})
+    .then(function(){
+      return true;
     })
     .catch(function(error){
       throw new Error(error);

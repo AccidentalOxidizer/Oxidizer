@@ -3,6 +3,8 @@ var utils = require('../server/utils');
 var User = require('../server/components/user');
 var userModel = require('../server/components').User;
 var Promise = require('bluebird');
+var testHelpers = require('./testHelpers');
+
 // TEST MODULES
 var test = require('tape');
 
@@ -52,6 +54,12 @@ test('----- User Controller Methods -----\n\n', function(t) {
     name: 'emilydummy',
     email: 'emily@emily.com',
     status: 1
+  };  
+
+  var dummyUser5 = {
+    name: 'anotherdummy',
+    email: 'another@dummy.com',
+    status: 1
   };
 
   var dummyUser1Update = {
@@ -80,57 +88,9 @@ test('----- User Controller Methods -----\n\n', function(t) {
   
   var dummyUsers = [dummyUser1, dummyUser2, dummyUser3, dummyUser4];
   
-  t.plan(11); // Number of tests that we plan to run
+  t.plan(12); // Number of tests that we plan to run
   
   // So that we don't get lost in async confusion, each test scenario will be a function. Tests run inside the function. The test function deletes any data that has been added to the database, and returns a promise. After defining all of our test functions, we call them in order (see below) 
-
-  // tests User.post in user controller
-  var testPostUser = function(dummyUser){
-    return User.post(dummyUser)
-      .then(function(user){
-        // checks if the user was added using a sequelize method
-        return userModel.findAndCountAll({where: {name: dummyUser.name}});
-      })
-      .then(function(result){
-        // check if findAndCountAll returned the one record we added
-        t.equal(result.count, 1, 'User.post posted ' + dummyUser.name +' to db!');
-        // clean up - remove the data we posted in our test  
-        return userModel.destroy({where: {name: dummyUser.name}});
-      })
-      .catch(function(err){
-        // if we get an error while posting or counting, we console.log, then delete the user if it was made
-        console.log(err, ' deleting user');
-        return userModel.destroy({where: {name: user.id}})
-          .then(function(){
-            console.log('users deleted');
-          })
-          .catch(function(err){
-            console.log(err, ' unable to delete users...');
-          });
-      });
-  };
-
-  //test User.put
-  var testPutUser = function(){
-    return User.post(dummyUser1)
-      .then(function(user){
-        // save the id on the dummy for the update test
-        dummyUser1.id = user.id;
-        return User.put(dummyUser1Update);
-      })
-      .then(function(){  
-        return userModel.findById(dummyUser1.id);
-      })
-      .then(function(user){
-        t.equal(user.email, dummyUser1.email, 'User.put updates email');
-        t.equal(user.status, dummyUser1.status, 'User.put updates status');
-        return userModel.destroy({where: {id: user.id}});
-      })
-      .catch(function(err){
-        console.log(err);
-        return userModel.destroy({where: {id: dummyUser1.id}});
-      });
-  };
 
   var testGetUser = function(dummyUser){
     var testUser = userModel.build(dummyUser);
@@ -146,13 +106,13 @@ test('----- User Controller Methods -----\n\n', function(t) {
   };
 
   var testRemoveUser = function(){
-    return User.post(dummyUser1)
+    return User.post(dummyUser5)
       .then(function(user){
-        dummyUser1.id = user.id;
+        dummyUser5.id = user.id;
         return User.remove(user.id);
       })
       .then(function(){
-        return userModel.findAndCountAll({where: {id: dummyUser1.id}});
+        return userModel.findAndCountAll({where: {id: dummyUser5.id}});
       })
       .then(function(result){
         t.equal(result.count, 0, 'User.remove deletes from db!');
@@ -165,21 +125,18 @@ test('----- User Controller Methods -----\n\n', function(t) {
 
   // run tests! use map so that we run the same 
   Promise.map(dummyUsers, function(user){
-    return testPostUser(user);
+    return testHelpers.testPost(User.post, user, userModel, t);
   })
+    .then(function(){
+      return testHelpers.testPut(User.put, dummyUser1, dummyUser1Update, userModel, t);
+    })
     .then(function(){
       return Promise.map(dummyUsers, function(user){
         testGetUser(user);
       });
     })
-    .then(function(){
-      return testPutUser();
-    })
-    .then(function(){
+    .spread(function(){
       return testRemoveUser();
-    })
-    .then(function(){
-      t.end();
     })
     .catch(function(err){
       console.log(err);
