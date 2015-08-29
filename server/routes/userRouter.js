@@ -2,6 +2,7 @@ var bodyParser = require('body-parser');
 var auth = require('../middleware').auth;
 
 var jsonParser = bodyParser.json();
+
 module.exports = function(app) {
   app.get('/api/users', jsonParser, auth.isAuthorized, function(req, res, next) {
     // Get list of users
