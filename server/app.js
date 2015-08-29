@@ -12,7 +12,7 @@ var session = require('express-session');
 var middleware = require('./middleware');
 var morgan = require('morgan');
 var passport = require('passport');
-var sequelize = require('./components/dbconfig').sequelize;
+var sequelize = require('./components').sequelize;
 
 // UTILITIES
 var utils = require('./utils');
