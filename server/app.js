@@ -8,8 +8,11 @@ var compression = require('compression');
 var favicon = require('serve-favicon');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
+var session = require('express-session');
 var middleware = require('./middleware');
 var morgan = require('morgan');
+var passport = require('passport');
+var sequelize = require('./components/dbconfig').sequelize;
 
 // UTILITIES
 var utils = require('./utils');
@@ -18,14 +21,31 @@ var utils = require('./utils');
 var config = require('./config.js').get(process.env.NODE_ENV);
 var port = process.env.PORT || 3000;
 
+// initialize passport settings
+require('./components/user/passport')(passport, config);
+
+// initialize database
+require('./components/dbconfig');
+
 // ROUTES
 var routes = require('./routes');
 
-// connect to DB here and do following in callback:
 
+sequelize.sync().then(function() {
+  app.use(morgan('dev'));
+  app.use(cookieParser());
 
-routes(app);
+  // using sessions for auth for now
+  app.use(session({
+    secret: 'iron oxide',
+  }));
 
-app.listen(port, function() {
-  console.log('Server running on port ' + port);
+  app.use(passport.initialize());
+  app.use(passport.session());
+
+  routes(app, passport);
+
+  app.listen(port, function() {
+    console.log('Server running on port ' + port);
+  });
 });
