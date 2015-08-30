@@ -17,16 +17,19 @@ var parseUrl = require('../../utils/parseURL.js');
 // it of http:// and www. stuff before saving
 // to the database.
 var fixUrl = function(obj) {
-  console.log('Check Obj: ', obj)
+  var tempObj = {}
+    //console.log('Check Obj: ', obj)
   if (obj.path) {
-    obj.path = parseUrl(obj.path);
+    tempObj.path = obj.path
+    tempObj.path = parseUrl(tempObj.path);
   }
 
-  return obj;
+  return tempObj;
 }
 
 // GET a URL from the database
 var get = function(searchObject) {
+  //console.log("Search Object: ", searchObject)
   searchObject = fixUrl(searchObject);
   return Url.findOne({
       where: searchObject
@@ -58,11 +61,10 @@ var save = function(urlObject) {
 // associated comments from the database as well,
 // but this might not matter since we won't display
 // them anyway.
-var remove = function(urlId) {
+var remove = function(urlObject) {
+  urlObject = fixUrl(urlObject);
   return Url.destroy({
-      where: {
-        id: urlId
-      }
+      where: urlObject
     })
     .then(function(affectedRows) {
       console.log(affectedRows);
