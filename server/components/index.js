@@ -1,7 +1,10 @@
 var Sequelize = require('sequelize');
 var config = require('../config').get().dbconfig;
 
-var sequelize = new Sequelize( config.name, config.username, config.password);
+var sequelize = new Sequelize(config.name, config.username, config.password, {
+  // disable logging; default: console.log
+  logging: false
+});
 
 var models = {
   'User': 'user/userModel',
@@ -25,8 +28,12 @@ for (var k in models) {
   });
   m.User.hasMany(m.Comment);
 
-  m.Group.belongsToMany(m.User, {through: 'UserGroup'});
-  m.User.belongsToMany(m.Group, {through: 'UserGroup'});
+  m.Group.belongsToMany(m.User, {
+    through: 'UserGroup'
+  });
+  m.User.belongsToMany(m.Group, {
+    through: 'UserGroup'
+  });
 
   m.Heart.belongsTo(m.User, {
     foreignKey: {
@@ -57,12 +64,12 @@ for (var k in models) {
       allowNull: false
     },
     onDelete: 'cascade'
-  });  
+  });
   m.Comment.hasMany(m.Heart);
 
 
   m.Comment.belongsTo(m.Group);
-  m.Group.hasMany(m.Comment);  
+  m.Group.hasMany(m.Comment);
 
   m.Comment.belongsTo(m.Url, {
     foreignKey: {
