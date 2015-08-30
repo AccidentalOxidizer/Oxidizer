@@ -13,12 +13,13 @@ var parseUrl = require('../../utils/parseURL.js');
  *  }
  */
 
+// This function parses the URL and strips
+// it of http:// and www. stuff before saving
+// to the database.
 var fixUrl = function(obj) {
   console.log('Check Obj: ', obj)
   if (obj.path) {
-    console.log("BEFORE FIX PATH: ", obj.path);
     obj.path = parseUrl(obj.path);
-    console.log("After FIX PATH: ", obj.path);
   }
 
   return obj;
@@ -39,19 +40,17 @@ var get = function(searchObject) {
 };
 
 // Write a new URL to the database
-var post = function(urlObject) {
+var save = function(urlObject) {
   urlObject = fixUrl(urlObject);
-  console.log('Hi Dave, POST URL: ', urlObject);
-  return User.findOrCreate({
+  return Url.findOrCreate({
       where: urlObject
     })
     .spread(function(url, created) {
-      if (!created) {
-        throw new Error('Error posting to db');
-      } else {
-        return url;
-      }
-    });
+      return url;
+    })
+    .catch(function(err) {
+      console.log('Error saving url to db: ', err);
+    })
 };
 
 // DELETE a URL from the database.
@@ -82,5 +81,5 @@ var remove = function(urlId) {
 
 
 exports.get = get;
-exports.post = post;
+exports.save = save;
 exports.remove = remove;

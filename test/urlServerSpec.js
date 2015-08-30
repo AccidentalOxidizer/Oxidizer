@@ -12,7 +12,7 @@ test('----- URL Controller Methods -----\n\n', function(t) {
 
   // Fake data for tests
   var fakeURL1 = {
-    path: 'http://ggle.com'
+    path: 'http://google.com'
   };
 
   var fakeURL2 = {
@@ -54,25 +54,27 @@ test('----- URL Controller Methods -----\n\n', function(t) {
 
   var resultUrl;
   var testGetUrl = function(url) {
-    var saveTestUrl = urlModel.build(url);
-    return saveTestUrl.save()
-      .then(function() {
-        //console.log("DATA SAVED!!!");
-        return Url.get(url);
-      })
-      .then(function(result) {
-        console.log("RESULT 64: ", result);
-      })
-      .catch(function(err) {
-        console.log("Awwww, error.", err);
-      })
+    Url.save(url);
+
+    // var saveTestUrl = urlModel.build(url);
+    // return saveTestUrl.save()
+    //   .then(function() {
+    //     //console.log("DATA SAVED!!!");
+    //     return Url.get(url);
+    //   })
+    //   .then(function(result) {
+    //     console.log("RESULT 64: ", result);
+    //   })
+    //   .catch(function(err) {
+    //     console.log("Awwww, error.", err);
+    //   })
   }
 
   Promise.promisify(testGetUrl);
   testGetUrl(fakeURL1)
-    .then(function() {
-      console.log("Saved: ", resultUrl);
-    })
+    // .then(function() {
+    //   //console.log("Saved: ", resultUrl);
+    // })
 
   t.end();
   // run tests! use map so that we run the same 
