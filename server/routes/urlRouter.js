@@ -8,6 +8,7 @@ var jsonParser = bodyParser.json();
 module.exports = function(app) {
   app.get('/api/urls', jsonParser, auth.isAuthorized, function(req, res, next) {
     // Get list of urls
+    res.send(200, "Should return list of all urls.");
   });
 
   //  app.get('/api/urls/:id', jsonParser, auth.isLoggedIn, function(req, res, next) {
@@ -34,15 +35,13 @@ module.exports = function(app) {
       .then(function(url) {
         res.send(200, url);
       })
-
-    //console.log(urlToGet);
   });
 
   //app.post('/api/urls', jsonParser, auth.isAdmin, function(req, res, next) {
   app.post('/api/urls', jsonParser, function(req, res, next) {
     /**
-     * This is setup as an object since we specifically ask for a
-     * search object in our URL get controller.
+     * This is setup as an object since we specifically ask
+     * for an object to save in our URL get controller.
      */
     var urlToSave = {
       path: req.body.url
@@ -69,7 +68,16 @@ module.exports = function(app) {
     // Updates url!
   });
 
-  app.delete('/api/urls/:id', jsonParser, auth.isAdmin, function(req, res, next) {
+  //app.delete('/api/urls/:id', jsonParser, auth.isAdmin, function(req, res, next) {
+  app.delete('/api/urls/:url', jsonParser, function(req, res, next) {
     // Delete a url!
+    var urlToDelete = {
+      path: decodeURIComponent(req.params.url)
+    };
+
+    urlHelper.remove(urlToDelete)
+      .then(function(url) {
+        res.send(200, "Deleted: " + urlToDelete.path);
+      })
   });
 }

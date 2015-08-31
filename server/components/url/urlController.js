@@ -80,7 +80,7 @@ var remove = function(urlObject) {
       }
     })
     .catch(function(error) {
-      throw new Error(error);
+      console.log("URL deletion failed! ", error);
     });
 };
 
