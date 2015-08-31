@@ -9,7 +9,12 @@ module.exports = function(app) {
     res.send(200);
   });
 
-  app.get('/api/comments/:id', jsonParser, auth.isLoggedIn, function(req, res, next) {
+  app.get('/api/comments/url/:urlid', jsonParser, auth.isLoggedIn, function(req, res, next) {
+    // Get all comments for a specific URL
+    res.send(200);
+  });
+
+  app.get('/api/comments/id/:id', jsonParser, auth.isLoggedIn, function(req, res, next) {
     // Get individual comment
     res.send(200);
   });
