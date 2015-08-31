@@ -6,7 +6,8 @@ var urlHelper = Promise.promisifyAll(require('../components/url'));
 var jsonParser = bodyParser.json();
 
 module.exports = function(app) {
-  app.get('/api/urls', jsonParser, auth.isAuthorized, function(req, res, next) {
+  //app.get('/api/urls', jsonParser, auth.isAuthorized, function(req, res, next) {
+  app.get('/api/urls', jsonParser, function(req, res, next) {
     // Get list of urls
     res.send(200, "Should return list of all urls.");
   });
@@ -55,7 +56,8 @@ module.exports = function(app) {
     // Save URL to database if it doesn't exist.
     // This method checks whether or not it's already in the database.
     urlHelper.save(urlToSave)
-      .then(function() {
+      .then(function(url) {
+        console.log("URL ID? ", url.get('id'));
         res.send(201, "Encoded URL: " + encodedURL);
       })
       .catch(function(err) {
