@@ -1,3 +1,4 @@
+var config = '';
 // listen for incoming message by chrome tab
 chrome.runtime.onMessage.addListener(
   function(request, sender, sendResponse) {
@@ -5,17 +6,16 @@ chrome.runtime.onMessage.addListener(
     if (request.type === "init") {
       // call server with get request for data.
       var xhr = new XMLHttpRequest();
-      xhr.open("GET", "http://localhost:3000/test/comments", true);
+      xhr.open("GET", config.server + "/test/comments", true);
       xhr.onreadystatechange = function() {
         if (xhr.readyState === 4 && xhr.status === 200) {
           // JSON.parse does not evaluate the attacker's scripts.
           var resp = JSON.parse(xhr.responseText);
           sendResponse({
-            dev: "rust.js responding to message from chrome tab",
-            data: resp,
-            add: 'something',
-            request: request,
-            sender: sender
+            // dev: "rust.js responding to message from chrome tab",
+            data: resp
+              // request: request,
+              // sender: sender
           });
         }
       }
@@ -24,10 +24,10 @@ chrome.runtime.onMessage.addListener(
       return true;
     }
 
-    // if conent script is sending data to post a new comment
+    // post a new comment
     if (request.type === 'post') {
       var xhr = new XMLHttpRequest();
-      xhr.open('POST', 'http://localhost:3000/test/comments');
+      xhr.open('POST', config.server + 'test/comments');
       xhr.setRequestHeader('Content-Type', 'application/json');
 
       xhr.onreadystatechange = function() {
@@ -45,7 +45,56 @@ chrome.runtime.onMessage.addListener(
       }));
       return true;
     }
+
+    // testing if authenticated with server
+    if (request.type === 'test') {
+      var xhr = new XMLHttpRequest();
+      xhr.open("GET", config.server + "/test/auth", true);
+      xhr.setRequestHeader('Content-Type', 'application/json');
+      xhr.onreadystatechange = function() {
+        if (xhr.readyState === 4 && xhr.status === 200) {
+          var resp = JSON.parse(xhr.responseText);
+          sendResponse({
+            data: resp
+          })
+        }
+      }
+      xhr.send();
+      return true;
+    }
+
+    // handle logout
+    if (request.type === 'logout') {
+      var xhr = new XMLHttpRequest();
+      xhr.open("GET", config.server + "/api/auth/chrome/logout", true);
+      xhr.setRequestHeader('Content-Type', 'application/json');
+      xhr.onreadystatechange = function() {
+        if (xhr.readyState === 4) {
+          var resp = JSON.parse(xhr.responseText);
+          sendResponse({
+            data: resp
+          })
+        }
+      }
+      xhr.send();
+      return true;
+    }
   });
+
+
+/* MAGIC HAPPENS HERE */
+
+// read configuration file & set config variable
+var getConfig = function() {
+  var xhr = new XMLHttpRequest();
+  xhr.onreadystatechange = function() {
+    config = JSON.parse(xhr.responseText);
+  };
+  xhr.open("GET", chrome.extension.getURL('config.json'), true);
+  xhr.send();
+}
+
+getConfig();
 
 // load content script (comment.js) each time chrome tab is updated & completed for specfic tab
 chrome.tabs.onUpdated.addListener(function(tabId, info) {
@@ -56,3 +105,10 @@ chrome.tabs.onUpdated.addListener(function(tabId, info) {
   }
 
 });
+
+
+/*
+Oauth 
+Client ID:  837204469183-nklfavnlll2v6jh0ku65tieuvc6qmhn1.apps.googleusercontent.com ; 
+Secret:  mXAPIt-gVJqr4NeXIvVFTi_M
+*/

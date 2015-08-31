@@ -5,12 +5,12 @@
 
 // content script running for each chrome tab window injected by the extension rust.js
 var url = document.location.href;
-var dataAttribute = 'data-rust-identiy';
+var dataAttribute = 'data-rust-identity';
 var dataAttributeValue = 'identity';
 
 // remove DOM element from previous calls
 var cleanDOM = function() {
-  var old = document.querySelector('[data-rust-identiy="identity"]') || undefined;
+  var old = document.querySelector('[data-rust-identity="identity"]') || undefined;
   if (old !== undefined) {
     document.body.removeChild(old);
   }
@@ -30,6 +30,7 @@ var templating = function(comments) {
 // add input field functionlity to html output
 var inputField = function(html) {
   var inputElement = '<input id="rustsubmit" type="text" name="comment"/><div class="submit-comment">Submit</div>';
+  inputElement += '<a id="test">Auth Test</a> || <a href="http://localhost:3000/api/auth/chrome/google">Login link test</a>';
   html += inputElement;
   return html;
 }
@@ -45,10 +46,10 @@ var appendToDOM = function(html) {
 
 // register all the events chrome needs to handle
 var registerEventListeners = function() {
-  var rust = document.querySelector('[data-rust-identiy="identity"]');
+  var rust = document.querySelector('[data-rust-identity="identity"]');
   rust.querySelector('#rustsubmit').addEventListener('keydown', function(e) {
     // if user hits enter key
-    if (e.keyCode == 13) {
+    if (e.keyCode === 13) {
       var text = document.getElementById('rustsubmit').value;
       // send message to background script rust.js with new coment data tp be posted to server
       chrome.runtime.sendMessage({
@@ -62,6 +63,16 @@ var registerEventListeners = function() {
 
     }
   });
+
+  // test if user is authenticated
+  document.querySelector('#test').addEventListener('click', function() {
+    chrome.runtime.sendMessage({
+      type: 'test'
+    }, function(response) {
+      console.log('auth test response:');
+      console.log(response);
+    });
+  });
 }
 
 /* MAGIC HAPPENS HERE */
@@ -73,10 +84,14 @@ chrome.runtime.sendMessage({
   if (response.data.comments) {
     console.log('Response:', response);
     cleanDOM();
+    var html = '';
+    if (response.data.name) {
+      html = '<div>Hello, ' + response.data.name + '</div>';
+    }
     // templating
-    var html = templating(response.data.comments);
+    html += templating(response.data.comments);
     // add input field
-    var html = inputField(html);
+    html = inputField(html);
     // append to document
     appendToDOM(html);
     // register event listeners for user input

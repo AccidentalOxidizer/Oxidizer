@@ -37,8 +37,18 @@ module.exports = function(app) {
     });
   });
 
+  app.get('/test/auth', auth.isLoggedIn, function(req, res, next) {
+    console.log('auth testing route for chrome extension');
+    res.status(200).send({
+      auth: 'ok'
+    });
+  })
+
   app.get('/test/comments', jsonParser, function(req, res, next) {
-    console.log(dummyData);
+    if (req.user) {
+      console.log('Req user,', req.user);
+      dummyData.name = req.user.name;
+    }
     res.status(200).send(dummyData);
   });
 };

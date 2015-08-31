@@ -1,10 +1,13 @@
 {
   "name": "Rust",
   "description": "The Commenting System of the Internet",
-  "version": "0.1",
+  "version": "0.2",
   "permissions": [
     "http://localhost:3000/test/comments",
     "http://127.0.0.1:3000/test/comments",
+    "http://localhost:4568/*",
+    "http://localhost:4568/auth/github",
+    "http://localhost:4568/auth/github/callback",
     "activeTab",
     "webNavigation",
     "tabs",
@@ -34,8 +37,7 @@
     "chrome_style": true
   },
   "web_accessible_resources": [
-    "cleanslate.css",
-    "http://localhost:3000/*"
+    "cleanslate.css"
   ],
   "content_scripts": [{
     "css": ["cleanslate.css", "comment.css"],

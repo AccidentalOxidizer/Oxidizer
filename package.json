@@ -2,7 +2,7 @@
   "name": "rustcomments",
   "version": "0.0.1",
   "description": "A commenting system for the entire internet.",
-  "main": "app.js",
+  "main": "server/app.js",
   "scripts": {
     "test": "faucet",
     "start": "nodemon server/app.js"
