@@ -13,9 +13,16 @@ module.exports = function(app) {
   //  app.get('/api/urls/:id', jsonParser, auth.isLoggedIn, function(req, res, next) {
   app.get('/api/urls/:url', jsonParser, function(req, res, next) {
     // Get individual url
-    var urlToGet = decodeURIComponent(req.params.url);
-    console.log(urlToGet);
-    res.send(200, "Decoded URL: " + urlToGet);
+    var urlToGet = {
+      path: decodeURIComponent(req.params.url)
+    };
+
+    urlHelper.get(urlToGet)
+      .then(function(url) {
+        res.send(200, url);
+      })
+
+    //console.log(urlToGet);
   });
 
   //app.post('/api/urls', jsonParser, auth.isAdmin, function(req, res, next) {
@@ -25,7 +32,7 @@ module.exports = function(app) {
       path: req.body.url
     }
 
-    console.log(urlToSave);
+    //console.log(urlToSave);
 
     // Encoded UR
     var encodedURL = encodeURIComponent(urlToSave.path);
