@@ -1,6 +1,7 @@
 var bodyParser = require('body-parser');
 var auth = require('../middleware').auth;
-var url = require('../components/url');
+var Promise = require('bluebird');
+var urlHelper = Promise.promisifyAll(require('../components/url'));
 
 var jsonParser = bodyParser.json();
 
@@ -9,18 +10,36 @@ module.exports = function(app) {
     // Get list of urls
   });
 
-  app.get('/api/urls/:id', jsonParser, auth.isLoggedIn, function(req, res, next) {
+  //  app.get('/api/urls/:id', jsonParser, auth.isLoggedIn, function(req, res, next) {
+  app.get('/api/urls/:url', jsonParser, function(req, res, next) {
     // Get individual url
+    var urlToGet = decodeURIComponent(req.params.url);
+    console.log(urlToGet);
+    res.send(200, "Decoded URL: " + urlToGet);
   });
 
   //app.post('/api/urls', jsonParser, auth.isAdmin, function(req, res, next) {
   app.post('/api/urls', jsonParser, function(req, res, next) {
     // Add new url!
-    var urlToSave = req.body.url;
+    var urlToSave = {
+      path: req.body.url
+    }
+
     console.log(urlToSave);
 
+    // Encoded UR
+    var encodedURL = encodeURIComponent(urlToSave.path);
 
-    res.send('Hahaha');
+    // Save URL to database if it doesn't exist.
+    // This method checks whether or not it's already in the database.
+    urlHelper.save(urlToSave)
+      .then(function() {
+        res.send(201, "Encoded URL: " + encodedURL);
+      })
+      .catch(function(err) {
+        res.send(403);
+      })
+
   });
 
   app.put('/api/urls/:id', jsonParser, auth.isAdmin, function(req, res, next) {
