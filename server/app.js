@@ -38,6 +38,8 @@ sequelize.sync().then(function() {
   // using sessions for auth for now
   app.use(session({
     secret: 'iron oxide',
+    resave: false,
+    saveUninitialized: true
   }));
 
   app.use(passport.initialize());

@@ -3,9 +3,9 @@ var Promise = require('bluebird');
 
 module.exports = function(sequelize, dataTypes) {
   return sequelize.define('User', {
+    // Display Name: required, but doesn't need to be unique
     name: {
       type: dataTypes.STRING,
-      unique: true,
       allowNull: false
     },
 
