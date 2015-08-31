@@ -35,7 +35,10 @@ var get = function(searchObject) {
       where: searchObject
     })
     .then(function(result) {
-      return result.get('path');
+      urlInfo = {}
+      urlInfo.id = result.get('id');
+      urlInfo.path = result.get('path');
+      return urlInfo;
     })
     .catch(function(err) {
       console.log("GET url error: ", err);
