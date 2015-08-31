@@ -1,5 +1,10 @@
 var User = require('../').User;
 
+var getAll = function(searchObject){
+  console.log('here');
+  return User.findAll(searchObject);
+};
+
 var get = function(searchObject){
   return User.findOne({where: searchObject});
 };
@@ -21,7 +26,6 @@ var put = function(userid, updatesObject){
   console.log(updatesObject);
   return User.update(updatesObject, {where: {id: userid}})
     .then(function(user){
-      console.log('................');
       return true;
     })
     .catch(function(error){
@@ -48,6 +52,7 @@ var remove = function(userId){
 
 
 exports.get = get;
+exports.getAll = getAll;
 exports.post = post;
 exports.put = put;
 exports.remove = remove;

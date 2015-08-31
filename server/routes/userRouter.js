@@ -4,6 +4,17 @@ var User = require('../components/user');
 var jsonParser = bodyParser.json();
 
 module.exports = function(app) {
+  app.get('/api/users/', jsonParser, function(req, res, next) {
+    console.log(User);
+    User.getAll({})
+      .then(function(users){
+        console.log(users);
+        res.json(users);
+      })
+      .catch(function(){
+        res.send(404);
+      });
+  });
 
   // TODO: add isAuthorized
   app.get('/api/users/:userid', jsonParser, function(req, res, next) {
