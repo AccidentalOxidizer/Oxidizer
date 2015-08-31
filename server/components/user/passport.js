@@ -1,6 +1,6 @@
 var LocalStrategy = require('passport-local').Strategy;
 var GoogleStrategy = require('passport-google-oauth').OAuth2Strategy;
-// var FacebookStrategy = require('passport-facebook').Strategy;
+var FacebookStrategy = require('passport-facebook').Strategy;
 var config = require('../../config.js').get(process.env.NODE_ENV);
 var User = require('../index')['User'];
 
@@ -68,9 +68,20 @@ module.exports = function(passport, config) {
       User.findOne({email: email})
         .then(function(user) {
           if (user) {
-            console.log("GoogleStrategy: found valid user with id: " + profile.id);
+            console.log("GoogleStrategy: found valid user with email " + email);
             console.log(user);
-            return done(null, user);
+
+            // If the Google data hasn't been set up yet, we have a case in
+            // which we need to link the info to an existing user.
+            if (!user.googleId) {
+              console.log("GoogleStrategy: updating user with id " + profile.id);
+              user.googleId = profile.id;
+              user.googleToken = accessToken;
+              user.googleName = profile.displayName;
+              return user.save();
+            } else {
+              return done(null, user);
+            }
           }
 
           // if the user wasn't already in the db, create a new entry
@@ -81,6 +92,59 @@ module.exports = function(passport, config) {
             googleId: profile.id,
             googleToken: accessToken,
             googleName: profile.displayName
+          });
+
+          return newUser.save();
+        })
+        .then(function(user) {
+          return done(null, user);
+        })
+        .catch(function(err) {
+          return done(err);
+        });
+    })
+  );
+
+  // Facebook OAuth
+  passport.use('facebook', new FacebookStrategy({
+      clientID: config.facebookAuth.clientId,
+      clientSecret: config.facebookAuth.clientSecret,
+      callbackURL: config.facebookAuth.callbackUrl,
+      profileFields: ['emails', 'id', 'displayName']
+    },
+    function(accessToken, refreshToken, profile, done) {
+      console.log('Passport: using FacebookStrategy');
+      console.log(profile);
+
+      var email = profile.emails[0].value;
+
+      User.findOne({email: email})
+        .then(function(user) {
+          if (user) {
+            console.log("FacebookStrategy: found valid user with email " + email);
+            console.log(user);
+
+            // If the fb data hasn't been set up yet, we have a case in
+            // which we need to link fb info to an existing user.
+            if (!user.fbId) {
+              console.log("FacebookStrategy: updating user with id " + profile.id);
+              user.fbId = profile.id;
+              user.fbToken = accessToken;
+              user.fbName = profile.displayName;
+              return user.save();
+            } else {
+              return done(null, user);
+            }
+          }
+
+          // if the user wasn't already in the db, create a new entry
+          console.log("FacebookStrategy: creating new user " + email);
+          var newUser = User.build({
+            name: profile.displayName,
+            email: email,
+            fbId: profile.id,
+            fbToken: accessToken,
+            fbName: profile.displayName
           });
 
           return newUser.save();
