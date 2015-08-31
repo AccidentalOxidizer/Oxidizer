@@ -21,7 +21,7 @@ var dummyData = {
     privacy: false,
     id_groups: 0
   }]
-}
+};
 
 module.exports = function(app) {
   app.get('/dummyData', auth.isAuthorized, function(req, res, next) {
