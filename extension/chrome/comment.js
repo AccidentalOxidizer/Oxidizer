@@ -30,7 +30,7 @@ var templating = function(comments) {
 // add input field functionlity to html output
 var inputField = function(html) {
   var inputElement = '<input id="rustsubmit" type="text" name="comment"/><div class="submit-comment">Submit</div>';
-  inputElement += '<a id="dummytest">Auth Test</a>';
+  inputElement += '<a id="test">Auth Test</a> || <a href="http://localhost:3000/api/auth/chrome/google">Login link test</a>';
   html += inputElement;
   return html;
 }
@@ -64,12 +64,12 @@ var registerEventListeners = function() {
     }
   });
 
-  document.querySelector('#dummytest').addEventListener('click', function() {
-    console.log('dummytest');
+  // test if user is authenticated
+  document.querySelector('#test').addEventListener('click', function() {
     chrome.runtime.sendMessage({
-      type: 'dummytest'
+      type: 'test'
     }, function(response) {
-      console.log('more dummytest');
+      console.log('auth test response:');
       console.log(response);
     });
   });
@@ -84,10 +84,14 @@ chrome.runtime.sendMessage({
   if (response.data.comments) {
     console.log('Response:', response);
     cleanDOM();
+    var html = '';
+    if (response.data.name) {
+      html = '<div>Hello, ' + response.data.name + '</div>';
+    }
     // templating
-    var html = templating(response.data.comments);
+    html += templating(response.data.comments);
     // add input field
-    var html = inputField(html);
+    html = inputField(html);
     // append to document
     appendToDOM(html);
     // register event listeners for user input

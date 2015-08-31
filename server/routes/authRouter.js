@@ -23,29 +23,19 @@ module.exports = function(app, passport) {
     failureRedirect: '/login'
   }));
 
-  // testing google oauth for chrome extension
-  app.get('/api/auth/chrome/google', jsonParser, passport.authenticate('google'), function(req, res) {
-    // req.user contains the authenticated user.
-    // return json object rather than redirect anywhere
-    // res.redirect('/users/' + req.user.username);
-    // if req.user
-    if (req.user) {
-      res.status(201).send({
-        data: 'ok',
-        user: req.user
-      });
-    } else {
-      res.status(401).send({
-        data: 'not ok'
-      });
-    }
-  });
+  // google oauth for chrome extension (we should have own IDs for this maybe)
+  app.get('/api/auth/chrome/google', urlEncodedParser, jsonParser, passport.authenticate('google', {
+    scope: ['https://www.googleapis.com/auth/plus.login',
+      'https://www.googleapis.com/auth/plus.profile.emails.read'
+    ]
+  }));
 
-  // testing google oauth for chrome extension
-  app.get('/api/auth/chrome/google/callback', jsonParser, passport.authenticate('google'), function() {
+  // google oauth for chrome extension callback url (does not work without new google id for this..)
+  app.get('/api/auth/chrome/google/callback', urlEncodedParser, jsonParser, passport.authenticate('google'), function() {
+    console.log('here: /api/auth/chrome/google/callback');
     if (req.user) {
       res.status(201).send({
-        data: 'ok',
+        data: 'seems ok',
         user: req.user
       });
     } else {
@@ -53,6 +43,21 @@ module.exports = function(app, passport) {
         data: 'not ok'
       });
     }
+  })
+
+  // route to logout user from chrome extension
+  app.get('/api/auth/chrome/logout', function(req, res, next) {
+    console.log(req.sesison, req.user);
+    req.logOut();
+    req.logout();
+    req.session.destroy();
+    console.log('Sesison & User after logout: ', req.sesison, req.user);
+
+    // what's our cookie name?
+    // res.clearCookie('cookiename')
+    res.status(200).send({
+      auth: 'terminated'
+    });
   })
 
   // Facebook Auth Routes
