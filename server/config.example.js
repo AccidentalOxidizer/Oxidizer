@@ -2,6 +2,7 @@ var config = {
   production: {},
   staging: {},
   development: {
+    serverPath: 'http://pathtoserver',
     dbconfig: {
       name: 'db name',
       username: 'username',

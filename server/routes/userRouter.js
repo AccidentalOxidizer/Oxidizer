@@ -1,26 +1,38 @@
 var bodyParser = require('body-parser');
 var auth = require('../middleware').auth;
-
+var User = require('../components/user');
 var jsonParser = bodyParser.json();
 
 module.exports = function(app) {
-  app.get('/api/users', jsonParser, auth.isAuthorized, function(req, res, next) {
-    // Get list of users
+
+  // TODO: add isAuthorized
+  app.get('/api/users/:userid', jsonParser, function(req, res, next) {
+    var userId = req.params.userid;
+    User.get({id: userId})
+      .then(function(user){
+        res.json(user);
+      })
+      .catch(function(){
+        res.send(404);
+      });
   });
 
-  app.get('/api/users/:id', jsonParser, auth.isAuthorized, function(req, res, next) {
-    // Get individual user
-  });
-
-  app.post('/api/users', jsonParser, auth.isAuthorized, function(req, res, next) {
-    // Add new user!
-  });
-
-  app.put('/api/users/:id', jsonParser, auth.isAuthorized, function(req, res, next) {
+  // TODO: add isAuthorized
+  app.put('/api/users/:userid', jsonParser, function(req, res, next) {
     // Updates user!
+    var userId = req.params.userid;
+    var updates = req.body;
+    console.log(updates);
+    User.put(userId, updates)
+      .then(function(){
+        res.send(200);
+      })
+      .catch(function(){
+        res.send(403);
+      });
   });
 
   app.delete('/api/users/:id', jsonParser, auth.isAuthorized, function(req, res, next) {
-    // Delete a user!
+      var userId = req.params.userid;
   });
-}
+};

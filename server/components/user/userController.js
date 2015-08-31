@@ -18,8 +18,10 @@ var post = function(userObject){
 
 // will throw error if no id provided
 var put = function(userid, updatesObject){
+  console.log(updatesObject);
   return User.update(updatesObject, {where: {id: userid}})
-    .then(function(){
+    .then(function(user){
+      console.log('................');
       return true;
     })
     .catch(function(error){
