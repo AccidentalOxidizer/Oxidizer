@@ -1,5 +1,14 @@
-.rust {
-  /*color: red !important;*/
+
+
+
+#rustsuperid {
+  position: absolute !important;
+  /* top: 0 !important; */
+  right: 0 !important;
+}
+
+[data-rust-identity="identity"] {
+    /* Styles */
   position: fixed !important;
   bottom: 0px !important;
   right: 0px !important;
@@ -7,11 +16,4 @@
   border:1px solid grey !important;
   padding:5px !important;
   margin:5px !important;
-}
-
-
-#rustsuperid {
-  position: absolute !important;
-  /* top: 0 !important; */
-  right: 0 !important;
 }

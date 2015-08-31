@@ -5,12 +5,12 @@
 
 // content script running for each chrome tab window injected by the extension rust.js
 var url = document.location.href;
-var dataAttribute = 'data-rust-identiy';
+var dataAttribute = 'data-rust-identity';
 var dataAttributeValue = 'identity';
 
 // remove DOM element from previous calls
 var cleanDOM = function() {
-  var old = document.querySelector('[data-rust-identiy="identity"]') || undefined;
+  var old = document.querySelector('[data-rust-identity="identity"]') || undefined;
   if (old !== undefined) {
     document.body.removeChild(old);
   }
@@ -30,6 +30,7 @@ var templating = function(comments) {
 // add input field functionlity to html output
 var inputField = function(html) {
   var inputElement = '<input id="rustsubmit" type="text" name="comment"/><div class="submit-comment">Submit</div>';
+  inputElement += '<a id="dummytest">Auth Test</a>';
   html += inputElement;
   return html;
 }
@@ -45,10 +46,10 @@ var appendToDOM = function(html) {
 
 // register all the events chrome needs to handle
 var registerEventListeners = function() {
-  var rust = document.querySelector('[data-rust-identiy="identity"]');
+  var rust = document.querySelector('[data-rust-identity="identity"]');
   rust.querySelector('#rustsubmit').addEventListener('keydown', function(e) {
     // if user hits enter key
-    if (e.keyCode == 13) {
+    if (e.keyCode === 13) {
       var text = document.getElementById('rustsubmit').value;
       // send message to background script rust.js with new coment data tp be posted to server
       chrome.runtime.sendMessage({
@@ -61,6 +62,16 @@ var registerEventListeners = function() {
       });
 
     }
+  });
+
+  document.querySelector('#dummytest').addEventListener('click', function() {
+    console.log('dummytest');
+    chrome.runtime.sendMessage({
+      type: 'dummytest'
+    }, function(response) {
+      console.log('more dummytest');
+      console.log(response);
+    });
   });
 }
 

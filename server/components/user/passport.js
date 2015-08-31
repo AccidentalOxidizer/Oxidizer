@@ -22,22 +22,27 @@ module.exports = function(passport, config) {
 
   // Local Strategy
   passport.use('local', new LocalStrategy({
-      usernameField: 'email', 
+      usernameField: 'email',
       passwordField: 'password',
       passReqToCallback: true,
       // session: false
-    }, 
+    },
     function(req, email, password, done) {
       console.log('Passport: using LocalStrategy');
-
-      User.findOne({email: email})
+      User.findOne({
+          email: email
+        })
         .then(function(user) {
           if (!user) {
-            return done(null, false, { message: 'Invalid email address.' });
+            return done(null, false, {
+              message: 'Invalid email address.'
+            });
           }
           // found user -> check if password is correct
           if (!user.validPassword(password)) {
-            return done(null, false, { message: 'Invalid password.' });
+            return done(null, false, {
+              message: 'Invalid password.'
+            });
           }
           // success! return valid user
           console.log("LocalStrategy: found valid user");
@@ -47,8 +52,7 @@ module.exports = function(passport, config) {
         .catch(function(err) {
           return done(err);
         });
-    })
-  );
+    }));
 
   // Google OAuth
   passport.use('google', new GoogleStrategy({
@@ -65,7 +69,9 @@ module.exports = function(passport, config) {
       // We will potentially allow a user to link more than one social
       // account for authentication and authorization with the email
       // address being the common field
-      User.findOne({email: email})
+      User.findOne({
+          email: email
+        })
         .then(function(user) {
           if (user) {
             console.log("GoogleStrategy: found valid user with id: " + profile.id);
@@ -91,7 +97,6 @@ module.exports = function(passport, config) {
         .catch(function(err) {
           return done(err);
         });
-    })
-  );
+    }));
 
 };
