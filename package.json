@@ -1,6 +1,6 @@
 {
   "name": "rustcomments",
-  "version": "0.0.1",
+  "version": "0.0.3",
   "description": "A commenting system for the entire internet.",
   "main": "server/app.js",
   "scripts": {
