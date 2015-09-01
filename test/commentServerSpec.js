@@ -6,6 +6,9 @@ var userModel = require('../server/components').User;
 var urlModel = require('../server/components').Url;
 var Promise = require('bluebird');
 var testHelpers = require('./testHelpers');
+var request = Promise.promisifyAll(require('request'));
+var config = require('../server/config.js').get(process.env.NODE_ENV);
+var session = require('express-session');
 
 // TEST MODULES
 var test = require('tape');
@@ -249,7 +252,7 @@ test('----- Comment Router Tests -----\n\n', function(t) {
   };
   
   var dummyUrl = {
-    path: 'www.rustedserverwfunnycomments.io'
+    url: 'http://www.rustedserverwfunnycomments.io'
   };
 
   var dummyComment = {
@@ -260,65 +263,88 @@ test('----- Comment Router Tests -----\n\n', function(t) {
   var testCommentPostRequest = function(){
     var testUserId;
     var testUrlId;
+    var testCommentId;
     
     var testUser = userModel.build(dummyUser);
     var testUrl = urlModel.build(dummyUrl);
+    var dummyCommentCopy;
 
     return Promise.all([testUser.save(), testUrl.save()])
-      .then(function(data){
+      .spread(function(testUser, testUrl){
         testUserId = testUser.get('id');
         testUrlId = testUrl.get('id');
         
-        var dummyCommentCopy = {
+        dummyCommentCopy = {
           text: dummyComment.text,
           isPrivate: dummyComment.isPrivate,
-          UserId: testUser.get('id'),
-          UrlId: testUrl.get('id')
+          url: testUrl.get('url'),
+          user: {
+            id: testUser.get('id'),
+            name: testUser.get('name')
+          }
         };
-        var newComment = commentModel.build(dummyCommentCopy);
-        return newComment.save();
+        var req = request.postAsync({
+          url: config.serverPath + '/api/comments/', 
+          json: dummyCommentCopy,
+          session: testUserId
+        });
+
+        req = true;
+
+        return req;
       })
       .then(function(data){
         var attributes = ['text','user.id', 'user.name'];
+        testCommentId = 'somehting';
+
         return commentModel.findAll({
+          where: {id: data.id},
           include: [userModel],
           attributes: attributes
         });
       })
       .then(function(data){
-        console.log(data);
+        t.equal(data.text, dummyCommentCopy.text, 'comment text posts');
+        t.equal(data.user.name, dummyCommentCopy.text, 'comment text posts');
+
+        userModel.destroy({where: {id: testUserId}});
+        urlModel.destroy({where: {id: testUrlId}});
+        commentModel.destroy({where: {id: testCommentId}});
       })
       .catch(function(err){
+        userModel.destroy({where: {id: testUserId}});
+        urlModel.destroy({where: {id: testUrlId}});
+        commentModel.destroy({where: {id: testCommentId}});
         throw err;
       });
   };
 
-  testCommentPostRequest()
-    .then(function(data){
-      console.log('postRequest sucess', data);
-    })
-    .catch(function(err){
-      throw err;
-    });
+  // testCommentPostRequest()
+  //   .then(function(data){
+  //     console.log('postRequest success');
+  //   })
+  //   .catch(function(err){
+  //     throw err;
+  //   });
 
-  // Create a new comment with a user account?
-  t.equal(200, 200, 'New comment added!');
+  // // Create a new comment with a user account?
+  // t.equal(200, 200, 'New comment added!');
 
-  // Try to post a comment containing a word from a potential spam blacklist
-  // We haven't actually created this yet. 
-  t.equal(200, 200, 'Comment with word from blacklist ignored!');
+  // // Try to post a comment containing a word from a potential spam blacklist
+  // // We haven't actually created this yet. 
+  // t.equal(200, 200, 'Comment with word from blacklist ignored!');
 
-  // Favorite a comment and make sure fav count increases?
-  t.equal(200, 200, 'Comment successfully favorited');
+  // // Favorite a comment and make sure fav count increases?
+  // t.equal(200, 200, 'Comment successfully favorited');
 
-  // Flag a comment and make sure flag count increases?
-  t.equal(200, 200, 'Comment successfully flagged');
+  // // Flag a comment and make sure flag count increases?
+  // t.equal(200, 200, 'Comment successfully flagged');
 
-  // Delete a comment (and associated favs / flags)
-  t.equal(410, 410, 'Comment successfully deleted');
+  // // Delete a comment (and associated favs / flags)
+  // t.equal(410, 410, 'Comment successfully deleted');
 
-  // Try to post a comment as a banned / blocked user 
-  // (maybe comment is auto hidden)?
-  t.equal(500, 500, 'Banned account cannot comment');
+  // // Try to post a comment as a banned / blocked user 
+  // // (maybe comment is auto hidden)?
+  // t.equal(500, 500, 'Banned account cannot comment');
 
 });

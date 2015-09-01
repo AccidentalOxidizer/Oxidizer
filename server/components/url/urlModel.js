@@ -1,6 +1,6 @@
 module.exports = function(sequelize, dataTypes) {
   return sequelize.define('Url', {
-    path: {
+    url: {
       type: dataTypes.STRING,
       unique: true,
       allowNull: false

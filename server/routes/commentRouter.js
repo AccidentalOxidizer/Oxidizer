@@ -35,8 +35,26 @@ module.exports = function(app) {
     res.send(200);
   });
 
-  app.post('/api/comments', jsonParser, auth.isAuthorized, function(req, res, next) {
+  // add isAuth
+  app.post('/api/comments/', jsonParser,  function(req, res, next) {
     // Add a new comment!
+    console.log('%%%%%%%%%%', req);
+    Url.save({url: req.body.url})
+      .then(function(url){
+        return Comment.post({
+          text: req.body.text,
+          isPrivate: req.body.isPrivate,
+          UserId: req.user.id, 
+          UrlId: url.get('id')
+        });
+      })
+      .then(function(comment){
+        res.send(comment);
+      })
+      .catch(function(err){
+        console.log(err);
+        res.end(500);
+      });
   });
 
   app.put('/api/comments/:id', jsonParser, auth.isAuthorized, function(req, res, next) {

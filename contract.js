@@ -5,7 +5,8 @@
   // extension sends in parameter the url (and later group/ maybe isPrivate)
   var requestAllCommentsForPath = {
     url: 'string unparsed url',
-    lastUpdateTimestamp: 'lastUpdate'
+    lastUpdateTimestamp: 'lastUpdate',
+    isPrivate: 'boolean'
   };
   // will add date 
 
@@ -31,7 +32,7 @@
     text: 'comment string',
     isPrivate: 'boolean'   
   };
-  // username and id will be available token
+  // username and id will be available token at req.user.name
 
   // server responds with the newly created comment
   var extPostResponse = {
