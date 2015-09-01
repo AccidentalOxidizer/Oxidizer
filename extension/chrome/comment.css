@@ -7,6 +7,10 @@
   right: 0 !important;
 }
 
+#commentContainer > div.ownChild {
+    color: red !important;
+}
+
 [data-rust-identity="identity"] {
     /* Styles */
   position: fixed !important;
@@ -16,4 +20,12 @@
   border:1px solid grey !important;
   padding:5px !important;
   margin:5px !important;
+  z-index: 99999 !important;
+}
+
+[data-rust-identity="identity"] .ownChild {
+  color: red !important;
+}
+#commentContainer > div.ownChild, .ownChild {
+    color: red !important;
 }

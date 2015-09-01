@@ -11,9 +11,12 @@
     <a href="http://www.google.com">Google</a> -->
     <p>We should only show login if user not already logged in. 
     Either we check with server, or we save state in chrome.storage (background script)</p>
-    <a href="" id="login">Login</a> || <a href="" id="logout">Logout</a> <br>
-    <a href="" id="options">Options</a>
-
+    <a id="login">Login</a> || <a id="logout">Logout</a> || <a id="options">Options</a> 
+    <br>
+    <a id="popup" style="display: none;">Popup</a> 
+    
+    <div id="status"></div>
+  
   <script src="popup.js"></script>
 </body>
 </html>

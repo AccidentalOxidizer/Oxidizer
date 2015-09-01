@@ -1,31 +1,54 @@
-document.querySelector('#login').addEventListener('click', function() {
+// login
+
+var login = function() {
   chrome.tabs.create({
     url: 'http://localhost:3000/api/auth/chrome/google'
   });
-});
+}
 
-document.querySelector('#logout').addEventListener('click', function() {
-  //send message to background script .. 
+// logout 
+var logout = function() {
   chrome.runtime.sendMessage({
     type: 'logout'
   }, function(response) {
     console.log(response);
-    // this is not working for some reason.. 
-    $("body").append(document.createTextNode("Test"));
-    // this neither.. 
-    var msg = document.createElement('p');
-    msg.innerHTML = 'logout complete';
-    document.body.appendChild(msg);
-  })
-});
 
-document.querySelector('#options').addEventListener('click', function() {
+    var status = document.getElementById('status');
+    status.textContent = 'Logout.. done.';
+    setTimeout(function() {
+      // reset the status message after 2 seconds
+      status.textContent = '';
+    }, 2000);
+
+  })
+}
+
+// open the options page
+var options = function() {
   if (chrome.runtime.openOptionsPage) {
     chrome.runtime.openOptionsPage();
   } else {
+    // fallback
     window.open(chrome.runtime.getURL('options.html'));
   }
-});
+}
+
+// for debugging only..
+var popup = function() {
+  chrome.extension.sendMessage({
+    type: 'popup'
+  }, function(response) {
+    console.log(response);
+  })
+}
+
+// Register Events on DOM
+document.querySelector('#login').addEventListener('click', login);
+document.querySelector('#logout').addEventListener('click', logout);
+document.querySelector('#options').addEventListener('click', options);
+document.querySelector('#popup').addEventListener('click', popup);
+
+// nope..
 // $(document).ready(function() {
 //   $('body').on('click', 'a', function() {
 //     if ($(this).attr('href') === '') {
