@@ -1,8 +1,8 @@
 var bodyParser = require('body-parser');
 var auth = require('../middleware').auth;
-var url = require('url');
+var urlParser = require('url');
 var Promise = require('bluebird');
-var urlHelper = Promise.promisifyAll(require('../components/url'));
+var Url = Promise.promisifyAll(require('../components/url'));
 
 var jsonParser = bodyParser.json();
 
@@ -10,21 +10,17 @@ module.exports = function(app) {
   //app.get('/api/urls', jsonParser, auth.isAuthorized, function(req, res, next) {
   app.get('/api/urls*', jsonParser, function(req, res, next) {
     // Get url info
-    var url_parts = url.parse(req.url, true);
-    var fullPath = url_parts.path;
-
-    //Remove our API path from the actual path so we can get our real URL.
-    var fullPath = fullPath.replace('/api/urls/', '');
-    console.log("FULL PATH: ", fullPath);
+    var url_parts = urlParser.parse(req.url, true);
+    var fullPath = url_parts.query.url;
 
     var urlToGet = {
       path: fullPath
     };
 
-    urlHelper.get(urlToGet)
+    Url.get(urlToGet)
       .then(function(url) {
         res.send(200, url);
-      })
+      });
 
     //res.send(200, "Should return list of all urls.");
   });

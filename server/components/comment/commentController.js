@@ -1,7 +1,11 @@
 var Comment = require('../').Comment;
+var User = require('../').User;
 
 var get = function(searchObject){
-  return Comment.findAll({where: searchObject});
+  return Comment.findAll({
+    where: searchObject,
+    include: []
+  });
 };
 
 // takes an object with the following format
@@ -23,7 +27,7 @@ var put = function(commentid, updatesObject){
       return true;
     })
     .catch(function(error){
-      throw new Error(error);
+      throw error;
     });  
 };
 
@@ -40,7 +44,7 @@ var remove = function(commentId){
       }
     })
     .catch(function(error) {
-      throw new Error(error);
+      throw error;
     });
 };
 
