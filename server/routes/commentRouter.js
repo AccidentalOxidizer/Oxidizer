@@ -1,16 +1,32 @@
 var bodyParser = require('body-parser');
 var auth = require('../middleware').auth;
-
+var urlParser = require('url');
+var Promise = require('bluebird');
+var Url = Promise.promisifyAll(require('../components/url'));
+var Comment = Promise.promisifyAll(require('../components/comment'));
 var jsonParser = bodyParser.json();
 
 module.exports = function(app) {
-  app.get('/api/comments', jsonParser, auth.isLoggedIn, function(req, res, next) {
-    // Get list of comments
-    res.send(200);
-  });
-
-  app.get('/api/comments/url/:urlid', jsonParser, auth.isLoggedIn, function(req, res, next) {
+  // TODO: isLoggedIn
+  app.get('/api/comments/url*', jsonParser, function(req, res, next) {
     // Get all comments for a specific URL
+    var url_parts = url.parse(req.url, true);
+    var fullPath = url_parts.path;
+
+    var urlToGet = {
+      path: fullPath
+    };
+
+    Url.get(urlToGet)
+      .then(function(url) {
+        return Comment.get({id: url.id});
+      })
+      .then(function(comments){
+
+      })
+      .catch(function(err){
+        return err;
+      });
     res.send(200);
   });
 

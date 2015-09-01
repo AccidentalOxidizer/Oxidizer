@@ -33,118 +33,118 @@ var test = require('tape');
 // test('----- User Controller Methods -----\n\n', function(t) {
 
 
-//   // dummy info for tests
-//   var dummyUser1 = {
-//     name: 'eliotdummy',
-//     email: 'eliot@eliot.com',
-//     status: 1
-//   };
+  // dummy info for tests
+  var dummyUser1 = {
+    name: 'eliotdummy',
+    email: 'eliot@eliot.com',
+    status: 1
+  };
 
-//   var dummyUser2 = {
-//     name: 'davedummy',
-//     email: 'dave@dave.com',
-//     status: 1
-//   };
+  var dummyUser2 = {
+    name: 'davedummy',
+    email: 'dave@dave.com',
+    status: 1
+  };
   
-//   var dummyUser3 = {
-//     name: 'matthiasdummy',
-//     email: 'matthias@matthias.com',
-//     status: 1
-//   };
+  var dummyUser3 = {
+    name: 'matthiasdummy',
+    email: 'matthias@matthias.com',
+    status: 1
+  };
 
-//   var dummyUser4 = {
-//     name: 'emilydummy',
-//     email: 'emily@emily.com',
-//     status: 1
-//   };  
+  var dummyUser4 = {
+    name: 'emilydummy',
+    email: 'emily@emily.com',
+    status: 1
+  };  
 
-//   var dummyUser5 = {
-//     name: 'anotherdummy',
-//     email: 'another@dummy.com',
-//     status: 1
-//   };
+  var dummyUser5 = {
+    name: 'anotherdummy',
+    email: 'another@dummy.com',
+    status: 1
+  };
 
-//   var dummyUser1Update = {
-//     name: 'eliotdummy',
-//     email: 'newemail@eliot.com',
-//     status: 2
-//   };  
+  var dummyUser1Update = {
+    name: 'eliotdummy',
+    email: 'newemail@eliot.com',
+    status: 2
+  };  
 
-//   var dummyUser2Update = {
-//     name: 'davedummy',
-//     email: 'newemail@dave.com',
-//     status: 2
-//   };
+  var dummyUser2Update = {
+    name: 'davedummy',
+    email: 'newemail@dave.com',
+    status: 2
+  };
 
-//   var dummyUser3Update = {
-//     name: 'matthiasdummy',
-//     email: 'newemail@matthias.com',
-//     status: 2
-//   };
+  var dummyUser3Update = {
+    name: 'matthiasdummy',
+    email: 'newemail@matthias.com',
+    status: 2
+  };
   
-//   var dummyUser4Update = {
-//     name: 'emilydummy',
-//     email: 'newemail@emily.com',
-//     status: 2
-//   };
+  var dummyUser4Update = {
+    name: 'emilydummy',
+    email: 'newemail@emily.com',
+    status: 2
+  };
   
-//   var dummyUsers = [dummyUser1, dummyUser2, dummyUser3, dummyUser4];
+  var dummyUsers = [dummyUser1, dummyUser2, dummyUser3, dummyUser4];
   
-//   t.plan(12); // Number of tests that we plan to run
+  t.plan(12); // Number of tests that we plan to run
   
-//   // So that we don't get lost in async confusion, each test scenario will be a function. Tests run inside the function. The test function deletes any data that has been added to the database, and returns a promise. After defining all of our test functions, we call them in order (see below) 
+  // So that we don't get lost in async confusion, each test scenario will be a function. Tests run inside the function. The test function deletes any data that has been added to the database, and returns a promise. After defining all of our test functions, we call them in order (see below) 
 
-//   var testGetUser = function(dummyUser){
-//     var testUser = userModel.build(dummyUser);
-//     return testUser.save()
-//       .then(function(){
-//         return User.get(dummyUser);
-//       })
-//       .then(function(user){
-//         t.equal(user.name, dummyUser.name, 'successfully gets from db');
-//         return userModel.destroy({where: {name: dummyUser.name}});
-//       });
+  var testGetUser = function(dummyUser){
+    var testUser = userModel.build(dummyUser);
+    return testUser.save()
+      .then(function(){
+        return User.get(dummyUser);
+      })
+      .then(function(user){
+        t.equal(user.name, dummyUser.name, 'successfully gets from db');
+        return userModel.destroy({where: {name: dummyUser.name}});
+      });
 
-//   };
+  };
 
-//   var testRemoveUser = function(){
-//     return User.post(dummyUser5)
-//       .then(function(user){
-//         dummyUser5.id = user.id;
-//         return User.remove(user.id);
-//       })
-//       .then(function(){
-//         return userModel.findAndCountAll({where: {id: dummyUser5.id}});
-//       })
-//       .then(function(result){
-//         t.equal(result.count, 0, 'User.remove deletes from db!');
-//       })
-//       .catch(function(err){
-//         console.log(err);
-//         t.end();
-//       });
-//   };
+  var testRemoveUser = function(){
+    return User.post(dummyUser5)
+      .then(function(user){
+        dummyUser5.id = user.id;
+        return User.remove(user.id);
+      })
+      .then(function(){
+        return userModel.findAndCountAll({where: {id: dummyUser5.id}});
+      })
+      .then(function(result){
+        t.equal(result.count, 0, 'User.remove deletes from db!');
+      })
+      .catch(function(err){
+        console.log(err);
+        t.end();
+      });
+  };
 
-//   // run tests! use map so that we run the same 
-//   Promise.map(dummyUsers, function(user){
-//     return testHelpers.testPost(User.post, user, userModel, t);
-//   })
-//     .then(function(){
-//       return testHelpers.testPut(User.put, dummyUser1, dummyUser1Update, userModel, t);
-//     })
-//     .then(function(){
-//       return Promise.map(dummyUsers, function(user){
-//         testGetUser(user);
-//       });
-//     })
-//     .spread(function(){
-//       return testRemoveUser();
-//     })
-//     .catch(function(err){
-//       console.log(err);
-//       t.end();
-//     });
-// });
+  // run tests! use map so that we run the same 
+  Promise.map(dummyUsers, function(user){
+    return testHelpers.testPost(User.post, user, userModel, t);
+  })
+    .then(function(){
+      return testHelpers.testPut(User.put, dummyUser1, dummyUser1Update, userModel, t);
+    })
+    .then(function(){
+      return Promise.map(dummyUsers, function(user){
+        testGetUser(user);
+      });
+    })
+    .spread(function(){
+      return testRemoveUser();
+    })
+    .catch(function(err){
+      console.log(err);
+      t.end();
+    });
+});
 
 test('----- User Servers -----\n\n', function(t) {
 
