@@ -3,6 +3,7 @@ var utils = require('../server/utils');
 var urlModel = require('../server/components').Url;
 var Promise = require('bluebird');
 var testHelpers = require('./testHelpers');
+var parseUrl = require('../server/utils/parseURL.js');
 
 // Promisify our URL library
 var Url = Promise.promisifyAll(require('../server/components/url'));
@@ -22,14 +23,14 @@ test('----- URL Controller Methods -----\n\n', function(t) {
   Url.save(fakeURL1)
     .then(function() {
       t.pass("Url written to database!");
-      return Url.get(fakeURL1)
+      return Url.get(fakeURL1);
     })
     .then(function(url) {
       t.pass("Url found in database!");
-      Url.remove(url);
+      return Url.remove(fakeURL1.path);
     })
     .then(function(url) {
-      t.pass("Url removed from database!")
+      t.pass("Url removed from database!");
       t.end();
     })
     .catch(function(err) {
