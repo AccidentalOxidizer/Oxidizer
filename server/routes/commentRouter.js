@@ -19,12 +19,14 @@ module.exports = function(app) {
 
     Url.get(urlToGet)
       .then(function(url) {
-        return Comment.get({id: url.id});
+        return Comment.get({
+          id: url.id
+        });
       })
-      .then(function(comments){
+      .then(function(comments) {
 
       })
-      .catch(function(err){
+      .catch(function(err) {
         return err;
       });
     res.send(200);
