@@ -1,7 +1,30 @@
 /**
  * For maximum compatibility and avoiding conflicts:
- * no 3rd party libs, not even jQuery for DOM manipulation, templating, etc
+ * No 3rd party libs, not even jQuery for DOM manipulation, templating, etc
  **/
+
+// TODO: 
+/*
+PRIVATE / PUBLIC:
+User should be able to quickly and easily switch between private site annotaitons and public page comments.
+This should trigger 
+1. Refresh content from server
+2. Rerendering of content on ALL tabs.
+
+DEFAULTS:
+If user changes defaults in options, this should be reflected accordingly on tab load.
+This means:
+1. Add eventListener for chrome storage change 
+2. Render accordingly on NEW tab, but not on update of existing tab
+3. -> this is to ensure user can still switch between private & public even on tab refresh
+
+DATA:
+1. We need to hook up GET & POST calls from extension with the correct routes of backend
+2. We need to ensure that GET & POST data handled by server corresponds with public / private setting of request
+3. Chrome Extension should save incoming data in chrome storage or in local cookie (including time stamp of data received)
+4. We should aim at implementing a Redis layer for comparing timestamps and only sending new data if new content can be sent
+5. Above needs to wotk for public and private content.
+*/
 
 // content script running for each chrome tab window injected by the extension rust.js
 var url = document.location.href;

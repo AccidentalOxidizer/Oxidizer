@@ -7,6 +7,7 @@ chrome.runtime.onMessage.addListener(
     if (request.type === "init") {
       // call server with get request for data.
       var xhr = new XMLHttpRequest();
+      // should include URL as parameter!
       xhr.open("GET", config.server + "/test/comments", true);
       xhr.onreadystatechange = function() {
         if (xhr.readyState === 4 && xhr.status === 200) {

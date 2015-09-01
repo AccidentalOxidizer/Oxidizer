@@ -20,6 +20,7 @@
   border:1px solid grey !important;
   padding:5px !important;
   margin:5px !important;
+  z-index: 99999 !important;
 }
 
 [data-rust-identity="identity"] .ownChild {
