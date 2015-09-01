@@ -1,3 +1,47 @@
+
+// *********** COMMENTS *************
+
+// POST request to api/comments*path
+  // extension sends in parameter the url (and later group/ maybe isPrivate)
+  var requestAllCommentsForPath = {
+    url: 'string unparsed url',
+    lastUpdateTimestamp: 'lastUpdate'
+  };
+  // will add date 
+
+  // server responds 
+  var commentsForAPath = {
+    comments: {
+      url: 'parsedUrl',
+      username: 'string',
+      text: 'string',
+      timestamp: 'date',
+      isPrivate: 'boolean'
+    },
+    currentTime: 'timestamp',
+    userInfo: {
+      username: 'string'
+    }
+  };
+
+// POST request to api/comments
+  // extension sends:
+  var extCommentPostRequestBody = {
+    url: 'unparsed_url',
+    text: 'comment string',
+    isPrivate: 'boolean'   
+  };
+  // username and id will be available token
+
+  // server responds with the newly created comment
+  var extPostResponse = {
+    url: 'unparsed_url',
+    text: 'comment string',
+    isPrivate: 'boolean',
+    timestamp: 'timestamp created by sql in GMT',
+    username: 'username'
+  };
+
 /** 
  * USERS:
  * This is a JSON object that we'd expect to get back
@@ -20,7 +64,7 @@ user = {
   name: 'Dave',
   email: 'dave@email.net',
   status: 1,
-  logininfo: "..." // Work in Progress
+  logininfo: "...", // Work in Progress
   profileinfo: "..." // Work in Progress
 }
 
