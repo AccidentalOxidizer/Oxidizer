@@ -32,9 +32,18 @@ module.exports = function(app) {
     console.log(req.body);
     dummyData.comments.push(req.body);
     console.log(dummyData);
-    res.status(201).send({
-      data: 'ok'
-    });
+
+    if (!req.user) {
+      console.log('not logged in');
+      res.status(401).send({
+        data: 'error'
+      })
+    } else {
+      res.status(201).send({
+        data: 'ok'
+      });
+    }
+
   });
 
   app.get('/test/auth', auth.isLoggedIn, function(req, res, next) {

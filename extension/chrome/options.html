@@ -4,13 +4,24 @@
   <title>Rust Options</title>
   <style>
     body: { padding: 10px; }
+    /*include some fancy styling here?*/
   </style>
 </head>
 <body>
- <h1>Options Placeholder Page</h1>
-<!--     <div id="login">Login test</div>
-    <a id="login">Logn test</a> -->
+ <h1>Options </h1>
 
+<label>
+<input type="checkbox" id="private">
+    make private site annotation default (not recomended)
+</label><br>
+  <input type="checkbox" id="visible">
+    auto-show comments on pages (recommended)
+</label>
+
+  <div id="status"></div>
+
+  <button id="save">Save</button>
+  <button id="reset">Reset</button>
 </body>
 <script src="options.js"></script>
 </html>

@@ -18,7 +18,7 @@ var cleanDOM = function() {
 
 // we can't use handlebars / hogan for mustache due to chrome security limitations 
 var templating = function(comments) {
-  var result = '<div>';
+  var result = '<div id="commentContainer">';
   for (var i = comments.length - 1; i >= 0; i--) {
     comment = comments[i];
     result += '<div id="' + comment['id'] + '"><div>' + comment['timestamp'] + '</div><div>' + comment['text'] + '</div></div>';
@@ -30,18 +30,24 @@ var templating = function(comments) {
 // add input field functionlity to html output
 var inputField = function(html) {
   var inputElement = '<input id="rustsubmit" type="text" name="comment"/><div class="submit-comment">Submit</div>';
-  inputElement += '<a id="test">Auth Test</a> || <a href="http://localhost:3000/api/auth/chrome/google">Login link test</a>';
+  inputElement += '<a id="test">Auth Test</a> || <a href="http://localhost:3000/api/auth/chrome/google">Login link test</a> || <a id="close">close</a>';
   html += inputElement;
   return html;
 }
 
-// append final html output to DOM
+// append final html output to DOM (ideall, we first do the container once globally, then the content.)
 var appendToDOM = function(html) {
   var section = document.createElement('section');
   section.setAttribute(dataAttribute, dataAttributeValue);
   section.className += 'rust cleanslate';
   section.innerHTML = html;
   document.body.appendChild(section);
+}
+
+// directly append the new comment which was submitted to server
+var appendNewCommentToDom = function(text) {
+  var rust = document.querySelector('[data-rust-identity="identity"]');
+  rust.querySelector('#commentContainer').insertAdjacentHTML('beforeend', '<div class="ownChild">' + text + '</div>');
 }
 
 // register all the events chrome needs to handle
@@ -51,21 +57,34 @@ var registerEventListeners = function() {
     // if user hits enter key
     if (e.keyCode === 13) {
       var text = document.getElementById('rustsubmit').value;
-      // send message to background script rust.js with new coment data tp be posted to server
-      chrome.runtime.sendMessage({
-        type: 'post',
-        comment: text
-      }, function(response) {
-        // background script rust.js should return the server response
-        console.log(response);
-        // todo: append new message to output html.. 
-      });
-
+      // Only proceed if text is not empty
+      if (text !== '') {
+        // send message to background script rust.js with new coment data tp be posted to server
+        chrome.runtime.sendMessage({
+          type: 'post',
+          comment: text
+        }, function(response) {
+          // background script rust.js should return the server response
+          console.log(response);
+          // oh my this is so ugly and not the proper way doing this, we need a better server response later on
+          if (response.data.data !== 'error') {
+            // Append new message to output html.. 
+            appendNewCommentToDom(text);
+          }
+          // Reset input field
+          document.getElementById('rustsubmit').value = '';
+        });
+      }
     }
   });
 
+  // remove everything on clicking close
+  rust.querySelector('#close').addEventListener('click', function() {
+    rust.parentNode.removeChild(rust);
+  });
+
   // test if user is authenticated
-  document.querySelector('#test').addEventListener('click', function() {
+  rust.querySelector('#test').addEventListener('click', function() {
     chrome.runtime.sendMessage({
       type: 'test'
     }, function(response) {
@@ -73,6 +92,7 @@ var registerEventListeners = function() {
       console.log(response);
     });
   });
+
 }
 
 /* MAGIC HAPPENS HERE */
@@ -83,7 +103,10 @@ chrome.runtime.sendMessage({
 }, function(response) {
   if (response.data.comments) {
     console.log('Response:', response);
+    // remove DOM artifacts
     cleanDOM();
+
+    // For demo: add user name if logged in. Makes not much sense like this
     var html = '';
     if (response.data.name) {
       html = '<div>Hello, ' + response.data.name + '</div>';

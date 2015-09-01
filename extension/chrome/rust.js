@@ -2,6 +2,7 @@ var config = '';
 // listen for incoming message by chrome tab
 chrome.runtime.onMessage.addListener(
   function(request, sender, sendResponse) {
+
     // if request type is init (object property sent by tab)
     if (request.type === "init") {
       // call server with get request for data.
@@ -27,22 +28,44 @@ chrome.runtime.onMessage.addListener(
     // post a new comment
     if (request.type === 'post') {
       var xhr = new XMLHttpRequest();
-      xhr.open('POST', config.server + 'test/comments');
+      xhr.open('POST', config.server + '/test/comments');
       xhr.setRequestHeader('Content-Type', 'application/json');
 
       xhr.onreadystatechange = function() {
-        if (xhr.readyState === 4 && xhr.status === 201) {
+        if (xhr.readyState === 4) { // && xhr.status === 201
           var resp = JSON.parse(xhr.responseText);
           sendResponse({
             data: resp
           });
         }
+
       };
 
       xhr.send(JSON.stringify({
         name: 'Matthias',
         text: request.comment
       }));
+      return true;
+    }
+
+    // handle logout
+    if (request.type === 'logout') {
+      sendResponse({
+        data: 'test'
+      });
+
+      var xhr = new XMLHttpRequest();
+      xhr.open("GET", config.server + "/api/auth/chrome/logout", true);
+      xhr.setRequestHeader('Content-Type', 'application/json');
+      xhr.onreadystatechange = function() {
+        if (xhr.readyState === 4) {
+          var resp = JSON.parse(xhr.responseText);
+          sendResponse({
+            data: resp
+          })
+        }
+      }
+      xhr.send();
       return true;
     }
 
@@ -63,20 +86,11 @@ chrome.runtime.onMessage.addListener(
       return true;
     }
 
-    // handle logout
-    if (request.type === 'logout') {
-      var xhr = new XMLHttpRequest();
-      xhr.open("GET", config.server + "/api/auth/chrome/logout", true);
-      xhr.setRequestHeader('Content-Type', 'application/json');
-      xhr.onreadystatechange = function() {
-        if (xhr.readyState === 4) {
-          var resp = JSON.parse(xhr.responseText);
-          sendResponse({
-            data: resp
-          })
-        }
-      }
-      xhr.send();
+    // for debugging
+    if (request.type === 'popup') {
+      sendResponse({
+        data: 'popup'
+      });
       return true;
     }
   });
@@ -103,7 +117,6 @@ chrome.tabs.onUpdated.addListener(function(tabId, info) {
       file: "comment.js"
     });
   }
-
 });
 
 
