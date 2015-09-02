@@ -1,10 +1,18 @@
 var config = {
   production: {
+    mysql: {
+      host: process.env.OPENSHIFT_MYSQL_DB_HOST,
+      url: process.env.OPENSHIFT_MYSQL_DB_URL,
+      user: process.env.OPENSHIFT_MYSQL_DB_USERNAME,
+      password: process.env.OPENSHIFT_MYSQL_DB_PASSWORD,
+      database: process.env.OPENSHIFT_GEAR_NAME,
+      port: process.env.OPENSHIFT_MYSQL_DB_PORT
+    },
     dbconfig: {
       path: 'rust.c51qtfkqoyo7.us-east-1.rds.amazonaws.com',
       name: 'rust',
-      username: 'root',
-      password: 'mypassword',
+      username: 'adminYDlBuNu',
+      password: 'V4xZ3WHXzvJE',
       port: '3306'
     },
     googleAuth: {
@@ -20,6 +28,14 @@ var config = {
     secret: 'development'
   },
   development: {
+    mysql: {
+      host: process.env.OPENSHIFT_MYSQL_DB_HOST,
+      url: process.env.OPENSHIFT_MYSQL_DB_URL,
+      user: process.env.OPENSHIFT_MYSQL_DB_USERNAME,
+      password: process.env.OPENSHIFT_MYSQL_DB_PASSWORD,
+      database: process.env.OPENSHIFT_GEAR_NAME,
+      port: process.env.OPENSHIFT_MYSQL_DB_PORT
+    },
     dbconfig: {
       name: 'rust',
       username: 'root',

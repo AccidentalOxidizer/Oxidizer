@@ -19,7 +19,6 @@ var utils = require('./utils');
 
 // CONFIG
 var config = require('./config.js').get(process.env.NODE_ENV);
-var port = process.env.PORT || 3000;
 
 // initialize passport settings
 require('./components/user/passport')(passport, config);
@@ -30,6 +29,22 @@ require('./components/dbconfig');
 // ROUTES
 var routes = require('./routes');
 
+var port = process.env.OPENSHIFT_NODEJS_PORT || 8080;
+var ipaddr = process.env.OPENSHIFT_NODEJS_IP || '127.0.0.1';
+
+app.set('port', process.env.OPENSHIFT_NODEJS_PORT || process.env.PORT || 8080);
+app.set('ipaddr', process.env.OPENSHIFT_NODEJS_IP || "127.0.0.1");
+
+
+
+console.log(process.env);
+console.log('openshift env var', process.env.OPENSHIFT_ENV_VAR);
+console.log('openshift port?', process.env.OPENSHIFT_NODEJS_PORT);
+console.log('opensdhift ip?', process.env.OPENSHIFT_NODEJS_IP);
+console.log('ip', app.get('ipaddr'));
+console.log('port', app.get('port'));
+app.set('port', process.env.OPENSHIFT_NODEJS_PORT || 8080);
+app.set('ipaddr', process.env.OPENSHIFT_NODEJS_IP || "127.0.0.1");
 
 sequelize.sync().then(function() {
   app.use(morgan('dev'));
@@ -47,7 +62,11 @@ sequelize.sync().then(function() {
 
   routes(app, passport);
 
-  app.listen(port, function() {
-    console.log('Server running on port ' + port);
+  http.createServer(app).listen(app.get('port'), app.get('ipaddr'), function() {
+    console.log("✔ Express server listening at %s:%d ", app.get('ipaddr'), app.get('port'));
   });
+
+  // app.listen(app.get('port'), app.get('ip'), function() {
+  //   console.log('Server running on port ' + port);
+  // });
 });
