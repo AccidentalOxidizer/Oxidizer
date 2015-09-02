@@ -28,17 +28,15 @@ var copyObject = function(obj) {
   return parsedObject;
 };
 
-// GET a URL from the database
+// GET all comments for a URL from the database
 var get = function(searchObject) {
-  console.log("URL OBJECT LNE 51: ", searchObject);
   var parsedObject = copyObject(searchObject);
 
   return Url.findOne({
       where: parsedObject
     })
     .then(function(result) {
-      console.log("RESULT ", result);
-      if (!result === null) {
+      if (result !== null) {
         urlInfo = {};
         urlInfo.id = result.get('id');
         urlInfo.url = result.get('url');
@@ -56,7 +54,6 @@ var get = function(searchObject) {
 
 // Write a new URL to the database
 var save = function(urlObject) {
-  console.log("URL OBJECT LNE 51: ", urlObject);
   var parsedObject = copyObject(urlObject);
 
   return Url.findOrCreate({

@@ -2,9 +2,12 @@ var Comment = require('../').Comment;
 var User = require('../').User;
 
 var get = function(searchObject){
+  var attributes = ['text','User.name'];
+
   return Comment.findAll({
     where: searchObject,
-    include: []
+    // attributes: attributes,
+    include: [{model: User, attributes: ['name']}]
   });
 };
 
@@ -16,6 +19,7 @@ var post = function(commentObject){
       return comment;
     })
     .catch(function(err){
+      console.log('this is the error',err);
       throw err;
     });
 };
