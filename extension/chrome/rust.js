@@ -29,7 +29,7 @@ chrome.runtime.onMessage.addListener(
     // post a new comment
     if (request.type === 'post') {
       var xhr = new XMLHttpRequest();
-      xhr.open('POST', config.server + '/test/comments');
+      xhr.open('POST', config.server + '/api/comments');
       xhr.setRequestHeader('Content-Type', 'application/json');
 
       xhr.onreadystatechange = function() {
