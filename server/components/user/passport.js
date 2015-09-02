@@ -86,7 +86,6 @@ module.exports = function(passport, config) {
                   return done(null, user);
                 });
             } else {
-              console.log('done called line 87');
               return done(null, user);
             }
           } else {
@@ -99,10 +98,9 @@ module.exports = function(passport, config) {
               googleToken: accessToken,
               googleName: profile.displayName
             });
+
             return newUser.save()
               .then(function(user) {
-                console.log(')))00)))))))))))))))))))))))', user);
-                console.log('done called line 105');
                 return done(null, user);
               });
           }        
@@ -137,26 +135,30 @@ module.exports = function(passport, config) {
               user.fbId = profile.id;
               user.fbToken = accessToken;
               user.fbName = profile.displayName;
-              return user.save();
+              return user.save()
+                .then(function(){
+                  return done(null, user);
+                });
             } else {
               return done(null, user);
             }
+          } else {
+
+            // if the user wasn't already in the db, create a new entry
+            console.log("FacebookStrategy: creating new user " + email);
+            var newUser = User.build({
+              name: profile.displayName,
+              email: email,
+              fbId: profile.id,
+              fbToken: accessToken,
+              fbName: profile.displayName
+            });
+
+            return newUser.save()
+              .then(function(){
+                return done(null, user);
+              });
           }
-
-          // if the user wasn't already in the db, create a new entry
-          console.log("FacebookStrategy: creating new user " + email);
-          var newUser = User.build({
-            name: profile.displayName,
-            email: email,
-            fbId: profile.id,
-            fbToken: accessToken,
-            fbName: profile.displayName
-          });
-
-          return newUser.save();
-        })
-        .then(function(user) {
-          return done(null, user);
         })
         .catch(function(err) {
           return done(err);
