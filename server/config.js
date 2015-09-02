@@ -1,7 +1,7 @@
 var config = {
   production: {
     dbconfig: {
-      path: 'rust.cezxregsdvmw.us-west-2.rds.amazonaws.com',
+      path: 'rust.c51qtfkqoyo7.us-east-1.rds.amazonaws.com',
       name: 'rust',
       username: 'root',
       password: 'mypassword',
