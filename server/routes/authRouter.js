@@ -43,7 +43,7 @@ module.exports = function(app, passport) {
         data: 'not ok'
       });
     }
-  })
+  });
 
   // route to logout user from chrome extension
   app.get('/api/auth/chrome/logout', function(req, res, next) {

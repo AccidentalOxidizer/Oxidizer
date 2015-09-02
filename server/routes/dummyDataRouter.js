@@ -37,7 +37,7 @@ module.exports = function(app) {
       console.log('not logged in');
       res.status(401).send({
         data: 'error'
-      })
+      });
     } else {
       res.status(201).send({
         data: 'ok'
@@ -51,11 +51,10 @@ module.exports = function(app) {
     res.status(200).send({
       auth: 'ok'
     });
-  })
+  });
 
   app.get('/test/comments', jsonParser, function(req, res, next) {
     if (req.user) {
-      console.log('Req user,', req.user);
       dummyData.name = req.user.name;
     }
     res.status(200).send(dummyData);

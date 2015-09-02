@@ -37,7 +37,7 @@ var cleanDOM = function() {
   if (old !== undefined) {
     document.body.removeChild(old);
   }
-}
+};
 
 // we can't use handlebars / hogan for mustache due to chrome security limitations 
 var templating = function(comments) {
@@ -56,7 +56,7 @@ var inputField = function(html) {
   inputElement += '<a id="test">Auth Test</a> || <a href="http://localhost:3000/api/auth/chrome/google">Login link test</a> || <a id="close">close</a>';
   html += inputElement;
   return html;
-}
+};
 
 // append final html output to DOM (ideall, we first do the container once globally, then the content.)
 var appendToDOM = function(html) {
@@ -65,7 +65,7 @@ var appendToDOM = function(html) {
   section.className += 'rust cleanslate';
   section.innerHTML = html;
   document.body.appendChild(section);
-}
+};
 
 // directly append the new comment which was submitted to server
 var appendNewCommentToDom = function(text) {
@@ -80,6 +80,7 @@ var registerEventListeners = function() {
     // if user hits enter key
     if (e.keyCode === 13) {
       var text = document.getElementById('rustsubmit').value;
+<<<<<<< HEAD
       // Only proceed if text is not empty
       if (text !== '') {
         // send message to background script rust.js with new coment data tp be posted to server
@@ -115,8 +116,12 @@ var registerEventListeners = function() {
       console.log(response);
     });
   });
+<<<<<<< HEAD
 
 }
+=======
+};
+>>>>>>> serverstuff
 
 /* MAGIC HAPPENS HERE */
 // send 'init' message with url to the chome extension (rust.js) when loaded

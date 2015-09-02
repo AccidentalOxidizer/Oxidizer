@@ -9,7 +9,7 @@ var parseUrl = require('../../utils/parseURL.js');
  *  following format:
  *  
  *  url = {
- *    path: "http://somethingsomething.com"
+ *    url: "http://somethingsomething.com"
  *  }
  */
 
@@ -23,8 +23,8 @@ var copyObject = function(obj) {
     }
   }
 
-  parsedObject.path = parseUrl(parsedObject.path);
-
+  parsedObject.url = parseUrl(parsedObject.url);
+  
   return parsedObject;
 };
 
@@ -38,7 +38,7 @@ var get = function(searchObject) {
     .then(function(result) {
       urlInfo = {};
       urlInfo.id = result.get('id');
-      urlInfo.path = result.get('path');
+      urlInfo.url = result.get('url');
       return urlInfo;
     })
     .catch(function(err) {
@@ -49,6 +49,7 @@ var get = function(searchObject) {
 // Write a new URL to the database
 var save = function(urlObject) {
   var parsedObject = copyObject(urlObject);
+  
   return Url.findOrCreate({
       where: parsedObject
     })
@@ -68,7 +69,7 @@ var save = function(urlObject) {
 var remove = function(url) {
   url = parseUrl(url);
   return Url.destroy({
-      where: {path: url}
+      where: {url: url}
     })
     .then(function(affectedRows) {
       if (affectedRows === 0) {

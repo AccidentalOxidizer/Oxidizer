@@ -46,7 +46,6 @@ module.exports = function(passport, config) {
           }
           // success! return valid user
           console.log("LocalStrategy: found valid user");
-          console.log(user);
           return done(null, user);
         })
         .catch(function(err) {
@@ -62,7 +61,6 @@ module.exports = function(passport, config) {
     },
     function(accessToken, refreshToken, profile, done) {
       console.log('Passport: using GoogleStrategy');
-      console.log(profile);
 
       var email = profile.emails[0].value;
 
@@ -73,9 +71,9 @@ module.exports = function(passport, config) {
           email: email
         })
         .then(function(user) {
+          console.log('%%%%%%%%%%%%%%%%%%%',user);
           if (user) {
             console.log("GoogleStrategy: found valid user with email " + email);
-            console.log(user);
 
             // If the Google data hasn't been set up yet, we have a case in
             // which we need to link the info to an existing user.
@@ -88,21 +86,21 @@ module.exports = function(passport, config) {
             } else {
               return done(null, user);
             }
-          }
-
-          // if the user wasn't already in the db, create a new entry
-          console.log("GoogleStrategy: creating new user " + email);
-          var newUser = User.build({
-            name: profile.displayName,
-            email: email,
-            googleId: profile.id,
-            googleToken: accessToken,
-            googleName: profile.displayName
-          });
-
-          return newUser.save();
+          } else {
+            // if the user wasn't already in the db, create a new entry
+            console.log("GoogleStrategy: creating new user " + email);
+            var newUser = User.build({
+              name: profile.displayName,
+              email: email,
+              googleId: profile.id,
+              googleToken: accessToken,
+              googleName: profile.displayName
+            });
+            return newUser.save();
+          }        
         })
         .then(function(user) {
+          console.log(')))00)))))))))))))))))))))))', user);
           return done(null, user);
         })
         .catch(function(err) {
@@ -119,7 +117,6 @@ module.exports = function(passport, config) {
     },
     function(accessToken, refreshToken, profile, done) {
       console.log('Passport: using FacebookStrategy');
-      console.log(profile);
 
       var email = profile.emails[0].value;
 
@@ -127,7 +124,6 @@ module.exports = function(passport, config) {
         .then(function(user) {
           if (user) {
             console.log("FacebookStrategy: found valid user with email " + email);
-            console.log(user);
 
             // If the fb data hasn't been set up yet, we have a case in
             // which we need to link fb info to an existing user.

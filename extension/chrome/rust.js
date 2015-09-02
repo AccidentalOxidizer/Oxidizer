@@ -20,7 +20,7 @@ chrome.runtime.onMessage.addListener(
               // sender: sender
           });
         }
-      }
+      };
       xhr.send();
       // if you don't return true here shit hits the fan
       return true;
@@ -43,8 +43,9 @@ chrome.runtime.onMessage.addListener(
       };
 
       xhr.send(JSON.stringify({
-        name: 'Matthias',
-        text: request.comment
+        text: request.comment,
+        isPrivate: false,
+        url: request.url
       }));
       return true;
     }
@@ -63,9 +64,9 @@ chrome.runtime.onMessage.addListener(
           var resp = JSON.parse(xhr.responseText);
           sendResponse({
             data: resp
-          })
+          });
         }
-      }
+      };
       xhr.send();
       return true;
     }
@@ -80,9 +81,9 @@ chrome.runtime.onMessage.addListener(
           var resp = JSON.parse(xhr.responseText);
           sendResponse({
             data: resp
-          })
+          });
         }
-      }
+      };
       xhr.send();
       return true;
     }
@@ -107,7 +108,7 @@ var getConfig = function() {
   };
   xhr.open("GET", chrome.extension.getURL('config.json'), true);
   xhr.send();
-}
+};
 
 getConfig();
 
