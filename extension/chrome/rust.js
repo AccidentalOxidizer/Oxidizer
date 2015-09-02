@@ -8,9 +8,10 @@ chrome.runtime.onMessage.addListener(
       // call server with get request for data.
       var xhr = new XMLHttpRequest();
       // should include URL as parameter!
-      xhr.open("POST", config.server + "/api/comments/get", true);
+      xhr.open("POST", config.server + "/api/comments/get");
+      xhr.setRequestHeader('Content-Type', 'application/json');
       xhr.onreadystatechange = function() {
-        if (xhr.readyState === 4 && xhr.status === 200) {
+        if (xhr.readyState === 4) {
           // JSON.parse does not evaluate the attacker's scripts.
           var resp = JSON.parse(xhr.responseText);
           sendResponse({
