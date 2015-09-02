@@ -46,10 +46,11 @@ var templating = function(comments) {
     comment = comments[i];
     result += [
       '<div id="', comment.User.name, '">',
-        '<div>', comment.User.name, '</div>',
-        '<div>', comment.createdAt, '</div>',
-        '<div>', comment.text, '</div>',
-      '</div>'].join('');
+      '<div>', comment.User.name, '</div>',
+      '<div>', comment.createdAt, '</div>',
+      '<div>', comment.text, '</div>',
+      '</div>'
+    ].join('');
   }
   result += '</div>';
   return result;
@@ -58,7 +59,7 @@ var templating = function(comments) {
 // add input field functionlity to html output
 var inputField = function(html) {
   var inputElement = '<input id="rustsubmit" type="text" name="comment"/><div class="submit-comment">Submit</div>';
-  inputElement += '<a id="test">Auth Test</a> || <a href="http://localhost:3000/api/auth/chrome/google">Login link test</a> || <a id="close">close</a>';
+  inputElement += '<a id="test">Auth Test</a> || <a href="http://localhost:3000/api/auth/chrome/google">Login link test</a> || <a id="minimize">minimize</a> || <a id="close">close</a>';
   html += inputElement;
   return html;
 };
@@ -106,6 +107,11 @@ var registerEventListeners = function() {
         });
       }
     }
+  });
+
+  // Hide element when clicking minimize
+  rust.querySelector('#minimize').addEventListener('minimize', function() {
+    rust.parentNode.removeChild(rust);
   });
 
   // remove everything on clicking close
