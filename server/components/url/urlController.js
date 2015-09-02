@@ -37,13 +37,20 @@ var get = function(searchObject) {
       where: parsedObject
     })
     .then(function(result) {
-      urlInfo = {};
-      urlInfo.id = result.get('id');
-      urlInfo.url = result.get('url');
-      return urlInfo;
+      console.log("RESULT ", result);
+      if (!result === null) {
+        urlInfo = {};
+        urlInfo.id = result.get('id');
+        urlInfo.url = result.get('url');
+        return urlInfo;
+      } else {
+        return null;
+      }
     })
     .catch(function(err) {
       console.log("GET url error: ", err);
+      // URL does not currently exist in the database.
+      return null;
     });
 };
 

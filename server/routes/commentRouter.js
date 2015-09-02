@@ -18,18 +18,43 @@ module.exports = function(app) {
 
     Url.get(urlToGet)
       .then(function(url) {
-        return Comment.get({
-          id: url.id
-        });
+        console.log("URL: ", url);
+
+        if (url !== null) {
+          return Comment.get({
+            UrlId: url.id
+          });
+        } else {
+          console.log("Null value, homies!");
+          // We expect an empty comments array to be returned
+          // for any webpage that we haven't yet visited / added
+          // comments to.
+
+          // var emptyComment = {
+          //   comments: [],
+          //   currentTime: '',
+          //   userInfo: {
+          //     username: ''
+          //   }
+          // };
+          return [];
+        }
       })
       .then(function(comments) {
+        // TODO: Handle case where URL exists but no comments??
         console.log("COMMENTS?? ", comments);
+        // TODO: Make this look like contract!
         res.send(200, {
-          comments: comments
+          comments: comments,
+          currentTime: '', // TODO: Fill this out!
+          userInfo: {
+            username: '' // TODO: Fill this out!
+          }
         });
       })
       .catch(function(err) {
-        return err;
+        console.log("Potential error: ", err);
+        //res.send(200);
       });
 
   });
