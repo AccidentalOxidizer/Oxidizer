@@ -44,11 +44,16 @@ var templating = function(comments) {
   var result = '<div id="commentContainer">';
   for (var i = comments.length - 1; i >= 0; i--) {
     comment = comments[i];
-    result += '<div id="' + comment['username'] + '"><div>' + comment['timestamp'] + '</div><div>' + comment['text'] + '</div></div>';
-  };
+    result += [
+      '<div id="', comment.User.name, '">',
+        '<div>', comment.User.name, '</div>',
+        '<div>', comment.createdAt, '</div>',
+        '<div>', comment.text, '</div>',
+      '</div>'].join('');
+  }
   result += '</div>';
   return result;
-}
+};
 
 // add input field functionlity to html output
 var inputField = function(html) {
@@ -92,6 +97,7 @@ var registerEventListeners = function() {
           // TODO: We might need some error handling here if we don't have a valid response object!
           // background script rust.js should return the server response
           //reuse templating for new comment (needs to be in an array)
+          console.log(response.data);
           var html = templating(response.data.comments);
           // Append new message 
           appendNewCommentToDom(html);
@@ -131,8 +137,8 @@ chrome.runtime.sendMessage({
     cleanDOM();
     // For demo: add user name if logged in. Makes not much sense like this
     var html = '';
-    if (response.data.userInfo.username) {
-      html = '<div>Hello, ' + response.data.userInfo.username + '</div>';
+    if (response.data.userInfo.name) {
+      html = '<div>Hello, ' + response.data.userInfo.name + '</div>';
     }
     // templating
     html += templating(response.data.comments);
@@ -142,5 +148,5 @@ chrome.runtime.sendMessage({
     appendToDOM(html);
     // register event listeners for user input
     registerEventListeners();
-  };
+  }
 });

@@ -76,7 +76,7 @@ module.exports = function(app) {
       })
       .catch(function(err) {
         res.send(403);
-      })
+      });
 
   });
 

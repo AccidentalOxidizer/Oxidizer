@@ -7,10 +7,8 @@ var jsonParser = bodyParser.json();
 
 module.exports = function(app) {
   // TODO: isLoggedIn
+  // Get all comments for a specific URL
   app.post('/api/comments/get', jsonParser, function(req, res, next) {
-    // Get all comments for a specific URL
-
-    console.log("REQ BODY LINE 13: ", req.body);
 
     var urlToGet = {
       url: req.body.url
@@ -18,14 +16,11 @@ module.exports = function(app) {
 
     Url.get(urlToGet)
       .then(function(url) {
-        console.log("URL: ", url);
-
         if (url !== null) {
           return Comment.get({
             UrlId: url.id
           });
         } else {
-          console.log("Null value, homies!");
           // We expect an empty comments array to be returned
           // for any webpage that we haven't yet visited / added
           // comments to.
@@ -42,19 +37,19 @@ module.exports = function(app) {
       })
       .then(function(comments) {
         // TODO: Handle case where URL exists but no comments??
-        console.log("COMMENTS?? ", comments);
         // TODO: Make this look like contract!
+
         res.send(200, {
           comments: comments,
-          currentTime: '', // TODO: Fill this out!
+          currentTime: new Date(), // TODO: Fill this out!
           userInfo: {
-            username: '' // TODO: Fill this out!
+            username: req.user.name || undefined// TODO: Fill this out!
           }
         });
       })
       .catch(function(err) {
-        console.log("Potential error: ", err);
-        //res.send(200);
+        console.log("User not logged in", err);
+        res.send(200);
       });
 
   });
@@ -67,7 +62,6 @@ module.exports = function(app) {
   // add isAuth
   app.post('/api/comments/add', jsonParser, function(req, res, next) {
     // Add a new comment!
-    console.log('%%%%%%%%%%', req.session);
     Url.save({
         url: req.body.url
       })
@@ -80,7 +74,23 @@ module.exports = function(app) {
         });
       })
       .then(function(comment) {
-        res.send(comment);
+        formatComment ={ 
+          UrlId: comment.get('UrlId'),
+          text: comment.get('text'),
+          createdAt: comment.get('createdAt'),
+          isPrivate: comment.get('isPrivate'),
+          User: {
+            name: req.user.name
+          }
+        };
+
+        res.send({
+          comments: [formatComment],
+          currentTime: new Date(), // TODO: add currentTime
+          userInfo: {
+            username: req.user.name
+          }
+        });
       })
       .catch(function(err) {
         console.log(err);
@@ -95,5 +105,4 @@ module.exports = function(app) {
   app.delete('/api/comments/:id', jsonParser, auth.isAuthorized, function(req, res, next) {
     // Delete a comment!
   });
-
-}
+};

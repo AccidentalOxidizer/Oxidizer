@@ -13,7 +13,9 @@ var requestAllCommentsForPath = {
 var commentsForAPath = {
   comments: [{
     url: 'parsedUrl',
-    username: 'string',
+    user: {
+      name: 'string'
+    },
     text: 'string',
     timestamp: 'date',
     isPrivate: 'boolean'
@@ -34,12 +36,20 @@ var extCommentPostRequestBody = {
 // username and id will be available token at req.user.name
 
 // server responds with the newly created comment
-var extPostResponse = {
-  url: 'unparsed_url',
-  text: 'comment string',
-  isPrivate: 'boolean',
-  timestamp: 'timestamp created by sql in GMT',
-  username: 'username'
+var postCommentsResponse = {
+  comments: [{
+    url: 'parsedUrl',
+    user: {
+      name: 'string'
+    },
+    text: 'string',
+    timestamp: 'date',
+    isPrivate: 'boolean'
+  }],
+  currentTime: 'timestamp',
+  userInfo: {
+    username: 'string'
+  }
 };
 
 /** 
