@@ -1,10 +1,19 @@
 var Sequelize = require('sequelize');
 var config = require('../config').get().dbconfig;
 
-var sequelize = new Sequelize(config.name, config.username, config.password, {
-  // disable logging; default: console.log
-  logging: false
-});
+// if (process.NODE_ENV === 'production') {
+var sequelize = new Sequelize('mysql://' +
+  config.username + ':' +
+  config.password + '@' +
+  config.path + ':' +
+  config.port + '/' +
+  config.name);
+// }
+
+// var sequelize = new Sequelize(config.name, config.username, config.password, {
+//   // disable logging; default: console.log
+//   logging: false
+// });
 
 var models = {
   'User': 'user/userModel',
