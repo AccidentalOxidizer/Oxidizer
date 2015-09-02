@@ -44,7 +44,7 @@ var templating = function(comments) {
   var result = '<div id="commentContainer">';
   for (var i = comments.length - 1; i >= 0; i--) {
     comment = comments[i];
-    result += '<div id="' + comment['id'] + '"><div>' + comment['timestamp'] + '</div><div>' + comment['text'] + '</div></div>';
+    result += '<div id="' + comment['username'] + '"><div>' + comment['timestamp'] + '</div><div>' + comment['text'] + '</div></div>';
   };
   result += '</div>';
   return result;
@@ -68,9 +68,9 @@ var appendToDOM = function(html) {
 };
 
 // directly append the new comment which was submitted to server
-var appendNewCommentToDom = function(text) {
+var appendNewCommentToDom = function(html) {
   var rust = document.querySelector('[data-rust-identity="identity"]');
-  rust.querySelector('#commentContainer').insertAdjacentHTML('beforeend', '<div class="ownChild">' + text + '</div>');
+  rust.querySelector('#commentContainer').insertAdjacentHTML('beforeend', '<div class="ownChild">' + html + '</div>');
 };
 
 // register all the events chrome needs to handle
@@ -85,16 +85,16 @@ var registerEventListeners = function() {
         // send message to background script rust.js with new coment data tp be posted to server
         chrome.runtime.sendMessage({
           type: 'post',
-          comment: text,
-          url: url
+          url: url,
+          text: text,
+          isPrivate: false
         }, function(response) {
+          // TODO: We might need some error handling here if we don't have a valid response object!
           // background script rust.js should return the server response
-          console.log(response);
-          // oh my this is so ugly and not the proper way doing this, we need a better server response later on
-          if (response.data.data !== 'error') {
-            // Append new message to output html.. 
-            appendNewCommentToDom(text);
-          }
+          //reuse templating for new comment (needs to be in an array)
+          var html = templating(response.data.comments);
+          // Append new message 
+          appendNewCommentToDom(html);
           // Reset input field
           document.getElementById('rustsubmit').value = '';
         });
@@ -129,11 +129,10 @@ chrome.runtime.sendMessage({
     console.log('Response:', response);
     // remove DOM artifacts
     cleanDOM();
-
     // For demo: add user name if logged in. Makes not much sense like this
     var html = '';
-    if (response.data.name) {
-      html = '<div>Hello, ' + response.data.name + '</div>';
+    if (response.data.userInfo.username) {
+      html = '<div>Hello, ' + response.data.userInfo.username + '</div>';
     }
     // templating
     html += templating(response.data.comments);

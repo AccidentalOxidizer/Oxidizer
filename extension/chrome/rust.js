@@ -8,20 +8,21 @@ chrome.runtime.onMessage.addListener(
       // call server with get request for data.
       var xhr = new XMLHttpRequest();
       // should include URL as parameter!
-      xhr.open("GET", config.server + "/test/comments", true);
+      xhr.open("POST", config.server + "/api/comments/get", true);
       xhr.onreadystatechange = function() {
         if (xhr.readyState === 4 && xhr.status === 200) {
           // JSON.parse does not evaluate the attacker's scripts.
           var resp = JSON.parse(xhr.responseText);
           sendResponse({
-            // dev: "rust.js responding to message from chrome tab",
             data: resp
-              // request: request,
-              // sender: sender
           });
         }
       };
-      xhr.send();
+      xhr.send(JSON.stringify({
+        url: request.url,
+        lastUpdateTimestamp: 'undefined',
+        isPrivate: false
+      }));
       // if you don't return true here shit hits the fan
       return true;
     }
@@ -29,7 +30,7 @@ chrome.runtime.onMessage.addListener(
     // post a new comment
     if (request.type === 'post') {
       var xhr = new XMLHttpRequest();
-      xhr.open('POST', config.server + '/api/comments');
+      xhr.open('POST', config.server + '/api/comments/add');
       xhr.setRequestHeader('Content-Type', 'application/json');
 
       xhr.onreadystatechange = function() {
@@ -39,13 +40,12 @@ chrome.runtime.onMessage.addListener(
             data: resp
           });
         }
-
       };
 
       xhr.send(JSON.stringify({
-        text: request.comment,
-        isPrivate: false,
-        url: request.url
+        url: request.url,
+        text: request.text,
+        isPrivate: false
       }));
       return true;
     }
