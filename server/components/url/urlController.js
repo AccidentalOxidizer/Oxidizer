@@ -18,18 +18,19 @@ var copyObject = function(obj) {
   var parsedObject = {};
 
   for (var prop in obj) {
-    if (obj.hasOwnProperty(prop)){
+    if (obj.hasOwnProperty(prop)) {
       parsedObject[prop] = obj[prop];
     }
   }
 
   parsedObject.url = parseUrl(parsedObject.url);
-  
+
   return parsedObject;
 };
 
 // GET a URL from the database
 var get = function(searchObject) {
+  console.log("URL OBJECT LNE 51: ", searchObject);
   var parsedObject = copyObject(searchObject);
 
   return Url.findOne({
@@ -48,8 +49,9 @@ var get = function(searchObject) {
 
 // Write a new URL to the database
 var save = function(urlObject) {
+  console.log("URL OBJECT LNE 51: ", urlObject);
   var parsedObject = copyObject(urlObject);
-  
+
   return Url.findOrCreate({
       where: parsedObject
     })
@@ -69,7 +71,9 @@ var save = function(urlObject) {
 var remove = function(url) {
   url = parseUrl(url);
   return Url.destroy({
-      where: {url: url}
+      where: {
+        url: url
+      }
     })
     .then(function(affectedRows) {
       if (affectedRows === 0) {

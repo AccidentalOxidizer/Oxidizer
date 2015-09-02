@@ -1,6 +1,5 @@
 var bodyParser = require('body-parser');
 var auth = require('../middleware').auth;
-var urlParser = require('url');
 var Promise = require('bluebird');
 var Url = Promise.promisifyAll(require('../components/url'));
 var Comment = Promise.promisifyAll(require('../components/comment'));
@@ -8,13 +7,13 @@ var jsonParser = bodyParser.json();
 
 module.exports = function(app) {
   // TODO: isLoggedIn
-  app.get('/api/comments/url*', jsonParser, function(req, res, next) {
+  app.post('/api/comments/get', jsonParser, function(req, res, next) {
     // Get all comments for a specific URL
-    var url_parts = url.parse(req.url, true);
-    var fullPath = url_parts.path;
+
+    console.log("REQ BODY LINE 13: ", req.body);
 
     var urlToGet = {
-      path: fullPath
+      url: req.body.url
     };
 
     Url.get(urlToGet)
@@ -24,12 +23,15 @@ module.exports = function(app) {
         });
       })
       .then(function(comments) {
-
+        console.log("COMMENTS?? ", comments);
+        res.send(200, {
+          comments: comments
+        });
       })
       .catch(function(err) {
         return err;
       });
-    res.send(200);
+
   });
 
   app.get('/api/comments/id/:id', jsonParser, auth.isLoggedIn, function(req, res, next) {
@@ -38,22 +40,24 @@ module.exports = function(app) {
   });
 
   // add isAuth
-  app.post('/api/comments/', jsonParser,  function(req, res, next) {
+  app.post('/api/comments/add', jsonParser, function(req, res, next) {
     // Add a new comment!
     console.log('%%%%%%%%%%', req.session);
-    Url.save({url: req.body.url})
-      .then(function(url){
+    Url.save({
+        url: req.body.url
+      })
+      .then(function(url) {
         return Comment.post({
           text: req.body.text,
           isPrivate: req.body.isPrivate,
-          UserId: req.user.id, 
+          UserId: req.user.id,
           UrlId: url.get('id')
         });
       })
-      .then(function(comment){
+      .then(function(comment) {
         res.send(comment);
       })
-      .catch(function(err){
+      .catch(function(err) {
         console.log(err);
         res.end(500);
       });
