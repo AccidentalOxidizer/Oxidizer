@@ -38,7 +38,7 @@ module.exports = function(app) {
   // add isAuth
   app.post('/api/comments/', jsonParser,  function(req, res, next) {
     // Add a new comment!
-    console.log('%%%%%%%%%%', req);
+    console.log('%%%%%%%%%%', req.session);
     Url.save({url: req.body.url})
       .then(function(url){
         return Comment.post({
