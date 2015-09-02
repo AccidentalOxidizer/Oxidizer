@@ -1,6 +1,14 @@
 $(document).ready(function() {
 
+  var buildComments = function(comment) {
+    var commentHTML = '<p>' + comment.User.name + '</br>' +
+      comment.createdAt + '</br>' + comment.text + '</p>';
+
+    return commentHTML;
+  }
+
   // Check if logged in from server?
+  // NOTE: This isn't working at the moment.
   var isLoggedIn = true;
 
   if (isLoggedIn === false) {
@@ -24,6 +32,14 @@ $(document).ready(function() {
     success: function(data) {
       console.log('DATA: ', data);
       console.log('DONE!');
+
+      var commentArrayHTML = '';
+      // Render comment HTML
+      data['comments'].forEach(function(element, index) {
+        commentArrayHTML = commentArrayHTML.concat(buildComments(data['comments'][index]));
+      });
+
+      $('#comments').html(commentArrayHTML);
     },
     error: function(err) {
       console.log("Awww shit", err);

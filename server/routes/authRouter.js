@@ -51,14 +51,14 @@ module.exports = function(app, passport) {
     req.logOut();
     req.logout();
     req.session.destroy();
-    console.log('Sesison & User after logout: ', req.sesison, req.user);
+    console.log('Session & User after logout: ', req.sesison, req.user);
 
     // what's our cookie name?
     // res.clearCookie('cookiename')
     res.status(200).send({
       auth: 'terminated'
     });
-  })
+  });
 
   // Facebook Auth Routes
   app.get('/api/auth/facebook', jsonParser, passport.authenticate('facebook', {
@@ -78,4 +78,4 @@ module.exports = function(app, passport) {
   app.get('/api/auth/chrome/facebook', jsonParser, passport.authenticate('facebook', {
     scope: 'email'
   }));
-}
+};
