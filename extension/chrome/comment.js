@@ -71,7 +71,7 @@ var appendToDOM = function(html) {
 var appendNewCommentToDom = function(text) {
   var rust = document.querySelector('[data-rust-identity="identity"]');
   rust.querySelector('#commentContainer').insertAdjacentHTML('beforeend', '<div class="ownChild">' + text + '</div>');
-}
+};
 
 // register all the events chrome needs to handle
 var registerEventListeners = function() {
@@ -80,13 +80,13 @@ var registerEventListeners = function() {
     // if user hits enter key
     if (e.keyCode === 13) {
       var text = document.getElementById('rustsubmit').value;
-<<<<<<< HEAD
       // Only proceed if text is not empty
       if (text !== '') {
         // send message to background script rust.js with new coment data tp be posted to server
         chrome.runtime.sendMessage({
           type: 'post',
-          comment: text
+          comment: text,
+          url: url
         }, function(response) {
           // background script rust.js should return the server response
           console.log(response);
@@ -116,12 +116,8 @@ var registerEventListeners = function() {
       console.log(response);
     });
   });
-<<<<<<< HEAD
-
-}
-=======
 };
->>>>>>> serverstuff
+
 
 /* MAGIC HAPPENS HERE */
 // send 'init' message with url to the chome extension (rust.js) when loaded

@@ -71,7 +71,6 @@ module.exports = function(passport, config) {
           email: email
         })
         .then(function(user) {
-          console.log('%%%%%%%%%%%%%%%%%%%',user);
           if (user) {
             console.log("GoogleStrategy: found valid user with email " + email);
 
@@ -82,8 +81,12 @@ module.exports = function(passport, config) {
               user.googleId = profile.id;
               user.googleToken = accessToken;
               user.googleName = profile.displayName;
-              return user.save();
+              return user.save()
+                .then(function(){
+                  return done(null, user);
+                });
             } else {
+              console.log('done called line 87');
               return done(null, user);
             }
           } else {
@@ -96,15 +99,17 @@ module.exports = function(passport, config) {
               googleToken: accessToken,
               googleName: profile.displayName
             });
-            return newUser.save();
+            return newUser.save()
+              .then(function(user) {
+                console.log(')))00)))))))))))))))))))))))', user);
+                console.log('done called line 105');
+                return done(null, user);
+              });
           }        
         })
-        .then(function(user) {
-          console.log(')))00)))))))))))))))))))))))', user);
-          return done(null, user);
-        })
         .catch(function(err) {
-          return done(err);
+          console.log('danger will robinson', err);
+          done(err);
         });
     }));
 
