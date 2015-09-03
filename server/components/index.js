@@ -1,21 +1,6 @@
 var Sequelize = require('sequelize');
 var config = require('../config').get().mysql;
-
-// if (process.NODE_ENV === 'production') {
-// var sequelize = new Sequelize('mysql://' +
-//   config.username + ':' +
-//   config.password + '@' +
-//   config.path + ':' +
-//   config.port + '/' +
-//   config.name);
-// }
-
-var sequelize = new Sequelize(process.env.OPENSHIFT_MYSQL_DB_URL);
-
-// var sequelize = new Sequelize(config.name, config.username, config.password, {
-//   // disable logging; default: console.log
-//   logging: false
-// });
+var sequelize = new Sequelize(config.url + 'rust');
 
 var models = {
   'User': 'user/userModel',
