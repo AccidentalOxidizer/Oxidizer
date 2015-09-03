@@ -78,7 +78,7 @@ chrome.runtime.onMessage.addListener(
       xhr.open("GET", config.server + "/test/auth", true);
       xhr.setRequestHeader('Content-Type', 'application/json');
       xhr.onreadystatechange = function() {
-        if (xhr.readyState === 4 && xhr.status === 200) {
+        if (xhr.readyState === 4) { // && xhr.status === 200
           var resp = JSON.parse(xhr.responseText);
           sendResponse({
             data: resp
