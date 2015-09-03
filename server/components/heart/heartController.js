@@ -17,9 +17,9 @@ var get = function(searchObject) {
 };
 
 var fave = function(searchObject) {
-  console.log("FAVE OBJECT: ", searchObject);
-  var newFave = Heart.build(searchObject);
-  return newFave.findOrCreate({
+  //console.log("FAVE OBJECT: ", searchObject);
+  //var newFave = Heart.build(searchObject);
+  return Heart.findOrCreate({
       where: searchObject
     })
     .then(function(favorite) {

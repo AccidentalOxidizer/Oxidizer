@@ -17,9 +17,11 @@ var get = function(searchObject) {
 };
 
 var flag = function(searchObject) {
-  console.log("FLAG OBJECT: ", searchObject);
-  var newFlag = Flag.build(searchObject);
-  return newFlag.save()
+  //console.log("FLAG OBJECT: ", searchObject);
+  //var newFlag = Flag.build(searchObject);
+  return Flag.findOrCreate({
+      where: searchObject
+    })
     .then(function(flag) {
       return get({
         CommentId: searchObject.CommentId
