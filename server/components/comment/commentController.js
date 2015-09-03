@@ -1,5 +1,7 @@
 var Comment = require('../').Comment;
 var User = require('../').User;
+var Heart = require('../').Heart;
+var Flag = require('../').Flag;
 
 var get = function(searchObject) {
   var attributes = ['text', 'User.name'];
@@ -10,6 +12,12 @@ var get = function(searchObject) {
     include: [{
       model: User,
       attributes: ['name']
+    }, {
+      model: Heart,
+      attributes: ['id']
+    }, {
+      model: Flag,
+      attributes: ['id']
     }]
   });
 };

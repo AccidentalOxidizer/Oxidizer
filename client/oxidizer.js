@@ -16,7 +16,7 @@ $(document).ready(function() {
     var commentHTML = '<div class="comment"><p>Comment ID:' + comment.id + '<br/>' + comment.User.name + '<br/>' +
       comment.createdAt + '<br/>' + comment.text + '<br/>' +
       '<a href="#" class="fave" data-comment-id="' + comment.id + '">FAVE IT</a> || <a href="#" class="flag" data-comment-id="' + comment.id + '">FLAG IT</a> <br/>' +
-      'TOTAL FAVS: <span id="faves-' + comment.id + '">0</span> || TOTAL FLAGS: <span id="flags-' + comment.id + '">0</span></p></div>';
+      'TOTAL FAVS: <span id="faves-' + comment.id + '">' + comment.Hearts.length + '</span> || TOTAL FLAGS: <span id="flags-' + comment.id + '">' + comment.Flags.length + '</span></p></div>';
     return commentHTML;
   };
 
