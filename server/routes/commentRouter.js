@@ -3,6 +3,7 @@ var Promise = require('bluebird');
 var xssFilters = require('xss-filters');
 var Url = Promise.promisifyAll(require('../components/url'));
 var Heart = Promise.promisifyAll(require('../components/heart'));
+var Flag = Promise.promisifyAll(require('../components/flag'));
 var Comment = Promise.promisifyAll(require('../components/comment'));
 var bodyParser = require('body-parser');
 var jsonParser = bodyParser.json();
@@ -24,11 +25,31 @@ module.exports = function(app) {
   });
 
   // Get all favs for a comment
+  app.get('/api/comments/flags/get', jsonParser, function(req, res, next) {
+    var flagsToGet = {
+      url: req.body.commentId
+    };
+  });
+
+  // Add a fav.
+  app.post('/api/comments/flag', jsonParser, function(req, res, next) {
+    Flag.flag({
+        UserId: req.body.UserId,
+        CommentId: req.body.CommentId
+      })
+      .then(function(result) {
+        console.log('Comment flagged!');
+      })
+      .catch(function(err) {
+        console.log("Error: Comment not flagged...", err);
+      });
+  });
+
+  // Get all favs for a comment
   app.get('/api/comments/faves/get', jsonParser, function(req, res, next) {
     var favesToGet = {
       url: req.body.commentId
     };
-
   });
 
   // TODO: isLoggedIn

@@ -126,6 +126,28 @@ $(document).ready(function() {
     console.log('FLAG CLICKED:', $(this).attr('data-comment-id'));
 
     // COOL! Let's FLAG SOME STUFF!
+    // Convert our data-comment-id attribute to a number.
+    var thisCommentId = Number($(this).attr('data-comment-id'));
+
+    var data = JSON.stringify({
+      UserId: testSettings.userId,
+      CommentId: thisCommentId
+    });
+
+    $.ajax({
+      type: "POST",
+      url: 'http://localhost:3000/api/comments/flag',
+      data: data,
+      contentType: 'application/json', // content type sent to server
+      dataType: 'json', //Expected data format from server
+      success: function(data) {
+        console.log("SUCCESS! Comment FLAGGED!");
+      },
+      error: function(err) {
+        console.log("Awww shit, man. Couldn't flag!", err);
+      }
+    });
+
 
   });
 
