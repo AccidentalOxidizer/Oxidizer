@@ -38,7 +38,7 @@ var config = {
       name: 'rust',
       username: 'root',
       password: '',
-      port: ''
+      port: '3306'
     },
     googleAuth: {
       clientId: '837204469183-nklfavnlll2v6jh0ku65tieuvc6qmhn1.apps.googleusercontent.com',
