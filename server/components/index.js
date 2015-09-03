@@ -1,10 +1,17 @@
 var Sequelize = require('sequelize');
-var config = require('../config').get().dbconfig;
 
-var sequelize = new Sequelize(config.name, config.username, config.password, {
-  // disable logging; default: console.log
-  logging: false
-});
+// this is horrible and needs to change.
+if (process.env.NODE_ENV === 'production') {
+  var config = require('../config').get().mysql;
+  var sequelize = new Sequelize(config.url + 'rust');
+} else {
+  var config = require('../config').get().dbconfig;
+  var sequelize = new Sequelize(config.name, config.username, config.password, {
+    // disable logging; default: console.log
+    logging: false
+  });
+}
+
 
 var models = {
   'User': 'user/userModel',

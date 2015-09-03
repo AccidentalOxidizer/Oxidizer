@@ -19,7 +19,8 @@ var utils = require('./utils');
 
 // CONFIG
 var config = require('./config.js').get(process.env.NODE_ENV);
-var port = process.env.PORT || 3000;
+app.set('port', process.env.OPENSHIFT_NODEJS_PORT || process.env.PORT || 3000);
+app.set('ip', process.env.OPENSHIFT_NODEJS_IP || process.env.IP || '127.0.0.1');
 
 // initialize passport settings
 require('./components/user/passport')(passport, config);
@@ -36,8 +37,9 @@ sequelize.sync().then(function() {
   app.use(cookieParser());
 
   // using sessions for auth for now
+  // need to switch to tokens 
   app.use(session({
-    secret: 'iron oxide',
+    secret: config.secret,
     resave: false,
     saveUninitialized: true
   }));
@@ -47,7 +49,16 @@ sequelize.sync().then(function() {
 
   routes(app, passport);
 
-  app.listen(port, function() {
-    console.log('Server running on port ' + port);
+  app.listen(app.get('port'), app.get('ip'), function(err) {
+    if (err) console.log(err);
+    console.log('Server running on port ' + app.get('port') + ' on ' + app.get('ip'));
   });
 });
+
+/*
+
+Warning: connect.session() MemoryStore is not
+designed for a production environment, as it will leak
+memory, and will not scale past a single process.
+
+*/
