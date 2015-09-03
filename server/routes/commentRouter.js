@@ -1,8 +1,9 @@
-var bodyParser = require('body-parser');
 var auth = require('../middleware').auth;
 var Promise = require('bluebird');
+var xssFilters = require('xss-filters');
 var Url = Promise.promisifyAll(require('../components/url'));
 var Comment = Promise.promisifyAll(require('../components/comment'));
+var bodyParser = require('body-parser');
 var jsonParser = bodyParser.json();
 
 module.exports = function(app) {
@@ -44,7 +45,7 @@ module.exports = function(app) {
           currentTime: new Date(), // TODO: Fill this out!
           userInfo: {
             userId: req.user.id || undefined,
-            username: req.user.name || undefined// TODO: Fill this out!
+            username: req.user.name || undefined // TODO: Fill this out!
           }
         });
       })
@@ -61,21 +62,34 @@ module.exports = function(app) {
   });
 
   // add isAuth
-  app.post('/api/comments/add', jsonParser, function(req, res, next) {
+  app.post('/api/comments/add', jsonParser, auth.isLoggedIn, function(req, res, next) {
     // Add a new comment!
+
     Url.save({
         url: req.body.url
       })
       .then(function(url) {
+
+        // HOW IS USER ID VERIFIED? 
+        // User ID needs to be a number
+        if (typeof req.user.id !== 'number') {
+          throw new Error('TypeError: User ID received is invalid.');
+        }
+
+        // sanitize against XSS etc
+        var text = xssFilters.inHTMLData(req.body.text);
+        var isPrivate = typeof req.body.isPrivate === 'boolean' ? req.body.isPrivate : false;
+
         return Comment.post({
-          text: req.body.text,
-          isPrivate: req.body.isPrivate,
+          text: text,
+          isPrivate: isPrivate,
           UserId: req.user.id,
           UrlId: url.get('id')
         });
       })
       .then(function(comment) {
-        formatComment ={ 
+
+        formatComment = {
           UrlId: comment.get('UrlId'),
           text: comment.get('text'),
           createdAt: comment.get('createdAt'),
