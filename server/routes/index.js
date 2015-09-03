@@ -11,7 +11,16 @@ var urlEncodedParser = bodyParser.urlencoded({
   extended: true
 });
 
-module.exports = function(app, passport) {
+module.exports = function(express, app, passport) {
+  app.use(express.static(__dirname + '/../../client/'));
+
+  //home
+  // app.get('/', urlEncodedParser, function(req, res, next) {
+  //   res.sendStatus(200);
+  // });
+
+
+
   // setup route for development only
   // to enable run: NODE_ENV='development' node server/app.js
   if (process.env.NODE_ENV === 'development') {

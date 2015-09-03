@@ -49,7 +49,7 @@ sequelize.sync().then(function() {
   app.use(passport.initialize());
   app.use(passport.session());
 
-  routes(app, passport);
+  routes(express, app, passport);
 
   app.listen(app.get('port'), app.get('ip'), function(err) {
     if (err) console.log(err);

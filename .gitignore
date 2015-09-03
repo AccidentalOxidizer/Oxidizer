@@ -28,6 +28,7 @@ dist/
 node_modules/
 bower_components/
 server/config.js
+client/dist
 
 # Elastic Beanstalk Files
 .elasticbeanstalk/*
