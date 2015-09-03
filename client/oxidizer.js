@@ -8,10 +8,10 @@ $(document).ready(function() {
   // Basically, our AJAX call will get data back, loop over the array of comments
   // then send each individiaul comment here to build out the comment.
   var buildComments = function(comment) {
-    var commentHTML = '<p>Comment ID:' + comment.id + '<br/>' + comment.User.name + '<br/>' +
+    var commentHTML = '<div class="comment"><p>Comment ID:' + comment.id + '<br/>' + comment.User.name + '<br/>' +
       comment.createdAt + '<br/>' + comment.text + '<br/>' +
-      '<a href="#">FAVE IT</a> || <a href="#">FLAG IT</a> <br/>' +
-      'TOTAL FAVS: 0 || TOTAL FLAGS: 0</p>';
+      '<a href="#" class="fave" data-comment-id="' + comment.id + '">FAVE IT</a> || <a href="#" class="flag" data-comment-id="' + comment.id + '">FLAG IT</a> <br/>' +
+      'TOTAL FAVS: 0 || TOTAL FLAGS: 0</p></div>';
     return commentHTML;
   };
 
@@ -79,4 +79,19 @@ $(document).ready(function() {
     console.log('STATUS = BALLER');
     getComments($('#getUrl').val());
   });
+
+  // Detect if we've clicked on a FAVE link
+  $(document).on('click', '.fave', function(event) {
+    event.preventDefault();
+    //console.log('FAVE clicked!');
+    console.log('FAVE CLICKED:', $(this).attr('data-comment-id'));
+  });
+
+  // Detect if we've clicked on a FLAG link
+  $(document).on('click', '.flag', function(event) {
+    event.preventDefault();
+    //console.log('FAVE clicked!');
+    console.log('FLAG CLICKED:', $(this).attr('data-comment-id'));
+  });
+
 });
