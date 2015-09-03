@@ -23,6 +23,7 @@
   },
   "homepage": "https://github.com/AccidentalOxidizer/rust#readme",
   "dependencies": {
+    "axios": "^0.5.4",
     "bcrypt-nodejs": "0.0.3",
     "blue-tape": "^0.1.10",
     "bluebird": "^2.9.34",
