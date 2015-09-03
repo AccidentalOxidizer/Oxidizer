@@ -16,7 +16,7 @@ $(document).ready(function() {
     var commentHTML = '<div class="comment"><p>Comment ID:' + comment.id + '<br/>' + comment.User.name + '<br/>' +
       comment.createdAt + '<br/>' + comment.text + '<br/>' +
       '<a href="#" class="fave" data-comment-id="' + comment.id + '">FAVE IT</a> || <a href="#" class="flag" data-comment-id="' + comment.id + '">FLAG IT</a> <br/>' +
-      'TOTAL FAVS: 0 || TOTAL FLAGS: 0</p></div>';
+      'TOTAL FAVS: <span id="faves-' + comment.id + '">0</span> || TOTAL FLAGS: <span id="flags-' + comment.id + '">0</span></p></div>';
     return commentHTML;
   };
 
@@ -112,6 +112,7 @@ $(document).ready(function() {
       dataType: 'json', //Expected data format from server
       success: function(result) {
         console.log("SUCCESS! Comment FAVORITED! # of favs: ", result);
+        $('#faves-' + thisCommentId).html(result.favs);
       },
       error: function(err) {
         console.log("Awww shit, man. Couldn't favorite!", err);
@@ -141,8 +142,9 @@ $(document).ready(function() {
       data: data,
       contentType: 'application/json', // content type sent to server
       dataType: 'json', //Expected data format from server
-      success: function(data) {
-        console.log("SUCCESS! Comment FLAGGED! # of flags", data);
+      success: function(result) {
+        console.log("SUCCESS! Comment FLAGGED! # of flags", result);
+        $('#flags-' + thisCommentId).html(result.flags);
       },
       error: function(err) {
         console.log("Awww shit, man. Couldn't flag!", err);
