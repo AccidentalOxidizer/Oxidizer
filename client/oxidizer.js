@@ -49,6 +49,7 @@ $(document).ready(function() {
         $('#comments').html(commentArrayHTML);
       },
       error: function(err) {
+        $('#comments').html('Please login with Google credentials first :)');
         console.log("Awww shit", err);
       }
     });
