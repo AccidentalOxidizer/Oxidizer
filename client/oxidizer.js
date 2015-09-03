@@ -57,6 +57,9 @@ $(document).ready(function() {
         console.log('DATA: ', data);
         console.log('DONE!');
 
+        // Set the logged in user's ID so we can pass into fav / flag functions.
+        testSettings.userId = data.userInfo.userId;
+
         var commentArrayHTML = '';
         // Render comment HTML
         data['comments'].forEach(function(element, index) {
@@ -93,6 +96,27 @@ $(document).ready(function() {
 
     // COOL! Let's FAVORITE SOME STUFF!
 
+    // Convert our data-comment-id attribute to a number.
+    var thisCommentId = Number($(this).attr('data-comment-id'));
+
+    var data = JSON.stringify({
+      UserId: testSettings.userId,
+      CommentId: thisCommentId
+    });
+
+    $.ajax({
+      type: "POST",
+      url: 'http://localhost:3000/api/comments/fave',
+      data: data,
+      contentType: 'application/json', // content type sent to server
+      dataType: 'json', //Expected data format from server
+      success: function(data) {
+        console.log("SUCCESS! Comment FAVORITED!");
+      },
+      error: function(err) {
+        console.log("Awww shit, man. Couldn't favorite!", err);
+      }
+    });
   });
 
   // Detect if we've clicked on a FLAG link

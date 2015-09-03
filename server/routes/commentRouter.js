@@ -2,6 +2,7 @@ var auth = require('../middleware').auth;
 var Promise = require('bluebird');
 var xssFilters = require('xss-filters');
 var Url = Promise.promisifyAll(require('../components/url'));
+var Heart = Promise.promisifyAll(require('../components/heart'));
 var Comment = Promise.promisifyAll(require('../components/comment'));
 var bodyParser = require('body-parser');
 var jsonParser = bodyParser.json();
@@ -9,12 +10,24 @@ var jsonParser = bodyParser.json();
 module.exports = function(app) {
 
   // Add a fav.
-  app.post('/api/comments/fav', jsonParser, function(req, res, next) {
-
+  app.post('/api/comments/fave', jsonParser, function(req, res, next) {
+    Heart.fave({
+        UserId: req.body.UserId,
+        CommentId: req.body.CommentId
+      })
+      .then(function(result) {
+        console.log('Comment faved!');
+      })
+      .catch(function(err) {
+        console.log("Error: Comment not faved...", err);
+      });
   });
 
   // Get all favs for a comment
   app.get('/api/comments/faves/get', jsonParser, function(req, res, next) {
+    var favesToGet = {
+      url: req.body.commentId
+    };
 
   });
 
