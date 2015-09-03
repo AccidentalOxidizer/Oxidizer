@@ -92,7 +92,7 @@ $(document).ready(function() {
   $(document).on('click', '.fave', function(event) {
     event.preventDefault();
     //console.log('FAVE clicked!');
-    console.log('FAVE CLICKED:', $(this).attr('data-comment-id'));
+    console.log('FAVE CLICKED, ID = ', $(this).attr('data-comment-id'));
 
     // COOL! Let's FAVORITE SOME STUFF!
 
@@ -110,20 +110,21 @@ $(document).ready(function() {
       data: data,
       contentType: 'application/json', // content type sent to server
       dataType: 'json', //Expected data format from server
-      success: function(data) {
-        console.log("SUCCESS! Comment FAVORITED!");
+      success: function(result) {
+        console.log("SUCCESS! Comment FAVORITED! # of favs: ", result);
       },
       error: function(err) {
         console.log("Awww shit, man. Couldn't favorite!", err);
       }
     });
+
   });
 
   // Detect if we've clicked on a FLAG link
   $(document).on('click', '.flag', function(event) {
     event.preventDefault();
     //console.log('FAVE clicked!');
-    console.log('FLAG CLICKED:', $(this).attr('data-comment-id'));
+    console.log('FLAG CLICKED, ID = ', $(this).attr('data-comment-id'));
 
     // COOL! Let's FLAG SOME STUFF!
     // Convert our data-comment-id attribute to a number.
@@ -141,7 +142,7 @@ $(document).ready(function() {
       contentType: 'application/json', // content type sent to server
       dataType: 'json', //Expected data format from server
       success: function(data) {
-        console.log("SUCCESS! Comment FLAGGED!");
+        console.log("SUCCESS! Comment FLAGGED! # of flags", data);
       },
       error: function(err) {
         console.log("Awww shit, man. Couldn't flag!", err);

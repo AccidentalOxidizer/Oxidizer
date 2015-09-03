@@ -18,6 +18,12 @@ module.exports = function(app) {
       })
       .then(function(result) {
         console.log('Comment faved!');
+        console.log('Faved result: ', result);
+        // The result returned is the number of favorites for this particular comment.
+        var faveCount = {
+          favs: result
+        };
+        res.send(faveCount);
       })
       .catch(function(err) {
         console.log("Error: Comment not faved...", err);
@@ -39,6 +45,12 @@ module.exports = function(app) {
       })
       .then(function(result) {
         console.log('Comment flagged!');
+        console.log('Flagged result: ', result);
+        // The result returned is the number of favorites for this particular comment.
+        var flagCount = {
+          flags: result
+        };
+        res.send(flagCount);
       })
       .catch(function(err) {
         console.log("Error: Comment not flagged...", err);

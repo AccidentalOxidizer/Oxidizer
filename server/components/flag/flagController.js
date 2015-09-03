@@ -21,7 +21,14 @@ var flag = function(searchObject) {
   var newFlag = Flag.build(searchObject);
   return newFlag.save()
     .then(function(flag) {
-      return flag;
+      return get({
+        CommentId: searchObject.CommentId
+      });
+    })
+    .then(function(flags) {
+      // NUMBER OF FAVORITES!
+      console.log("GET FLAGS: ", flags.length);
+      return flags.length;
     })
     .catch(function(err) {
       console.log('this is the error', err);
