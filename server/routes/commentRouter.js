@@ -43,6 +43,7 @@ module.exports = function(app) {
           comments: comments,
           currentTime: new Date(), // TODO: Fill this out!
           userInfo: {
+            userId: req.user.id || undefined,
             username: req.user.name || undefined// TODO: Fill this out!
           }
         });
