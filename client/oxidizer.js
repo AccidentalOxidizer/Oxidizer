@@ -5,7 +5,7 @@ $(document).ready(function() {
       comment.createdAt + '</br>' + comment.text + '</p>';
 
     return commentHTML;
-  }
+  };
 
   // Check if logged in from server?
   // NOTE: This isn't working at the moment.
