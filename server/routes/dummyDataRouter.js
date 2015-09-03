@@ -4,7 +4,6 @@ var urlEncodedParser = bodyParser.urlencoded({
   extended: true
 });
 var jsonParser = bodyParser.json();
-var is = require('type-is');
 
 var dummyData = {
   comments: [{
