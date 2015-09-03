@@ -7,6 +7,17 @@ var bodyParser = require('body-parser');
 var jsonParser = bodyParser.json();
 
 module.exports = function(app) {
+
+  // Add a fav.
+  app.post('/api/comments/fav', jsonParser, function(req, res, next) {
+
+  });
+
+  // Get all favs for a comment
+  app.get('/api/comments/faves/get', jsonParser, function(req, res, next) {
+
+  });
+
   // TODO: isLoggedIn
   // Get all comments for a specific URL
   app.post('/api/comments/get', jsonParser, function(req, res, next) {

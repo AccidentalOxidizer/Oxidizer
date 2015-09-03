@@ -2,7 +2,12 @@ $(document).ready(function() {
 
   // Initial vars
   // Setting this to emtpy so we can do some interesting stuff later.
-  var url = '';
+
+  var testSettings = {
+    url: '',
+    urlId: '',
+    userId: ''
+  };
 
   // Use this to build out HTML for individual comments.
   // Basically, our AJAX call will get data back, loop over the array of comments
@@ -33,10 +38,10 @@ $(document).ready(function() {
   // That way we can update the server if I input a new URL to look at in the
   // input box at the top of the screen.
   var getComments = function(url) {
-    url = url || 'http://reddit.com/r/kerbalspaceprogram';
+    testSettings.url = url || 'http://reddit.com/r/kerbalspaceprogram';
     // Default website to show comments from on page load.
     var data = JSON.stringify({
-      url: url
+      url: testSettings.url
     });
 
     // AJAX call to server to get comments from a particular URL.
@@ -58,7 +63,7 @@ $(document).ready(function() {
           commentArrayHTML = commentArrayHTML.concat(buildComments(data['comments'][index]));
         });
 
-        $('#comments').html('<p>URL: ' + url + '</p>' + commentArrayHTML);
+        $('#comments').html('<p>URL: ' + testSettings.url + '</p>' + commentArrayHTML);
       },
       error: function(err) {
         $('#comments').html('Please login with Google credentials first :)');
@@ -85,6 +90,9 @@ $(document).ready(function() {
     event.preventDefault();
     //console.log('FAVE clicked!');
     console.log('FAVE CLICKED:', $(this).attr('data-comment-id'));
+
+    // COOL! Let's FAVORITE SOME STUFF!
+
   });
 
   // Detect if we've clicked on a FLAG link
@@ -92,6 +100,9 @@ $(document).ready(function() {
     event.preventDefault();
     //console.log('FAVE clicked!');
     console.log('FLAG CLICKED:', $(this).attr('data-comment-id'));
+
+    // COOL! Let's FLAG SOME STUFF!
+
   });
 
 });
