@@ -1,9 +1,14 @@
 $(document).ready(function() {
 
+  // Initial vars
+  var url = '';
+
   // Use this to build out HTML for individual comments.
   var buildComments = function(comment) {
-    var commentHTML = '<p>' + comment.User.name + '</br>' +
-      comment.createdAt + '</br>' + comment.text + '</p>';
+    var commentHTML = '<p>Comment ID:' + comment.id + '<br/>' + comment.User.name + '<br/>' +
+      comment.createdAt + '<br/>' + comment.text + '<br/>' +
+      '<a href="#">FAVE IT</a> || <a href="#">FLAG IT</a> <br/>' +
+      'TOTAL FAVS: 0 || TOTAL FLAGS: 0</p>';
 
     return commentHTML;
   };
@@ -21,8 +26,8 @@ $(document).ready(function() {
   }
 
   var getComments = function(url) {
-    url = url || 'http://reddit.com/r/kerbalspaceprogram'
-      // Default website to show comments from on page load.
+    url = url || 'http://reddit.com/r/kerbalspaceprogram';
+    // Default website to show comments from on page load.
     var data = JSON.stringify({
       url: url
     });
@@ -46,7 +51,7 @@ $(document).ready(function() {
           commentArrayHTML = commentArrayHTML.concat(buildComments(data['comments'][index]));
         });
 
-        $('#comments').html(commentArrayHTML);
+        $('#comments').html('<p>URL: ' + url + '</p>' + commentArrayHTML);
       },
       error: function(err) {
         $('#comments').html('Please login with Google credentials first :)');
@@ -55,7 +60,7 @@ $(document).ready(function() {
     });
   };
 
-  // On Page Load:
+  // On Initial Page Load:
   getComments();
 
 
