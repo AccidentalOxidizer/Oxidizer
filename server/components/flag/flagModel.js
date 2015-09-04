@@ -1,3 +1,12 @@
-module.exports = function(sequelize, dataTypes){
-  return sequelize.define('Flag', {});
+module.exports = function(sequelize, dataTypes) {
+  return sequelize.define('Flag', {
+    UserId: {
+      type: dataTypes.INTEGER,
+      allowNull: false
+    },
+    CommentId: {
+      type: dataTypes.INTEGER,
+      allowNull: false
+    }
+  });
 };

@@ -1,1 +1,1 @@
-index.js
+module.exports = require('./heartController');

@@ -2,6 +2,9 @@
 var express = require('express');
 var app = express();
 
+// SERVE STATIC FILES FROM CLIENT FOLDER
+app.use(express.static('client'));
+
 // MIDDLEWARE
 var path = require('path');
 var compression = require('compression');
@@ -31,7 +34,6 @@ require('./components/dbconfig');
 // ROUTES
 var routes = require('./routes');
 
-
 sequelize.sync().then(function() {
   app.use(morgan('dev'));
   app.use(cookieParser());
@@ -53,12 +55,12 @@ sequelize.sync().then(function() {
     if (err) console.log(err);
     console.log('Server running on port ' + app.get('port') + ' on ' + app.get('ip'));
   });
+
+  /*
+
+  Warning: connect.session() MemoryStore is not
+  designed for a production environment, as it will leak
+  memory, and will not scale past a single process.
+
+  */
 });
-
-/*
-
-Warning: connect.session() MemoryStore is not
-designed for a production environment, as it will leak
-memory, and will not scale past a single process.
-
-*/

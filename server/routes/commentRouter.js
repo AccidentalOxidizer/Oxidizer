@@ -2,11 +2,68 @@ var auth = require('../middleware').auth;
 var Promise = require('bluebird');
 var xssFilters = require('xss-filters');
 var Url = Promise.promisifyAll(require('../components/url'));
+var Heart = Promise.promisifyAll(require('../components/heart'));
+var Flag = Promise.promisifyAll(require('../components/flag'));
 var Comment = Promise.promisifyAll(require('../components/comment'));
 var bodyParser = require('body-parser');
 var jsonParser = bodyParser.json();
 
 module.exports = function(app) {
+
+  // Add a fav.
+  app.post('/api/comments/fave', jsonParser, function(req, res, next) {
+    Heart.fave({
+        UserId: req.body.UserId,
+        CommentId: req.body.CommentId
+      })
+      .then(function(result) {
+        console.log('Comment faved!');
+        console.log('Faved result: ', result);
+        // The result returned is the number of favorites for this particular comment.
+        var faveCount = {
+          favs: result
+        };
+        res.send(faveCount);
+      })
+      .catch(function(err) {
+        console.log("Error: Comment not faved...", err);
+      });
+  });
+
+  // Get all favs for a comment
+  app.get('/api/comments/flags/get', jsonParser, function(req, res, next) {
+    var flagsToGet = {
+      url: req.body.commentId
+    };
+  });
+
+  // Add a fav.
+  app.post('/api/comments/flag', jsonParser, function(req, res, next) {
+    Flag.flag({
+        UserId: req.body.UserId,
+        CommentId: req.body.CommentId
+      })
+      .then(function(result) {
+        console.log('Comment flagged!');
+        console.log('Flagged result: ', result);
+        // The result returned is the number of favorites for this particular comment.
+        var flagCount = {
+          flags: result
+        };
+        res.send(flagCount);
+      })
+      .catch(function(err) {
+        console.log("Error: Comment not flagged...", err);
+      });
+  });
+
+  // Get all favs for a comment
+  app.get('/api/comments/faves/get', jsonParser, function(req, res, next) {
+    var favesToGet = {
+      url: req.body.commentId
+    };
+  });
+
   // TODO: isLoggedIn
   // Get all comments for a specific URL
   app.post('/api/comments/get', jsonParser, function(req, res, next) {

@@ -12,13 +12,6 @@ var urlEncodedParser = bodyParser.urlencoded({
 });
 
 module.exports = function(app, passport) {
-  //home
-  app.get('/', urlEncodedParser, function(req, res, next) {
-    res.sendStatus(200);
-  });
-
-
-
   // setup route for development only
   // to enable run: NODE_ENV='development' node server/app.js
   if (process.env.NODE_ENV === 'development') {
@@ -38,4 +31,10 @@ module.exports = function(app, passport) {
 
   // error handling
   error(app);
+
+  //home
+  app.get('/', urlEncodedParser, function(req, res, next) {
+    console.log(req.isAuthenticated());
+    res.sendStatus(200);
+  });
 };

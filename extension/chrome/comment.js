@@ -46,10 +46,11 @@ var templating = function(comments) {
     comment = comments[i];
     result += [
       '<div id="', comment.User.name, '">',
-        '<div>', comment.User.name, '</div>',
-        '<div>', comment.createdAt, '</div>',
-        '<div>', comment.text, '</div>',
-      '</div>'].join('');
+      '<div>', comment.User.name, '</div>',
+      '<div>', comment.createdAt, '</div>',
+      '<div>', comment.text, '</div>',
+      '</div>'
+    ].join('');
   }
   result += '</div>';
   return result;
