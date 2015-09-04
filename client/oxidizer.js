@@ -54,8 +54,8 @@ $(document).ready(function() {
       success: function(data) {
         $('#comments').html('');
 
-        console.log('DATA: ', data);
-        console.log('DONE!');
+        //console.log('DATA: ', data);
+        //console.log('DONE!');
 
         // Set the logged in user's ID so we can pass into fav / flag functions.
         testSettings.userId = data.userInfo.userId;
@@ -82,17 +82,17 @@ $(document).ready(function() {
   getComments();
 
   // This checks the URL FORM for any URLs and will call the getComments()
-  // function in order to get updated URLs.
+  // function in order to get updated comments related to a specific URL.
   $("#urlForm").submit(function() {
-    console.log('STATUS = BALLER');
     getComments($('#getUrl').val());
   });
 
   // Detect if we've clicked on a FAVE link
+  // If so, send an AJAX call to the database and update the number of favorites.
   $(document).on('click', '.fave', function(event) {
     event.preventDefault();
     //console.log('FAVE clicked!');
-    console.log('FAVE CLICKED, ID = ', $(this).attr('data-comment-id'));
+    //console.log('FAVE CLICKED, ID = ', $(this).attr('data-comment-id'));
 
     // COOL! Let's FAVORITE SOME STUFF!
 
@@ -111,21 +111,23 @@ $(document).ready(function() {
       contentType: 'application/json', // content type sent to server
       dataType: 'json', //Expected data format from server
       success: function(result) {
-        console.log("SUCCESS! Comment FAVORITED! # of favs: ", result);
+        //console.log("SUCCESS! Comment FAVORITED! # of favs: ", result);
         $('#faves-' + thisCommentId).html(result.favs);
       },
       error: function(err) {
-        console.log("Awww shit, man. Couldn't favorite!", err);
+        console.log("Awww, man. Couldn't favorite!", err);
       }
     });
 
   });
 
   // Detect if we've clicked on a FLAG link
+  // If so, send an AJAX call to the database and update the number of flags for
+  // a particular comment.
   $(document).on('click', '.flag', function(event) {
     event.preventDefault();
     //console.log('FAVE clicked!');
-    console.log('FLAG CLICKED, ID = ', $(this).attr('data-comment-id'));
+    //console.log('FLAG CLICKED, ID = ', $(this).attr('data-comment-id'));
 
     // COOL! Let's FLAG SOME STUFF!
     // Convert our data-comment-id attribute to a number.
@@ -143,11 +145,11 @@ $(document).ready(function() {
       contentType: 'application/json', // content type sent to server
       dataType: 'json', //Expected data format from server
       success: function(result) {
-        console.log("SUCCESS! Comment FLAGGED! # of flags", result);
+        //console.log("SUCCESS! Comment FLAGGED! # of flags", result);
         $('#flags-' + thisCommentId).html(result.flags);
       },
       error: function(err) {
-        console.log("Awww shit, man. Couldn't flag!", err);
+        console.log("Awww, man. Couldn't flag!", err);
       }
     });
 
