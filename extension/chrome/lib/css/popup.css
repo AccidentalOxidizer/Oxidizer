@@ -1,44 +1,15 @@
 body {
-    font-family: "Open Sans", sans-serif;
-
-  min-width:600px;
-  /*min-height:280px;*/
-  font-size: 13px;
-  padding: 20px;
-}
-h1,h2,h3,h4 {
-  color: #444;
-}
-h1 {
-  font-size: 2.6em;
-  font-weight: 300;
-  line-height: 1.2;
-  margin: 0 0 .4em;
-}
-h2 {
-  font-size: 1.6em;
-  color: #909090;
-  font-weight: 300;
-  line-height: 1.2;
-  margin: 0 0 .4em;
+  min-width: 600px;
+  background: #fff;
 }
 nav {
   background-color: #fafafa;
   width: 100%;
 }
 nav ul {
-  width:90%;
+  width: 90%;
 }
-/*.btn {
-  font-size: 1.2em;
-  padding: .6em 1.8em;
-  cursor: pointer;
-  border: none;
-  box-shadow: none;
-  border-radius: .25em;
-  float:left;
-  margin:10px;
-}*/
+
 .btn.red {
   background: #c6463d;
   color: #fff;
@@ -54,12 +25,9 @@ nav ul {
 .btn.outline {
   color: #383838;
   background: transparent;
-  border:1px solid #383838;
+  border: 1px solid #383838;
 }
-.btn.outline:hover{
-  background: rgba(0, 0, 0, 0.23);;
+.btn.outline:hover {
+  background: rgba(0, 0, 0, 0.23);
 }
 
-.btn-social>:first-child{
-  font-size: 1.4em;
-}

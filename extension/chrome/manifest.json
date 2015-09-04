@@ -1,5 +1,5 @@
 {
-  "name": "Rust",
+  "name": "Oxidizer",
   "description": "The Commenting System of the Internet",
   "version": "0.2",
   "permissions": [
@@ -34,6 +34,7 @@
   },
   "options_ui": {
     "page": "options.html",
+    "open_in_tab": true,
     "chrome_style": true
   },
   "web_accessible_resources": [
