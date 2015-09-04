@@ -40,13 +40,15 @@ $(document).ready(function() {
   var getComments = function(url) {
     testSettings.url = url || 'http://reddit.com/r/kerbalspaceprogram';
     // Default website to show comments from on page load.
-    var data = JSON.stringify({
+    // If this is for a POST request, we need to JSON.stringify() data.
+    // If it's for a GET request, we don't need to stringify data.
+    var data = {
       url: testSettings.url
-    });
+    };
 
     // AJAX call to server to get comments from a particular URL.
     $.ajax({
-      type: "POST",
+      type: "GET",
       url: 'http://localhost:3000/api/comments/get',
       data: data,
       contentType: 'application/json', // content type sent to server
