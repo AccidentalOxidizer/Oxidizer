@@ -1,0 +1,46 @@
+body {
+    background: #eee;
+    color: #333;
+    font: Arial, Helvetica, sans-serif;
+    /*line-height: 1;*/
+    -webkit-text-size-adjust: none;
+    -webkit-font-smoothing: antialiased;
+  padding: 20px;
+}
+
+h1, h2, h3, h4 {
+  color: #444;
+}
+h1 {
+  font-size: 2.6em;
+  font-weight: 300;
+  line-height: 1.2;
+  margin: 0 0 .4em;
+}
+h2 {
+  font-size: 1.6em;
+  color: #6B6B6B;
+  font-weight: 300;
+  line-height: 1.2;
+  margin: 0 0 .4em;
+}
+
+.btn-social>:first-child {
+  font-size: 1.2em;
+  line-height: 32px;
+}
+
+
+header {
+    margin: 2.3em auto 2.3em;
+}
+article {
+    position: relative;
+    background: #fff;
+    margin-bottom: 2em;#6B6B6B
+    /*margin: 0 auto 2.3em;*/
+    width: 520px;
+    padding: 2.5em 3em 1.6em 3em;
+    border-radius: 2px;
+    box-shadow: rgba(0, 0, 0, .10) 0px 2px 1px, rgba(0, 0, 0, .10) 0px 0px 1px;
+}

@@ -1,18 +1,22 @@
 function saveOptions() {
   // get the values:
-  var private = document.getElementById('private').checked;
-  var visible = document.getElementById('visible').checked;
+  var keepprivate = document.getElementById('keepprivate').checked;
+  var autoshow = document.getElementById('autoshow').checked;
   // save values with chrome storage sync
   chrome.storage.sync.set({
-    private: private,
-    visible: visible
+    keepprivate: keepprivate,
+    autoshow: autoshow
   }, function() {
     // Update status to indicate successful saved options
     var status = document.getElementById('status');
-    status.textContent = 'Saved.';
+    status.classList.remove('hidden');
+    status.classList.add('visible');
+    status.textContent = 'Settings saved';
     setTimeout(function() {
       // reset the status message after 2 seconds
       status.textContent = '';
+      status.classList.remove('visible');
+      status.classList.add('hidden');
     }, 2000);
   });
 }
@@ -21,11 +25,11 @@ function saveOptions() {
 function restoreOptions() {
   // Use default values
   chrome.storage.sync.get({
-    private: false,
-    visible: true
+    keepprivate: false,
+    autoshow: true
   }, function(items) {
-    document.getElementById('private').checked = items.private;
-    document.getElementById('visible').checked = items.visible;
+    document.getElementById('keepprivate').checked = items.keepprivate;
+    document.getElementById('autoshow').checked = items.autoshow;
   });
 }
 

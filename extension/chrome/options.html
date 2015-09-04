@@ -2,27 +2,82 @@
 <html>
 <head>
   <title>Rust Options</title>
-  <style>
-    body: { padding: 10px; }
-    /*include some fancy styling here?*/
-  </style>
-</head>
+  <link rel="stylesheet" media="screen" href="lib/css/bootstrap.min.css">
+  <link rel="stylesheet" media="screen" href="lib/css/font-awesome.min.css">
+  <link rel="stylesheet" media="screen" href="lib/css/bootstrap-social.css">
+  <link rel="stylesheet" media="screen" href="lib/css/common.css">
+  <link rel="stylesheet" media="screen" href="lib/css/options.css">
+
+  </head>
 <body>
- <h1>Options </h1>
+<!-- <div class="container-fluid bg-success">
+test
+</div> -->
 
-<label>
-<input type="checkbox" id="private">
-    make private site annotation default (not recomended)
-</label><br>
-  <input type="checkbox" id="visible">
-    auto-show comments on pages (recommended)
-</label>
 
-  <div id="status"></div>
+<div class="container wrapper" style="margin-top:20px;">
+<div class="row">
+<div class="col-xs-12">
 
-  <button id="save">Save</button>
-  <button id="reset">Reset</button>
+<header>
+  
+<h1 style="margin-left:40px;">Oxidizer</h1> 
+</header>
+
+
+
+<article>
+<div class="row">
+<div class="col-xs-12">
+<h2>Default Settings</h2>
+</div>
+</div>
+  <form>
+  <div class="form-group" style="display:none"> 
+    <div class="checkbox">
+      <label>
+        <input type="checkbox" id="autoshow"> Auto-show comments
+      </label>
+    </div>
+  </div>
+  <div class="form-group"> 
+    <div class="checkbox">
+      <label>
+        <input type="checkbox" id="keepprivate"> Make comments private site annotations by default
+      </label>
+    </div>
+  </div>
+
+  <a class="btn btn-primary btn-social " id="save"><i class="fa fa-floppy-o"></i> Save</a>
+  <a class="btn btn-default btn-social " id="reset" style="margin-left:10px;"><i class="fa fa-times"></i> Reset</a>
+  </form>
+  <br>
+  <div id="status" class="alert alert-info alert-dismissible hidden" role="alert"></div>
+</article>
+
+<article>
+<div class="row">
+<div class="col-xs-12">
+<h2>Invite others to use Oxidizer</h2>
+<p>Share the link: <a href="http://www.oxidizer.io">www.oxidizer.io</a></p>
+<p>via: 
+<a class="btn btn-social btn-facebook btn-xs " id=""><i class="fa fa-facebook"></i> Facebook</a>
+<a class="btn btn-social btn-twitter btn-xs " id=""><i class="fa fa-twitter"></i> Twitter</a>
+<a class="btn btn-social btn-google btn-xs " id=""><i class="fa fa-facebook"></i> Google</a>
+</p>
+</div>
+</div>
+</article>
+
+</div>
+
+</div>
+</div>
+
+
+
+
 </body>
-<script src="options.js"></script>
+<script src="lib/js/options.js"></script>
 </html>
 
