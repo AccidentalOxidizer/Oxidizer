@@ -68,6 +68,11 @@ module.exports = function(app) {
   // Get all comments for a specific URL
   app.get('/api/comments/get', jsonParser, function(req, res, next) {
 
+    // Handle undefined URLs to prevent crashing? Maybe...
+    if (req.query.url === undefined) {
+      return;
+    }
+
     var urlToGet = {
       url: req.query.url
     };
