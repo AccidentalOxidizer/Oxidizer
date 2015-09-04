@@ -1,12 +1,31 @@
-// login
+// CONFIG
+var config = '';
 
-var login = function() {
+var getConfig = function() {
+  var xhr = new XMLHttpRequest();
+  xhr.onreadystatechange = function() {
+    config = JSON.parse(xhr.responseText);
+  };
+  xhr.open("GET", chrome.extension.getURL('config.json'), true);
+  xhr.send();
+};
+
+getConfig();
+
+// LOGIN STRATEGIES
+var googleLogin = function() {
   chrome.tabs.create({
-    url: 'http://localhost:3000/api/auth/chrome/google'
+    url: config.server + '/api/auth/chrome/google'
   });
 }
 
-// logout 
+var facebookLogin = function() {
+  chrome.tabs.create({
+    url: config.server + '/api/auth/chrome/facebook'
+  });
+}
+
+// LOGOUT STRATEGIES 
 var logout = function() {
   chrome.runtime.sendMessage({
     type: 'logout'
@@ -43,10 +62,13 @@ var popup = function() {
 }
 
 // Register Events on DOM
-document.querySelector('#login').addEventListener('click', login);
+document.querySelector('#facebook-login').addEventListener('click', facebookLogin);
+document.querySelector('#google-login').addEventListener('click', googleLogin);
 document.querySelector('#logout').addEventListener('click', logout);
 document.querySelector('#options').addEventListener('click', options);
 document.querySelector('#popup').addEventListener('click', popup);
+
+
 
 // nope..
 // $(document).ready(function() {
