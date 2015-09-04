@@ -4,6 +4,7 @@
 // extension sends in parameter the url (and later group/ maybe isPrivate)
 var requestAllCommentsForPath = {
   url: 'string unparsed url',
+  mostRecentCommentId: 'number ',
   lastUpdateTimestamp: 'lastUpdate',
   isPrivate: 'boolean'
 };
