@@ -3,13 +3,11 @@ var User = require('../').User;
 var Heart = require('../').Heart;
 var Flag = require('../').Flag;
 
-var get = function(searchObject) {
-  var attributes = ['text', 'User.name'];
-
-  return Comment.findAll({
-      where: searchObject,
-      // attributes: attributes,
-      include: [{
+var get = function(searchObject, lastCommentId) {
+  var attributes = ['text', 'User.name']; 
+  var queryObject = {
+    where: searchObject,
+    include: [{
         model: User,
         attributes: ['name']
       }, {
@@ -19,9 +17,21 @@ var get = function(searchObject) {
         model: Flag,
         attributes: ['id']
       }]
-    })
+  };
+
+  if (lastCommentId !== null) {
+    queryObject.where.id = {};
+    queryObject.where.id.$gt = lastCommentId;
+  }
+
+  // limit the number of comments we send to the user
+  queryObject.limit = 50;
+
+  // return in descending order of commentid
+  queryObject.order = 'id ASC';
+  console.log(queryObject);
+  return Comment.findAll(queryObject)
     .then(function(results) {
-      //console.log("GET COMMENT RESULTS: ", results);
       // Iterate over our results array and update the number of hearts and favorites so
       // we don't return the ENTIRE array.
       results.forEach(function(element, index, array) {
@@ -71,7 +81,6 @@ var remove = function(commentId) {
       }
     })
     .then(function(affectedRows) {
-      console.log(affectedRows);
       if (affectedRows === 0) {
         throw new Error('User not found - delete failed');
       } else if (affectedRows > 1) {

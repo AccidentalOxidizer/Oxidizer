@@ -34,7 +34,7 @@ var test = require('tape');
  */
 
 test('----- Comment Controller Tests -----\n\n', function(t) {
-  t.plan(4); // Number of tests that we plan to run
+  t.plan(5); // Number of tests that we plan to run
   var dummyUser = {
     name: 'eliotdummy',
     email: 'eliot@eliot.com',
@@ -60,7 +60,6 @@ test('----- Comment Controller Tests -----\n\n', function(t) {
 
     return Promise.all([testUser.save(), testUrl.save()])
       .then(function(data){
-        console.log('hey');
         testUserId = testUser.get('id');
         testUrlId = testUrl.get('id');
         
@@ -156,7 +155,7 @@ test('----- Comment Controller Tests -----\n\n', function(t) {
         return newComment.save();
       })
       .then(function(commentInstance){
-        return Comment.get(commentInstance);
+        return Comment.get(dummyComment);
       })
       .then(function(comments){
         t.equal(comments.length, 1, 'get returns an object');
@@ -226,6 +225,78 @@ test('----- Comment Controller Tests -----\n\n', function(t) {
       });
   };
 
+  var testGetCommentWithLastCommentId = function(t){
+    var dummyUser = {
+      name: 'eliotdummy',
+      email: 'eliot@eliot.com',
+      status: 1
+    };
+    
+    var dummyUrl = {
+      url: 'www.rustedserverwfunnycomments.io'
+    };
+
+    var dummyComment = {
+      text: 'funny comment about the web',
+      isPrivate: false
+    };
+
+    var testUser = userModel.build(dummyUser);
+    var testUrl = urlModel.build(dummyUrl);
+
+    var testUserId;
+    var testUrlId;
+
+    return Promise.all([testUser.save(), testUrl.save()])
+      .then(function(data){
+        testUserId = testUser.get('id');
+        testUrlId = testUrl.get('id');
+        
+        var comments = [];
+
+        for (var i = 0; i < 10; i++){
+          comments.push({
+            text: dummyComment.text,
+            isPrivate: dummyComment.isPrivate,
+            UserId: testUser.get('id'),
+            UrlId: testUrl.get('id')
+          });
+        }
+
+        return Promise.map(comments, function(comment){
+          var newComment = commentModel.build(comment);
+          return newComment.save();
+        });
+      })
+      .then(function(comments){
+        var middleId = comments[5].id; 
+        console.log('middleId',middleId);
+        return Comment.get({
+          UrlId: testUrlId
+        }, middleId);
+      })
+      .then(function(comments){
+        console.log(comments[0].id);
+        t.equal(comments.length, 4, 'returns comments after given id');
+        return commentModel.destroy({where: {UrlId: testUrlId}});
+      })
+      .then(function(){
+        return Promise.all([
+          userModel.destroy({where: {id: testUserId}}),
+          urlModel.destroy({where: {id: testUrlId}})
+        ])
+        .catch(function(err){
+          Comment.remove({where: {UrlId: testUrlId}});  
+          throw err;
+        });
+      })
+      .catch(function(err){        
+        userModel.destroy({where: {id: testUserId}});
+        urlModel.destroy({where: {id: testUrlId}});
+        throw err;
+      });
+  };
+
   testCommentPost(dummyComment, t)  
     .then(function(){
       return testPutComment(dummyComment, t);
@@ -236,9 +307,13 @@ test('----- Comment Controller Tests -----\n\n', function(t) {
     .then(function(){
       return testRemoveComment(t);
     })
+    .then(function(){
+      return testGetCommentWithLastCommentId(t);
+    })
     .catch(function(err){
       throw err;
     });
+
 });
 
 // test('----- Comment Router Tests -----\n\n', function(t) {
