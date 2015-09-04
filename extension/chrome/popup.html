@@ -1,22 +1,38 @@
 <html>
 <head>
-  <script src="lib/jquery-2.1.4.min.js"></script>
+<link rel="stylesheet" media="screen" href="lib/css/bootstrap.min.css">
+<link rel="stylesheet" media="screen" href="lib/css/font-awesome.min.css">
+<link rel="stylesheet" media="screen" href="lib/css/bootstrap-social.css">
+<link rel="stylesheet" media="screen" href="lib/css/popup.css">
 </head>
-<body style="width:400px;">
-  <h2>RUST - The Commenting System of the Internet</h2>
+<body>
+<div class="container" style="margin-top:20px;">
+<div class="row">
+<div class="col-xs-12">
+<h1>Oxidizer</h1> 
+<h2>The Commenting System of the Internet</h2><br>
+</div>
+</div>
+<div class="row">
+<div class="col-xs-12">
 
-  <!--   <a href="http://localhost:4568/auth/github">Login via Github</a>
-    <a href="http://localhost:4568/test">Test</a>
-    <a href="http://localhost:3000/options.html">options</a>
-    <a href="http://www.google.com">Google</a> -->
-    <p>We should only show login if user not already logged in. 
-    Either we check with server, or we save state in chrome.storage (background script)</p>
-    <a id="login">Login</a> || <a id="logout">Logout</a> || <a id="options">Options</a> 
-    <br>
-    <a id="popup" style="display: none;">Popup</a> 
-    
-    <div id="status"></div>
-  
-  <script src="popup.js"></script>
+<a id="facebook-login" class="btn btn-social btn-facebook">
+    <i class="fa fa-facebook"></i> Login
+</a>
+<a id="google-login" class="btn btn-social btn-google">
+    <i class="fa fa-google"></i> Login
+</a>
+<a class="btn btn-social outline" id="logout"><i class="fa fa-sign-out"></i> Logout</a> 
+<a class="btn btn-social outline" id="options"><i class="fa fa-cog"></i> Options</a> 
+</div>
+<br>
+<a id="popup"style="display: none;">Popup</a> 
+
+<div id="status"></div>
+</div>
+</div>
+<script src="lib/js/jquery-2.1.4.min.js"></script>
+<script src="lib/js/bootstrap.min.js"></script>
+<script src="lib/js/popup.js"></script>
 </body>
 </html>
