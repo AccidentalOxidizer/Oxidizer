@@ -4,6 +4,7 @@ var urlEncodedParser = bodyParser.urlencoded({
   extended: true
 });
 
+
 module.exports = function(app, passport) {
   app.post('/api/auth/local', jsonParser, passport.authenticate('local', {
     successRedirect: '/',
