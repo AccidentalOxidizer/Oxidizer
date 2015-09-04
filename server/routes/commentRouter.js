@@ -67,7 +67,6 @@ module.exports = function(app) {
   // TODO: isLoggedIn
   // Get all comments for a specific URL
   app.get('/api/comments/get', jsonParser, function(req, res, next) {
-    console.log('REQUEST QUERY: ', req.query);
 
     var urlToGet = {
       url: req.query.url
@@ -78,8 +77,7 @@ module.exports = function(app) {
         if (url !== null) {
           return Comment.get({
             UrlId: url.id
-              //maxCommentId: req.body.maxCommentId || null
-          });
+          }, req.body.maxCommentId || null);
         } else {
           // We expect an empty comments array to be returned
           // for any webpage that we haven't yet visited / added
