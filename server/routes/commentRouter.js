@@ -77,7 +77,7 @@ module.exports = function(app) {
         if (url !== null) {
           return Comment.get({
             UrlId: url.id
-          }, req.body.maxCommentId || null);
+          }, req.query.maxCommentId || null);
         } else {
           // We expect an empty comments array to be returned
           // for any webpage that we haven't yet visited / added
