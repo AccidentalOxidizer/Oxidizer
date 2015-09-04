@@ -67,7 +67,12 @@ module.exports = function(app) {
   // TODO: isLoggedIn
   // Get all comments for a specific URL
   app.get('/api/comments/get', jsonParser, function(req, res, next) {
-    console.log("REQUEST inside Comment Router: ", req);
+
+    // Handle undefined URLs to prevent crashing? Maybe...
+    if (req.query.url === undefined) {
+      return;
+    }
+
     var urlToGet = {
       url: req.query.url
     };
