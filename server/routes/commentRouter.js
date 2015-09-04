@@ -10,7 +10,7 @@ var jsonParser = bodyParser.json();
 
 module.exports = function(app) {
 
-  // Add a fav.
+  // Users marks a specific comment as a new favorite.
   app.post('/api/comments/fave', jsonParser, function(req, res, next) {
     Heart.fave({
         UserId: req.body.UserId,
@@ -30,14 +30,14 @@ module.exports = function(app) {
       });
   });
 
-  // Get all favs for a comment
-  app.get('/api/comments/flags/get', jsonParser, function(req, res, next) {
-    var flagsToGet = {
+  // Get all favorites for a specific comment
+  app.get('/api/comments/faves/get', jsonParser, function(req, res, next) {
+    var favesToGet = {
       url: req.body.commentId
     };
   });
 
-  // Add a fav.
+  // Users marks a specific comment as flagged for bad behavior.
   app.post('/api/comments/flag', jsonParser, function(req, res, next) {
     Flag.flag({
         UserId: req.body.UserId,
@@ -57,19 +57,19 @@ module.exports = function(app) {
       });
   });
 
-  // Get all favs for a comment
-  app.get('/api/comments/faves/get', jsonParser, function(req, res, next) {
-    var favesToGet = {
+  // Get all flags for a specific comment.
+  app.get('/api/comments/flags/get', jsonParser, function(req, res, next) {
+    var flagsToGet = {
       url: req.body.commentId
     };
   });
 
   // TODO: isLoggedIn
   // Get all comments for a specific URL
-  app.post('/api/comments/get', jsonParser, function(req, res, next) {
+  app.get('/api/comments/get', jsonParser, function(req, res, next) {
 
     var urlToGet = {
-      url: req.body.url
+      url: req.query.url
     };
 
     Url.get(urlToGet)
@@ -77,7 +77,7 @@ module.exports = function(app) {
         if (url !== null) {
           return Comment.get({
             UrlId: url.id
-          });
+          }, req.query.maxCommentId || null);
         } else {
           // We expect an empty comments array to be returned
           // for any webpage that we haven't yet visited / added
