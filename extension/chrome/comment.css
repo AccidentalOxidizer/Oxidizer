@@ -1,31 +1,133 @@
-
-
-
-#rustsuperid {
-  position: absolute !important;
-  /* top: 0 !important; */
-  right: 0 !important;
-}
-
-#commentContainer > div.ownChild {
-    color: red !important;
-}
-
-[data-rust-identity="identity"] {
-    /* Styles */
+[data-rust-css="rustful"][data-rust-identity="identity"] {
+  height: 100vh !important;
+  width: 250px !important;
   position: fixed !important;
+  right: 0px !important;
+  bottom: 0px !important;
+  background-color: transparent !important;
+  z-index: 99999 !important;
+  /*so user can click underneath our div*/
+  pointer-events: none !important;
+  transition: transform 0.3s !important;
+}
+
+/*so users can click our divs*/
+[data-rust-css="rustful"][data-rust-identity="identity"] * {
+  pointer-events: auto !important;
+}
+
+[data-rust-css="rustful"][data-rust-identity="expandcontainer"] {
+  position: fixed !important;
+  width: 20px !important;
+  height: 20px !important;
+  right: 0px !important;
+  bottom: 0px !important;
+}
+
+[data-rust-css="rustful"][data-rust-identity="expand"] {
+  position: fixed !important;
+  height: 20px !important;
+  width: 20px !important;
+  right: 0px !important;
+  bottom: 0px !important;
+  fill: #B7410E !important;
+}
+
+[data-rust-css="rustful"][data-rust-identity="rustbody"]{
+  position: fixed !important;
+  height: 100% !important;
+  width: 250px !important;
+  padding: 4px !important;
+  border:1px solid grey !important;
+  font-family: Gotham, "Helvetica Neue", Helvetica, Arial, sans-serif !important;
+  font-size: 10pt !important;
+  background-color: white !important;
+  -webkit-box-sizing: border-box !important;
+  box-sizing: border-box !important;
+  transition: transform 0.3s !important;
+}
+
+[data-rust-css="rustful"][data-rust-identity="rustbody"][data-rust-show="hide"] {
+  -webkit-transform: translateX(250px) !important; /* THIS NEEDS TO BE SAME AS WIDTH OF rustbody*/
+}
+
+[data-rust-css="rustful"][data-rust-identity="expandcontainer"][data-rust-show="hide"] {
+  display: none !important;
+}
+
+[data-rust-css="rustful"][data-rust-identity="commentcontainer"]{
+  width: 245px !important;
+  -webkit-box-sizing: border-box !important;
+  box-sizing: border-box !important;
+}
+[data-rust-css="rustful"][data-rust-identity="commentcontainer"] * {
+  display: inline-block !important;
+  margin-top: 0px !important;
+  margin-right: 0px !important;
+  margin-bottom: 0px !important;
+  margin-left: 0px !important;
+  -webkit-box-sizing: border-box !important;
+  box-sizing: border-box !important;
+}
+[data-rust-identity="comment"] {
+  width: 100% !important;
+  padding-top: 0px !important;
+  padding-right: 0px !important;
+  padding-bottom: 0px !important;
+  padding-left: 3px !important;
+  -webkit-box-sizing: border-box !important;
+  box-sizing: border-box !important;
+}
+[data-rust-css="rustful"][data-rust-identity="flags"] {
+  position: relative !important;
   bottom: 0px !important;
   right: 0px !important;
-  background-color: white !important;
-  border:1px solid grey !important;
-  padding:5px !important;
-  margin:5px !important;
-  z-index: 99999 !important;
+  display: inline !important;
+  height: 20px !important;
+  margin-top: 0px !important;
+  margin-right: 0px !important;
+  margin-bottom: 0px !important;
+  margin-left: 0px !important;
+  float: right !important;
+  -webkit-box-sizing: border-box !important;
+  box-sizing: border-box !important;
 }
-
-[data-rust-identity="identity"] .ownChild {
-  color: red !important;
+[data-rust-css="rustful"][data-rust-identity="heart"] {
+  width: 20px !important;
+  height: 20px !important;
+  border-style: solid !important;
+  -webkit-box-sizing: border-box !important;
+  box-sizing: border-box !important;
 }
-#commentContainer > div.ownChild, .ownChild {
-    color: red !important;
+[data-rust-css="rustful"][data-rust-identity="flag"] {
+  width: 20px !important;
+  height: 20px !important;
+  border-style: solid !important;
+  -webkit-box-sizing: border-box !important;
+  -moz-box-sizing: border-box !important;
+  box-sizing: border-box !important;
+  margin-top: 0px !important;
+  margin-right: 0px !important;
+  margin-bottom: 0px !important;
+  margin-left: 0px !important;
+}
+[data-rust-css="rustful"][data-rust-identity="toprow"] {
+  width: 100% !important;
+  margin-bottom: 3px !important;
+}
+[data-rust-css="rustful"][data-rust-identity="commenttext"] {
+  padding-left: 8px !important;
+  word-wrap: break-word !important;
+  width: 100% !important;
+}
+[data-rust-css="rustful"][data-rust-identity="datetime"] {
+  float: right !important;
+  padding-right: 3px !important;
+}
+[data-rust-css="rustful"][data-rust-identity="time"] {
+  margin-right: 3px !important;
+}
+[data-rust-css="rustful"][data-rust-identity="input"] {
+  position: absolute !important;
+  bottom: 4px !important;
 }

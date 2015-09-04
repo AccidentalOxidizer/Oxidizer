@@ -27,9 +27,12 @@ DATA:
 */
 
 // content script running for each chrome tab window injected by the extension rust.js
+
+
 var url = document.location.href;
 var dataAttribute = 'data-rust-identity';
 var dataAttributeValue = 'identity';
+var rustTag = 'data-rust-css="rustful"';
 
 // remove DOM element from previous calls
 var cleanDOM = function() {
@@ -39,27 +42,73 @@ var cleanDOM = function() {
   }
 };
 
+var parseDate = function(dateString) {
+  var dateObj = new Date(dateString);
+  var locale = "en-us";
+  var month = dateObj.getMonth();
+  var day = dateObj.getDate();
+  var year = dateObj.getYear() % 100;
+  var hour = dateObj.getHours();
+  var amOrPm;
+  if (hour > 11) {
+    amOrPm = 'PM';
+  } else {
+    amOrPm = 'AM';
+  }
+  hour = hour % 12;
+  if (hour === 0){
+    hour = 12;
+  }
+  var minute = dateObj.getMinutes();
+  return {
+    time: [hour, ':', minute, ' ', amOrPm].join(''),
+    date: [month, '/', day, '/', year].join('')
+  };
+};
+
+// builds data-rust-type="value"
+var buildSelector = function(value, type){
+  type = type || 'identity';
+  return ['data-rust-', type, '="', value, '"'].join('');
+};
+
 // we can't use handlebars / hogan for mustache due to chrome security limitations 
 var templating = function(comments) {
-  var result = '<div id="commentContainer">';
+  var comment;
+  var timestamp;
+  var result = '<div ' + rustTag + dataAttribute + '="commentcontainer">';
   for (var i = comments.length - 1; i >= 0; i--) {
     comment = comments[i];
+    timestamp = parseDate(comment.createdAt);
     result += [
-      '<div id="', comment.User.name, '">',
-      '<div>', comment.User.name, '</div>',
-      '<div>', comment.createdAt, '</div>',
-      '<div>', comment.text, '</div>',
-      '</div>'
-    ].join('');
+      '<div ', rustTag, buildSelector('comment'),'>',
+        '<div ', rustTag, buildSelector('toprow'),'>',
+          '<div ', rustTag, buildSelector('username'), '>', comment.User.name, '</div>',
+          '<div ', rustTag, buildSelector('datetime'), '>', 
+            '<div ', rustTag, buildSelector('time'), '>', parseDate(comment.createdAt).time, '</div>',
+            '<div ', rustTag, buildSelector('date'), '>', parseDate(comment.createdAt).date, '</div>',
+          '</div>',
+          '<div ', rustTag, buildSelector('commenttext'), '>', comment.text, '</div>',
+          '<div ', rustTag, buildSelector('flags'), '>',
+            '<div ', rustTag, buildSelector('heart'), '></div>',
+            '<div ', rustTag, buildSelector('flag'), '></div>',
+          '</div>',  
+        '</div>', '<br>',  
+      '</div>'].join('');
   }
   result += '</div>';
   return result;
 };
 
+var addExpandButton = function(html){ 
+  html = '<div ' + rustTag + ' ' + buildSelector('rustbody') +' ' + buildSelector('hide', 'show') + '>' + html;
+  html += '</div><div ' + rustTag + ' ' + buildSelector('expandcontainer') + 'data-rust-show="show"><svg><polygon ' + rustTag + ' ' + dataAttribute + '="expand" points="20,0 0,20, 20,20"/></svg><div>';
+  return html;
+};
+
 // add input field functionlity to html output
 var inputField = function(html) {
-  var inputElement = '<input id="rustsubmit" type="text" name="comment"/><div class="submit-comment">Submit</div>';
-  inputElement += '<a id="test">Auth Test</a> || <a href="http://localhost:3000/api/auth/chrome/google">Login link test</a> || <a id="close">close</a>';
+  var inputElement = '<div ' + rustTag + " " + buildSelector('input') + '><input class="rustsubmit" type="text" name="comment"/><div class="submit-comment">Submit</div></div>';
   html += inputElement;
   return html;
 };
@@ -68,6 +117,8 @@ var inputField = function(html) {
 var appendToDOM = function(html) {
   var section = document.createElement('section');
   section.setAttribute(dataAttribute, dataAttributeValue);
+  section.setAttribute('data-rust-css', 'rustful');
+  section.setAttribute('data-rust-show', 'hide');
   section.className += 'rust cleanslate';
   section.innerHTML = html;
   document.body.appendChild(section);
@@ -76,13 +127,22 @@ var appendToDOM = function(html) {
 // directly append the new comment which was submitted to server
 var appendNewCommentToDom = function(html) {
   var rust = document.querySelector('[data-rust-identity="identity"]');
-  rust.querySelector('#commentContainer').insertAdjacentHTML('beforeend', '<div class="ownChild">' + html + '</div>');
+  rust.querySelector('[data-rust-identity="commentcontainer"]').insertAdjacentHTML('beforeend', '<div class="ownChild">' + html + '</div>');
 };
 
 // register all the events chrome needs to handle
 var registerEventListeners = function() {
   var rust = document.querySelector('[data-rust-identity="identity"]');
-  rust.querySelector('#rustsubmit').addEventListener('keydown', function(e) {
+
+  // returns an HTML element given value and type (type is optional and defaults to identity): '[data-rust-type="value"]' 
+  var dataSelector = function(parentNode, value, type){
+    type = type || 'identity';
+    var selector = buildSelector(value,type);
+    console.log(selector);
+    return rust.querySelector('[' + selector + ']');
+  };
+
+  rust.querySelector('[data-rust-identity="input"]').addEventListener('keydown', function(e) {
     // if user hits enter key
     if (e.keyCode === 13) {
       var text = document.getElementById('rustsubmit').value;
@@ -98,7 +158,6 @@ var registerEventListeners = function() {
           // TODO: We might need some error handling here if we don't have a valid response object!
           // background script rust.js should return the server response
           //reuse templating for new comment (needs to be in an array)
-          console.log(response.data);
           var html = templating(response.data.comments);
           // Append new message 
           appendNewCommentToDom(html);
@@ -109,19 +168,25 @@ var registerEventListeners = function() {
     }
   });
 
-  // remove everything on clicking close
-  rust.querySelector('#close').addEventListener('click', function() {
-    rust.parentNode.removeChild(rust);
+  //expand comments section when clicking expando button
+  rust.querySelector('[data-rust-identity="expand"]').addEventListener('mouseover', function(evt) {
+    var rustBody = rust.querySelector('[data-rust-identity="rustbody"]');
+    var expandButton = rust.querySelector('[data-rust-identity="expandcontainer"]');
+    if (rustBody.dataset.rustShow === 'hide') {
+      rustBody.dataset.rustShow = 'show';
+      expandButton.dataset.rustShow = 'hide';
+    } 
   });
 
-  // test if user is authenticated
-  rust.querySelector('#test').addEventListener('click', function() {
-    chrome.runtime.sendMessage({
-      type: 'test'
-    }, function(response) {
-      console.log('auth test response:');
-      console.log(response);
-    });
+  dataSelector(rust, 'rustbody').addEventListener('mouseleave', function(evt) {
+    if (evt.toElement !== null){
+      var rustBody = rust.querySelector('[data-rust-identity="rustbody"]');
+      var expandButton = rust.querySelector('[data-rust-identity="expandcontainer"]');
+      if (rustBody.dataset.rustShow === 'show') {
+        rustBody.dataset.rustShow = 'hide';
+        expandButton.dataset.rustShow = 'show';
+      } 
+    }
   });
 };
 
@@ -138,13 +203,15 @@ chrome.runtime.sendMessage({
     cleanDOM();
     // For demo: add user name if logged in. Makes not much sense like this
     var html = '';
-    if (response.data.userInfo.name) {
-      html = '<div>Hello, ' + response.data.userInfo.name + '</div>';
-    }
+    // if (response.data.userInfo.name) {
+    //   html = '<div>Hello, ' + response.data.userInfo.name + '</div>';
+    // }
     // templating
     html += templating(response.data.comments);
     // add input field
     html = inputField(html);
+    // add expand button
+    html = addExpandButton(html);
     // append to document
     appendToDOM(html);
     // register event listeners for user input
