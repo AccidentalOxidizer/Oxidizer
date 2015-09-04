@@ -28,9 +28,14 @@ dist/
 node_modules/
 bower_components/
 server/config.js
+client/dist
 
 # Elastic Beanstalk Files
 .elasticbeanstalk/*
 !.elasticbeanstalk/*.cfg.yml
 !.elasticbeanstalk/*.global.yml
 
+# .DS_Store files
+.DS_Store
+extension/.DS_Store
+extension/chrome/.DS_Store
