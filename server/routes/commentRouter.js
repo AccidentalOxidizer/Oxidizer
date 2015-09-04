@@ -67,7 +67,7 @@ module.exports = function(app) {
   // TODO: isLoggedIn
   // Get all comments for a specific URL
   app.get('/api/comments/get', jsonParser, function(req, res, next) {
-
+    console.log("REQUEST inside Comment Router: ", req);
     var urlToGet = {
       url: req.query.url
     };

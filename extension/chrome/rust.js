@@ -8,7 +8,22 @@ chrome.runtime.onMessage.addListener(
       // call server with get request for data.
       var xhr = new XMLHttpRequest();
       // should include URL as parameter!
-      xhr.open("POST", config.server + "/api/comments/get");
+
+      // TODO: We need to clean these parameters after we build everything!
+      var params = {
+        url: encodeURIComponent(request.url),
+        lastUpdateTimestamp: 'undefined',
+        isPrivate: false
+      };
+      var paramString = [];
+      for (var key in params) {
+        if (params.hasOwnProperty(key)) {
+          paramString.push(key + '=' + params[key]);
+        }
+      }
+      paramString = paramString.join('&');
+      var apiURL = config.server + "/api/comments/get?" + paramString;
+      xhr.open("GET", apiURL);
       xhr.setRequestHeader('Content-Type', 'application/json');
       xhr.onreadystatechange = function() {
         if (xhr.readyState === 4) {
@@ -19,11 +34,7 @@ chrome.runtime.onMessage.addListener(
           });
         }
       };
-      xhr.send(JSON.stringify({
-        url: request.url,
-        lastUpdateTimestamp: 'undefined',
-        isPrivate: false
-      }));
+      xhr.send();
       // if you don't return true here shit hits the fan
       return true;
     }
