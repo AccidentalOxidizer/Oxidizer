@@ -169,10 +169,20 @@ chrome.tabs.onUpdated.addListener(function(tabId, info) {
     });
   }
 });
+chrome.commands.onCommand.addListener(function(command) {
+  chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
+    chrome.tabs.sendMessage(tabs[0].id, {command: "toggle"});
+  });
+});
 
 
-/*
-Oauth 
-Client ID:  837204469183-nklfavnlll2v6jh0ku65tieuvc6qmhn1.apps.googleusercontent.com ; 
-Secret:  mXAPIt-gVJqr4NeXIvVFTi_M
-*/
+
+
+
+
+
+
+
+
+
+

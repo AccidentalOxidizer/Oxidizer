@@ -97,15 +97,13 @@ var templating = function(comments) {
         '</div>', '<br>',
       '</div>'
     ].join('');
-  };
+  }
   return result;
 };
 
-
-
-var addExpandButton = function(html) {
+var addExpandButton = function(html, commentsExist) {
   html = '<div ' + rustTag + ' ' + buildSelector('rustbody') + ' ' + buildSelector('hide', 'show') + '>' + html;
-  html += '</div><div ' + rustTag + ' ' + buildSelector('expandcontainer') + 'data-rust-show="show"><svg><polygon ' + rustTag + ' ' + dataAttribute + '="expand" points="20,0 0,20, 20,20"/></svg><div>';
+  html += '</div><div ' + rustTag + ' ' + buildSelector('expandcontainer') + 'data-rust-show="show"><svg><polygon ' + buildSelector(commentsExist, 'commentsexist') + rustTag + ' ' + dataAttribute + '="expand" points="20,0 0,20, 20,20"/></svg><div>';
   return html;
 };
 
@@ -192,6 +190,7 @@ var registerEventListeners = function() {
           appendComments(html);
         });
       }
+
   });
 
 
@@ -215,6 +214,21 @@ var registerEventListeners = function() {
       }
     }
   });
+
+  chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
+    if (request.command == "toggle"){
+      var rustBody = rust.querySelector('[data-rust-identity="rustbody"]');
+      var expandButton = rust.querySelector('[data-rust-identity="expandcontainer"]');
+      if (rustBody.dataset.rustShow === 'show') {
+        rustBody.dataset.rustShow = 'hide';
+        expandButton.dataset.rustShow = 'show';
+      } else {
+        rustBody.dataset.rustShow = 'show';
+        expandButton.dataset.rustShow = 'hide';
+      }
+      console.log('hey');
+    }
+  });
 };
 
 
@@ -225,8 +239,16 @@ chrome.runtime.sendMessage({
   url: url
 }, function(response) {
   if (response.data.comments) {
-    lastLoadedCommentId = response.data.comments[response.data.comments.length - 1].id;
-    console.log('Response:', response);
+    if (response.data.comments.length > 0) {
+      lastLoadedCommentId = response.data.comments[response.data.comments.length - 1].id;
+    }
+
+    // change ext color if there are comments
+    var commentsExist = false; 
+    if (response.data.comments.length > 0) {
+      commentsExist = true;
+    }
+
     // remove DOM artifacts
     cleanDOM();
 
@@ -236,7 +258,7 @@ chrome.runtime.sendMessage({
     // add input field
     html = inputField(html);
     // add expand button
-    html = addExpandButton(html);
+    html = addExpandButton(html, commentsExist);
 
     // append to document
     appendToDOM(html);

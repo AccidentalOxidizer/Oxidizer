@@ -30,7 +30,16 @@
   width: 20px !important;
   right: 0px !important;
   bottom: 0px !important;
+}
+
+/*if there are comments*/
+[data-rust-css="rustful"][data-rust-commentsexist="true"]{
   fill: #B7410E !important;
+}
+
+/*if there are no comments*/
+[data-rust-css="rustful"][data-rust-commentsexist="false"]{
+  fill: #0F85B7 !important;
 }
 
 [data-rust-css="rustful"][data-rust-identity="rustbody"]{
