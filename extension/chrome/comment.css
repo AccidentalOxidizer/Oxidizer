@@ -136,3 +136,6 @@
 [data-rust-css="rustful"][data-rust-identity="input"] * {
   display: inline-block !important;
 }
+[data-rust-css="rustful"][data-rust-identity="inputfield"] {
+  width: 200px;
+}

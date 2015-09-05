@@ -25,7 +25,7 @@ var get = function(searchObject, lastCommentId) {
   }
 
   // limit the number of comments we send to the user
-  queryObject.limit = 50;
+  queryObject.limit = 25;
 
   // return in descending order of commentid
   queryObject.order = 'id ASC';

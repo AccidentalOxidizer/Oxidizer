@@ -76,7 +76,7 @@ module.exports = function(app) {
     var urlToGet = {
       url: req.query.url
     };
-
+    console.log(req.query.maxCommentId);
     Url.get(urlToGet)
       .then(function(url) {
         if (url !== null) {

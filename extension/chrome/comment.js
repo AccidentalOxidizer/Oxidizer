@@ -30,6 +30,7 @@ DATA:
 
 
 var url = document.location.href;
+var lastLoadedCommentId;
 var dataAttribute = 'data-rust-identity';
 var dataAttributeValue = 'identity';
 var rustTag = 'data-rust-css="rustful"';
@@ -76,30 +77,31 @@ var buildSelector = function(value, type) {
 var templating = function(comments) {
   var comment;
   var timestamp;
-  var result = '<div ' + rustTag + dataAttribute + '="commentcontainer">';
+  var result = '';
   for (var i = comments.length - 1; i >= 0; i--) {
     comment = comments[i];
     timestamp = parseDate(comment.createdAt);
     result += [
       '<div ', rustTag, buildSelector('comment'), '>',
-      '<div ', rustTag, buildSelector('toprow'), '>',
-      '<div ', rustTag, buildSelector('username'), '>', comment.User.name, '</div>',
-      '<div ', rustTag, buildSelector('datetime'), '>',
-      '<div ', rustTag, buildSelector('time'), '>', parseDate(comment.createdAt).time, '</div>',
-      '<div ', rustTag, buildSelector('date'), '>', parseDate(comment.createdAt).date, '</div>',
-      '</div>',
-      '<div ', rustTag, buildSelector('commenttext'), '>', comment.text, '</div>',
-      '<div ', rustTag, buildSelector('flags'), '>',
-      '<div ', rustTag, buildSelector('heart'), '></div>',
-      '<div ', rustTag, buildSelector('flag'), '></div>',
-      '</div>',
-      '</div>', '<br>',
+        '<div ', rustTag, buildSelector('toprow'), '>',
+          '<div ', rustTag, buildSelector('username'), '>', comment.User.name, '</div>',
+          '<div ', rustTag, buildSelector('datetime'), '>',
+            '<div ', rustTag, buildSelector('time'), '>', parseDate(comment.createdAt).time, '</div>',
+              '<div ', rustTag, buildSelector('date'), '>', parseDate(comment.createdAt).date, '</div>',
+            '</div>',
+          '<div ', rustTag, buildSelector('commenttext'), '>', comment.text, '</div>',
+          '<div ', rustTag, buildSelector('flags'), '>',
+            '<div ', rustTag, buildSelector('heart'), '></div>',
+            '<div ', rustTag, buildSelector('flag'), '></div>',
+          '</div>',
+        '</div>', '<br>',
       '</div>'
     ].join('');
-  }
-  result += '</div>';
+  };
   return result;
 };
+
+
 
 var addExpandButton = function(html) {
   html = '<div ' + rustTag + ' ' + buildSelector('rustbody') + ' ' + buildSelector('hide', 'show') + '>' + html;
@@ -128,9 +130,12 @@ var appendToDOM = function(html) {
 // directly append the new comment which was submitted to server
 var appendNewCommentToDom = function(html) {
   var rust = document.querySelector('[data-rust-identity="identity"]');
-  rust.querySelector('[data-rust-identity="commentcontainer"]').insertAdjacentHTML('beforeend', '<div class="ownChild">' + html + '</div>');
+  rust.querySelector('[data-rust-identity="commentcontainer"]').insertAdjacentHTML('afterbegin', html);
 };
-
+var appendComments = function(html) {
+  var rust = document.querySelector('[data-rust-identity="identity"]');
+  rust.querySelector('[data-rust-identity="commentcontainer"]').insertAdjacentHTML('beforeend', html);
+};
 // register all the events chrome needs to handle
 var registerEventListeners = function() {
   var rust = document.querySelector('[data-rust-identity="identity"]');
@@ -146,7 +151,7 @@ var registerEventListeners = function() {
   rust.querySelector('[data-rust-identity="input"]').addEventListener('keydown', function(e) {
     // if user hits enter key
     if (e.keyCode === 13) {
-      var text = document.querySelector('[data-rust-identity="inputfield"]').value;
+      var text = rust.querySelector('[data-rust-identity="inputfield"]').value;
       // Only proceed if text is not empty
       if (text !== '') {
         // send message to background script rust.js with new coment data tp be posted to server
@@ -163,13 +168,34 @@ var registerEventListeners = function() {
           // Append new message 
           appendNewCommentToDom(html);
           // Reset input field
-          document.getElementById('rustsubmit').value = '';
+          rust.querySelector('[data-rust-identity="inputfield"]').value = '';
         });
       }
     }
   });
+  
+  // sends request for new comments when we get to the bottom of comments
+  rust.querySelector('[data-rust-identity="commentcontainer"]').addEventListener('scroll',function(){
+      var commentContainer = rust.querySelector('[data-rust-identity="commentcontainer"]');
+      console.log(lastLoadedCommentId);
+      // if you want to  
+      if(commentContainer.scrollHeight - commentContainer.scrollTop < 300){ 
+        
+        chrome.runtime.sendMessage({
+          type: 'getmorecomments',
+          url: url,
+          lastUpdateId: lastLoadedCommentId
+        }, function(response) {
+          lastLoadedCommentId = response.data.comments[response.data.comments.length - 1].id;
+          var html = templating(response.data.comments);
+          // Append new messages 
+          appendComments(html);
+        });
+      }
+  });
 
-  //expand comments section when clicking expando button
+
+  // expand comments section when clicking expando button
   rust.querySelector('[data-rust-identity="expand"]').addEventListener('mouseover', function(evt) {
     var rustBody = rust.querySelector('[data-rust-identity="rustbody"]');
     var expandButton = rust.querySelector('[data-rust-identity="expandcontainer"]');
@@ -199,20 +225,19 @@ chrome.runtime.sendMessage({
   url: url
 }, function(response) {
   if (response.data.comments) {
+    lastLoadedCommentId = response.data.comments[response.data.comments.length - 1].id;
     console.log('Response:', response);
     // remove DOM artifacts
     cleanDOM();
+
     // For demo: add user name if logged in. Makes not much sense like this
-    var html = '';
-    // if (response.data.userInfo.name) {
-    //   html = '<div>Hello, ' + response.data.userInfo.name + '</div>';
-    // }
-    // templating
-    html += templating(response.data.comments);
+    var html = ['<div ', rustTag, dataAttribute, '="commentcontainer">',templating(response.data.comments), '</div>'].join('');
+
     // add input field
     html = inputField(html);
     // add expand button
     html = addExpandButton(html);
+
     // append to document
     appendToDOM(html);
     // register event listeners for user input
