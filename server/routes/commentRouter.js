@@ -76,13 +76,13 @@ module.exports = function(app) {
     var urlToGet = {
       url: req.query.url
     };
-    console.log(req.query.maxCommentId);
+    console.log(req.query.lastUpdateId);
     Url.get(urlToGet)
       .then(function(url) {
         if (url !== null) {
           return Comment.get({
             UrlId: url.id
-          }, req.query.maxCommentId || null);
+          }, req.query.lastUpdateId);
         } else {
           // We expect an empty comments array to be returned
           // for any webpage that we haven't yet visited / added

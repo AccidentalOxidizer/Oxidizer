@@ -22,18 +22,18 @@ var get = function(searchObject, lastCommentId) {
         attributes: ['url']
       }]
   };
-
-  if (lastCommentId !== null) {
+  if (lastCommentId !== 'undefined') {
+    console.log(lastCommentId);
     queryObject.where.id = {};
-    queryObject.where.id.$gt = lastCommentId;
-  }
+    queryObject.where.id.$lt = lastCommentId;
+  } 
 
   // limit the number of comments we send to the user
   queryObject.limit = 25;
 
   // return in ascending order of commentid
-  queryObject.order = 'id ASC';
-
+  queryObject.order = [['id', 'DESC']];
+  console.log('query', queryObject);
   return Comment.findAll(queryObject)
     .then(function(results) {
       // Iterate over our results array and update the number of hearts and favorites so
