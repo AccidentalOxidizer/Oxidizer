@@ -13,7 +13,7 @@ var Comment = React.createClass({
   render: function() {
     return (
       <div>
-        <p><strong>{this.props.comment.user.name}</strong> | {this.props.comment.url} | {this.props.comment.timestamp}</p>
+        <p><strong>{this.props.comment.User.name}</strong> | {this.props.comment.Url.url} | {this.props.comment.createdAt}</p>
         <p>{this.props.comment.text}</p>
       </div>
     );

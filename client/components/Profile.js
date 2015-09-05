@@ -16,6 +16,7 @@ var Profile = React.createClass({
     }
   },
 
+  // TODO: refactor to use to load additional comments too.
   init: function() {
     $.ajax({
       url: window.location.origin + '/api/comments/get/user',
@@ -43,8 +44,14 @@ var Profile = React.createClass({
   },
 
   render: function() {
+    var comments = this.state.comments.map(function(comment) {
+      return <Comment key={comment.id} comment={comment} />;
+    });
+
     return (
-      <h2>Your Comments</h2>
+      <div className="row">
+        {comments}
+      </div>
     );
   }
 });
