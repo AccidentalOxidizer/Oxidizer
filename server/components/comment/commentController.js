@@ -2,6 +2,7 @@ var Comment = require('../').Comment;
 var User = require('../').User;
 var Heart = require('../').Heart;
 var Flag = require('../').Flag;
+var Url = require('../').Url;
 
 var get = function(searchObject, lastCommentId) {
   var attributes = ['text', 'User.name']; 
@@ -16,6 +17,9 @@ var get = function(searchObject, lastCommentId) {
       }, {
         model: Flag,
         attributes: ['id']
+      }, {
+        model: Url,
+        attributes: ['url']
       }]
   };
 

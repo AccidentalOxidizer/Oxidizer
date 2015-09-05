@@ -118,6 +118,39 @@ module.exports = function(app) {
 
   });
 
+
+  // Get all comments for a given user. Defaults to loading all the
+  // comments for the logged in user.
+  // TODO? Add support to load comments for a given user via user id.
+  app.get('/api/comments/get/user', jsonParser, function(req, res, next) {
+
+    // TODO: when we have our middleware checks in place,
+    // this shouldn't be necessary
+    if (req.user === undefined) {
+      console.log("Comments: get comments for user - user not logged in.");
+      res.send(401); // unauthorized
+      return;
+    }
+
+    var userId = req.user.id;
+    var maxCommentId = req.query.maxCommentId || null;
+    console.log("Comments: get comments for userId " + userId + " maxCommentId " + maxCommentId);
+    console.log("Comments: get comments req.query");
+    console.log(req.query);
+
+    Comment.get({UserId: userId}, maxCommentId)
+      .then(function(comments) {
+        res.send(200, {
+          comments: comments,
+        });
+      })
+      .catch(function(err) {
+        console.log("Comments: get comments for user error ", err);
+        res.send(500);
+      });
+  });
+
+
   app.get('/api/comments/id/:id', jsonParser, auth.isLoggedIn, function(req, res, next) {
     // Get individual comment
     res.send(200);
