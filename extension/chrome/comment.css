@@ -1,6 +1,8 @@
+/*IMPORTANT: WE NEED TO BETTER HIDE !*/
+
 [data-rust-css="rustful"][data-rust-identity="identity"] {
   height: 100vh !important;
-  width: 275px !important;
+  width: 315px !important;
   position: fixed !important;
   right: 0px !important;
   bottom: 0px !important;
@@ -8,7 +10,13 @@
   z-index: 99999 !important;
   /*so user can click underneath our div*/
   pointer-events: none !important;
-  transition: transform 0.3s !important;
+  transition: transform 0.2s !important;
+
+      /*background: #eee !important;*/
+    color: #333 !important;
+    font: Arial, Helvetica, sans-serif !important;
+    -webkit-text-size-adjust: none !important;
+    -webkit-font-smoothing: antialiased !important;
 }
 
 /*so users can click our divs*/
@@ -45,30 +53,35 @@
 [data-rust-css="rustful"][data-rust-identity="rustbody"]{
   position: fixed !important;
   height: 100% !important;
-  width: 275px !important;
-  padding: 4px !important;
-  border:1px solid grey !important;
-  font-family: Gotham, "Helvetica Neue", Helvetica, Arial, sans-serif !important;
+  width: 315px !important;
+  padding: 0px !important;
+/*  border:1px solid grey !important;
+  border-top: 0px !important;
+  border-bottom: 0px !important;*/
+  border-left:3px solid #f4f7f8 !important;
+  /*font-family: Gotham, "Helvetica Neue", Helvetica, Arial, sans-serif !important;*/
   font-size: 10pt !important;
-  background-color: white !important;
+  background-color: #f1f4f9 !important;
   -webkit-box-sizing: border-box !important;
   box-sizing: border-box !important;
-  transition: transform 0.3s !important;
+  transition: transform 0.2s ease-in-out !important;
 }
 
 [data-rust-css="rustful"][data-rust-identity="rustbody"][data-rust-show="hide"] {
-  -webkit-transform: translateX(275px) !important; /* THIS NEEDS TO BE SAME AS WIDTH OF rustbody*/
+  -webkit-transform: translateX(315px) !important; /* THIS NEEDS TO BE SAME AS WIDTH OF rustbody*/
+  /*z-index: -1 !important;*/
 }
 
 [data-rust-css="rustful"][data-rust-identity="expandcontainer"][data-rust-show="hide"] {
+  /*z-index: -1 !important;*/
   display: none !important;
 }
 
 [data-rust-css="rustful"][data-rust-identity="commentcontainer"]{
-  width: 265px !important;
+  width: 315px !important;
   -webkit-box-sizing: border-box !important;
   box-sizing: border-box !important;
-  height: calc(100% - 30px) !important;
+  height: calc(100% - 50px) !important;
   overflow-y: scroll !important;
 }
 [data-rust-css="rustful"][data-rust-identity="commentcontainer"] * {
@@ -80,7 +93,7 @@
   -webkit-box-sizing: border-box !important;
   box-sizing: border-box !important;
 }
-[data-rust-identity="comment"] {
+[data-rust-css="rustful"][data-rust-identity="comment"] {
   width: 100% !important;
   padding-top: 0px !important;
   padding-right: 0px !important;
@@ -88,6 +101,9 @@
   padding-left: 3px !important;
   -webkit-box-sizing: border-box !important;
   box-sizing: border-box !important;
+      background: #fff !important;
+    padding: 10px !important;
+  margin-bottom:5px !important;
 }
 [data-rust-css="rustful"][data-rust-identity="flags"] {
   position: relative !important;
@@ -126,25 +142,57 @@
   width: 100% !important;
   margin-bottom: 3px !important;
 }
+
+[data-rust-css="rustful"][data-rust-identity="username"] {
+
+font-size: 1.2em !important;
+    color: #6B6B6B !important;
+    font-weight: 300 !important;
+    line-height: 1.2 !important;
+    margin: 0 0 .4em !important;
+}
+
 [data-rust-css="rustful"][data-rust-identity="commenttext"] {
   padding-left: 8px !important;
   word-wrap: break-word !important;
   width: 100% !important;
+  font-size: 1.2em !important;
+    color: #444 !important;
+    font-weight: 300 !important;
 }
 [data-rust-css="rustful"][data-rust-identity="datetime"] {
   float: right !important;
   padding-right: 3px !important;
+  color: #76ADD4 !important;
 }
 [data-rust-css="rustful"][data-rust-identity="time"] {
   margin-right: 3px !important;
 }
 [data-rust-css="rustful"][data-rust-identity="input"] {
+  width: 100% !important;
   position: absolute !important;
-  bottom: 4px !important;
+  /*bottom: 4px !important;*/
+  padding:10px !important;
+  background: #76ADD4 !important;
+  bottom: 0px !important;
+}
+[data-rust-css="rustful"][data-rust-identity="inputfield"] {
+  border: 1px solid rgba(118, 135, 212, 0.24) !important;
+  width: 75% !important;
+  border-radius: 2px !important;
+  height: 25px !important;
+}
+
+
+[data-rust-css="rustful"][data-rust-identity="submit-comment"] {
+    border: 1px solid rgba(118, 135, 212, 0.24) !important;
+    margin-top:1px;
+    background-color: white !important;
+    margin-left: 5px !important;
+    padding: 3px! important;
 }
 [data-rust-css="rustful"][data-rust-identity="input"] * {
   display: inline-block !important;
 }
-[data-rust-css="rustful"][data-rust-identity="inputfield"] {
-  width: 200px;
-}
+
+
