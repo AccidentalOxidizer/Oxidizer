@@ -13,12 +13,14 @@ var requestAllCommentsForPath = {
 // server responds 
 var commentsForAPath = {
   comments: [{
-    url: 'parsedUrl',
-    user: {
+    Url: {
+      url: 'parsedUrl',
+    },
+    User: {
       name: 'string'
     },
     text: 'string',
-    timestamp: 'date',
+    createdAt: 'date',
     isPrivate: 'boolean'
   }],
   currentTime: 'timestamp',
