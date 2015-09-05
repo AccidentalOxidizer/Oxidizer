@@ -13,7 +13,7 @@ var Profile = React.createClass({
     return {
       comments: [],
       maxCommentId: -1
-    }
+    };
   },
 
   // TODO: refactor to use to load additional comments too.

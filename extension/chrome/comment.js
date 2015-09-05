@@ -78,7 +78,7 @@ var templating = function(comments) {
   var comment;
   var timestamp;
   var result = '';
-  for (var i = comments.length - 1; i >= 0; i--) {
+  for (var i = 0; i < comments.length; i++) {
     comment = comments[i];
     timestamp = parseDate(comment.createdAt);
     result += [
@@ -172,22 +172,46 @@ var registerEventListeners = function() {
     }
   });
   
+  // tracks if we have a pending http request so that we don't receive back the same comments twice
+  var requestReturned = true;
+
   // sends request for new comments when we get to the bottom of comments
   rust.querySelector('[data-rust-identity="commentcontainer"]').addEventListener('scroll',function(){
       var commentContainer = rust.querySelector('[data-rust-identity="commentcontainer"]');
-      console.log(lastLoadedCommentId);
-      // if you want to  
-      if(commentContainer.scrollHeight - commentContainer.scrollTop < 300){ 
-        
+
+      // tracks is we've gotten all of the comments
+      var endOfComments = false;
+
+      // calculates how much space is left to scroll through the comments
+      var spaceLeft = commentContainer.scrollHeight - (commentContainer.clientHeight + commentContainer.scrollTop);
+      
+      //if we are towards the bottom of the div, and we haven't gotten all comments, and we don't have a pending request
+      if( spaceLeft < 300 && !endOfComments && requestReturned){ 
+
+        // toggle requestReturned so that we don't send two requests concurrently
+        requestReturned = false;
+
+        // get comments!
         chrome.runtime.sendMessage({
           type: 'getmorecomments',
           url: url,
           lastUpdateId: lastLoadedCommentId
         }, function(response) {
-          lastLoadedCommentId = response.data.comments[response.data.comments.length - 1].id;
-          var html = templating(response.data.comments);
-          // Append new messages 
-          appendComments(html);
+
+          // reset our pending request tracker
+          requestReturned = true;
+
+          // if no comments are returned switch our tracker, so we don't request more
+          if (response.data.comments.length === 0){
+            endOfComments = true;
+          } else {
+            // track what the oldest comment we got was so we can request older comments next
+            lastLoadedCommentId = response.data.comments[response.data.comments.length - 1].id;
+                       
+            // Append new messages 
+            var html = templating(response.data.comments);
+            appendComments(html);
+          }
         });
       }
 
