@@ -4,24 +4,11 @@ var React = require('react');
 // a url feed, or any other comment list.
 // Comment data will be passed down in this.props.comment.
 //
-// var commentsForAPath = {
-//   comments: [{
-//     url: 'parsedUrl',
-//     user: {
-//       name: 'string'
-//     },
-//     text: 'string',
-//     timestamp: 'date',
-//     isPrivate: 'boolean'
-//   }],
-//   currentTime: 'timestamp',
-//   userInfo: {
-//     username: 'string'
-//   }
-// };
+// TODO:
+// - Show a delete link if this comment belongs to the logged in user?
+//   How does the comment get deleted from the feed?
+// - Show # Hearts?
 //
-// TODO: show a delete link if this comment belongs to the logged in user?
-// How does the comment get deleted from the feed?
 var Comment = React.createClass({
   render: function() {
     return (
