@@ -27,9 +27,9 @@ var get = function(searchObject, lastCommentId) {
   // limit the number of comments we send to the user
   queryObject.limit = 25;
 
-  // return in descending order of commentid
+  // return in ascending order of commentid
   queryObject.order = 'id ASC';
-  console.log(queryObject);
+
   return Comment.findAll(queryObject)
     .then(function(results) {
       // Iterate over our results array and update the number of hearts and favorites so

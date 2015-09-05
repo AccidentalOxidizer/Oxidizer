@@ -35,7 +35,7 @@
   "commands": {
     "open": {
       "suggested_key": {
-        "default": "Ctrl+Shift+U"
+        "default": "Ctrl+Shift+M"
       },
       "description": "open",
       "global": false
