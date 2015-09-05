@@ -12,7 +12,7 @@ chrome.runtime.onMessage.addListener(
       // TODO: We need to clean these parameters after we build everything!
       var params = {
         url: encodeURIComponent(request.url),
-        lastUpdateTimestamp: 'undefined',
+        lastUpdateId: 'undefined',
         isPrivate: false
       };
       var paramString = [];
@@ -21,6 +21,7 @@ chrome.runtime.onMessage.addListener(
           paramString.push(key + '=' + params[key]);
         }
       }
+
       paramString = paramString.join('&');
       var apiURL = config.server + "/api/comments/get?" + paramString;
       xhr.open("GET", apiURL);
@@ -39,6 +40,42 @@ chrome.runtime.onMessage.addListener(
       return true;
     }
 
+    // loads more comments
+    if (request.type === "getmorecomments") {
+      // call server with get request for data.
+      var xhr = new XMLHttpRequest();
+      // should include URL as parameter!
+
+      // TODO: We need to clean these parameters after we build everything!
+      var params = {
+        url: encodeURIComponent(request.url),
+        lastUpdateId: request.lastUpdateId,
+        isPrivate: false
+      };
+      var paramString = [];
+      for (var key in params) {
+        if (params.hasOwnProperty(key)) {
+          paramString.push(key + '=' + params[key]);
+        }
+      }
+      
+      paramString = paramString.join('&');
+      var apiURL = config.server + "/api/comments/get?" + paramString;
+      xhr.open("GET", apiURL);
+      xhr.setRequestHeader('Content-Type', 'application/json');
+      xhr.onreadystatechange = function() {
+        if (xhr.readyState === 4) {
+          // JSON.parse does not evaluate the attacker's scripts.
+          var resp = JSON.parse(xhr.responseText);
+          sendResponse({
+            data: resp
+          });
+        }
+      };
+      xhr.send();
+      // if you don't return true here shit hits the fan
+      return true;
+    }
     // post a new comment
     if (request.type === 'post') {
       var xhr = new XMLHttpRequest();
@@ -132,10 +169,20 @@ chrome.tabs.onUpdated.addListener(function(tabId, info) {
     });
   }
 });
+chrome.commands.onCommand.addListener(function(command) {
+  chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
+    chrome.tabs.sendMessage(tabs[0].id, {command: "toggle"});
+  });
+});
 
 
-/*
-Oauth 
-Client ID:  837204469183-nklfavnlll2v6jh0ku65tieuvc6qmhn1.apps.googleusercontent.com ; 
-Secret:  mXAPIt-gVJqr4NeXIvVFTi_M
-*/
+
+
+
+
+
+
+
+
+
+

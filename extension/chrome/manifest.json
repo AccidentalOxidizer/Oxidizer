@@ -32,6 +32,15 @@
     },
     "default_popup": "popup.html"
   },
+  "commands": {
+    "open": {
+      "suggested_key": {
+        "default": "Ctrl+Shift+M"
+      },
+      "description": "open",
+      "global": false
+    }
+  },
   "options_ui": {
     "page": "options.html",
     "open_in_tab": true,
