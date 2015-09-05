@@ -109,7 +109,7 @@ var addExpandButton = function(html) {
 
 // add input field functionlity to html output
 var inputField = function(html) {
-  var inputElement = '<div ' + rustTag + " " + buildSelector('input') + '><input ' + buildSelector('inputfield') + ' type="text" name="comment"/><div class="submit-comment">Submit</div></div>';
+  var inputElement = '<div ' + rustTag + " " + buildSelector('input') + '><input ' + rustTag + buildSelector('inputfield') + ' type="text" name="comment"/><div ' + rustTag + buildSelector('submit-comment') + '>Submit</div></div>';
   html += inputElement;
   return html;
 };

@@ -1,6 +1,6 @@
 [data-rust-css="rustful"][data-rust-identity="identity"] {
   height: 100vh !important;
-  width: 250px !important;
+  width: 275px !important;
   position: fixed !important;
   right: 0px !important;
   bottom: 0px !important;
@@ -36,7 +36,7 @@
 [data-rust-css="rustful"][data-rust-identity="rustbody"]{
   position: fixed !important;
   height: 100% !important;
-  width: 250px !important;
+  width: 275px !important;
   padding: 4px !important;
   border:1px solid grey !important;
   font-family: Gotham, "Helvetica Neue", Helvetica, Arial, sans-serif !important;
@@ -48,7 +48,7 @@
 }
 
 [data-rust-css="rustful"][data-rust-identity="rustbody"][data-rust-show="hide"] {
-  -webkit-transform: translateX(250px) !important; /* THIS NEEDS TO BE SAME AS WIDTH OF rustbody*/
+  -webkit-transform: translateX(275px) !important; /* THIS NEEDS TO BE SAME AS WIDTH OF rustbody*/
 }
 
 [data-rust-css="rustful"][data-rust-identity="expandcontainer"][data-rust-show="hide"] {
@@ -56,9 +56,11 @@
 }
 
 [data-rust-css="rustful"][data-rust-identity="commentcontainer"]{
-  width: 245px !important;
+  width: 265px !important;
   -webkit-box-sizing: border-box !important;
   box-sizing: border-box !important;
+  height: calc(100% - 30px) !important;
+  overflow-y: scroll !important;
 }
 [data-rust-css="rustful"][data-rust-identity="commentcontainer"] * {
   display: inline-block !important;
@@ -130,4 +132,7 @@
 [data-rust-css="rustful"][data-rust-identity="input"] {
   position: absolute !important;
   bottom: 4px !important;
+}
+[data-rust-css="rustful"][data-rust-identity="input"] * {
+  display: inline-block !important;
 }
