@@ -1,29 +1,10 @@
 /*IMPORTANT: WE NEED TO BETTER HIDE !*/
 
-[data-rust-css="rustful"][data-rust-identity="identity"] {
-  height: 100vh !important;
-  width: 315px !important;
-  position: fixed !important;
-  right: 0px !important;
-  bottom: 0px !important;
-  background-color: transparent !important;
-  z-index: 99999 !important;
-  /*so user can click underneath our div*/
-  pointer-events: none !important;
-  transition: transform 0.2s !important;
-
-      /*background: #eee !important;*/
-    color: #333 !important;
-    font: Arial, Helvetica, sans-serif !important;
-    -webkit-text-size-adjust: none !important;
-    -webkit-font-smoothing: antialiased !important;
-}
 
 /*so users can click our divs*/
 [data-rust-css="rustful"][data-rust-identity="identity"] * {
   pointer-events: auto !important;
 }
-
 [data-rust-css="rustful"][data-rust-identity="expandcontainer"] {
   position: fixed !important;
   width: 20px !important;
@@ -31,7 +12,6 @@
   right: 0px !important;
   bottom: 0px !important;
 }
-
 [data-rust-css="rustful"][data-rust-identity="expand"] {
   position: fixed !important;
   height: 20px !important;
@@ -41,49 +21,142 @@
 }
 
 /*if there are comments*/
-[data-rust-css="rustful"][data-rust-commentsexist="true"]{
+[data-rust-css="rustful"][data-rust-commentsexist="true"] {
   fill: #B7410E !important;
 }
 
 /*if there are no comments*/
-[data-rust-css="rustful"][data-rust-commentsexist="false"]{
+[data-rust-css="rustful"][data-rust-commentsexist="false"] {
   fill: #0F85B7 !important;
 }
 
-[data-rust-css="rustful"][data-rust-identity="rustbody"]{
+
+/* NEW TRIGGER MECHANISM */
+
+*, *::after, *::before {
+  -webkit-box-sizing: border-box !important;
+  -moz-box-sizing: border-box !important;
+  box-sizing: border-box !important;
+}
+
+*::after, *::before {
+  content: '' !important;
+}
+
+[data-rust-css="rustful"][data-rust-identity="identity"] {
   position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
   height: 100% !important;
-  width: 315px !important;
-  padding: 0px !important;
-/*  border:1px solid grey !important;
-  border-top: 0px !important;
-  border-bottom: 0px !important;*/
-  border-left:3px solid #f4f7f8 !important;
-  /*font-family: Gotham, "Helvetica Neue", Helvetica, Arial, sans-serif !important;*/
-  font-size: 10pt !important;
-  background-color: #f1f4f9 !important;
+  width: 100% !important;
+  visibility: hidden !important;
+  -webkit-transition: visibility 0s 0.6s !important;
+  -moz-transition: visibility 0s 0.6s !important;
+  transition: visibility 0s 0.6s !important;
+   background-color: transparent !important;
+  z-index: 99999 !important;  
+  pointer-events: none !important;
+  transition: transform 0.2s !important;      
+  color: #333 !important;
+  font: Arial, Helvetica, sans-serif !important;
+  -webkit-text-size-adjust: none !important;
+  -webkit-font-smoothing: antialiased !important;
+}
+
+[data-rust-css="rustful"][data-rust-identity="identity"] {
+  /*height: 100vh !important;*/
+
+ 
+}
+
+[data-rust-css="rustful"][data-rust-identity="identity"]::after {
+  /* overlay layer */
+  position: absolute !important;
+  top: 0 !important;
+  left: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  background: transparent !important;
+  cursor: pointer !important;
+  -webkit-transition: background 0.3s 0.3s !important;
+  -moz-transition: background 0.3s 0.3s !important;
+  transition: background 0.3s 0.3s !important;
+}
+
+[data-rust-css="rustful"][data-rust-identity="identity"][data-rust-show="show"] {
+  visibility: visible !important;
+  -webkit-transition: visibility 0s 0s !important;
+  -moz-transition: visibility 0s 0s !important;
+  transition: visibility 0s 0s !important;
+}
+
+[data-rust-css="rustful"][data-rust-identity="identity"][data-rust-show="show"]::after {
+  background: rgba(0, 0, 0, 0.6) !important;
+  -webkit-transition: background 0.3s 0s !important;
+  -moz-transition: background 0.3s 0s !important;
+  transition: background 0.3s 0s !important;
+}
+[data-rust-css="rustful"][data-rust-identity="rustbody"] {
+  position: fixed !important;
+  width: 50% !important;
+  height: 100%  !important;
+  top: 0 !important;
+  right: 0 !important;
+  background: #dbe2e9 !important;
+  z-index: 1 !important; /*is this sufficient? probably not .. */
+  -webkit-transition-property: -webkit-transform !important;
+  -moz-transition-property: -moz-transform !important;
+  transition-property: transform !important;
+  -webkit-transition-duration: 0.3s !important;
+  -moz-transition-duration: 0.3s !important;
+  transition-duration: 0.3s !important;
+  -webkit-transition-delay: 0.3s !important;
+  -moz-transition-delay: 0.3s !important;
+  transition-delay: 0.3s !important;
+}
+[data-rust-css="rustful"][data-rust-identity="commentcontainer"] {
+  width: 50% !important;
   -webkit-box-sizing: border-box !important;
   box-sizing: border-box !important;
-  transition: transform 0.2s ease-in-out !important;
-}
-
-[data-rust-css="rustful"][data-rust-identity="rustbody"][data-rust-show="hide"] {
-  -webkit-transform: translateX(315px) !important; /* THIS NEEDS TO BE SAME AS WIDTH OF rustbody*/
-  /*z-index: -1 !important;*/
-}
-
-[data-rust-css="rustful"][data-rust-identity="expandcontainer"][data-rust-show="hide"] {
-  /*z-index: -1 !important;*/
-  display: none !important;
-}
-
-[data-rust-css="rustful"][data-rust-identity="commentcontainer"]{
-  width: 315px !important;
-  -webkit-box-sizing: border-box !important;
-  box-sizing: border-box !important;
-  height: calc(100% - 50px) !important;
+  padding-top: 50px !important;
+  padding-bottom: 50% !important;
+  height: 100%;
+  /*height: calc(100% - 50px) !important;*/
   overflow-y: scroll !important;
 }
+/*[data-rust-css="rustful"][data-rust-identity="rustbody"][data-rust-show="show"] {
+}*/
+
+[data-rust-css="rustful"][data-rust-identity="expandcontainer"][data-rust-show="show"] {
+}
+
+
+[data-rust-css="rustful"] > [data-rust-identity="input"] {
+  width: 50% !important;
+  position: absolute !important;  /*bottom: 4px !important;*/
+  padding: 10px !important;
+  background: #76ADD4 !important;
+  bottom: 0px !important;
+}
+
+.header {
+    position: fixed;
+    width: 50%;
+    height: 50px;
+    line-height: 50px;
+    background: rgba(255, 255, 255, 0.96);
+    z-index: 2;
+    box-shadow: 0 1px 1px rgba(0, 0, 0, 0.08);
+    -webkit-transition: top 0.3s 0s;
+    -moz-transition: top 0.3s 0s;
+    transition: top 0.3s 0s;
+}
+
+
+
+
+/* NEW TRIGGER MECHANISM END */
+
 [data-rust-css="rustful"][data-rust-identity="commentcontainer"] * {
   display: inline-block !important;
   margin-top: 0px !important;
@@ -101,9 +174,9 @@
   padding-left: 3px !important;
   -webkit-box-sizing: border-box !important;
   box-sizing: border-box !important;
-      background: #fff !important;
-    padding: 10px !important;
-  margin-bottom:5px !important;
+  background: #fff !important;
+  padding: 10px !important;
+  margin-bottom: 5px !important;
 }
 [data-rust-css="rustful"][data-rust-identity="flags"] {
   position: relative !important;
@@ -142,23 +215,20 @@
   width: 100% !important;
   margin-bottom: 3px !important;
 }
-
 [data-rust-css="rustful"][data-rust-identity="username"] {
-
-font-size: 1.2em !important;
-    color: #6B6B6B !important;
-    font-weight: 300 !important;
-    line-height: 1.2 !important;
-    margin: 0 0 .4em !important;
+  font-size: 1.2em !important;
+  color: #6B6B6B !important;
+  font-weight: 300 !important;
+  line-height: 1.2 !important;
+  margin: 0 0 .4em !important;
 }
-
 [data-rust-css="rustful"][data-rust-identity="commenttext"] {
   padding-left: 8px !important;
   word-wrap: break-word !important;
   width: 100% !important;
   font-size: 1.2em !important;
-    color: #444 !important;
-    font-weight: 300 !important;
+  color: #444 !important;
+  font-weight: 300 !important;
 }
 [data-rust-css="rustful"][data-rust-identity="datetime"] {
   float: right !important;
@@ -168,31 +238,20 @@ font-size: 1.2em !important;
 [data-rust-css="rustful"][data-rust-identity="time"] {
   margin-right: 3px !important;
 }
-[data-rust-css="rustful"][data-rust-identity="input"] {
-  width: 100% !important;
-  position: absolute !important;
-  /*bottom: 4px !important;*/
-  padding:10px !important;
-  background: #76ADD4 !important;
-  bottom: 0px !important;
-}
+
 [data-rust-css="rustful"][data-rust-identity="inputfield"] {
   border: 1px solid rgba(118, 135, 212, 0.24) !important;
   width: 75% !important;
   border-radius: 2px !important;
   height: 25px !important;
 }
-
-
 [data-rust-css="rustful"][data-rust-identity="submit-comment"] {
-    border: 1px solid rgba(118, 135, 212, 0.24) !important;
-    margin-top:1px;
-    background-color: white !important;
-    margin-left: 5px !important;
-    padding: 3px! important;
+  border: 1px solid rgba(118, 135, 212, 0.24) !important;
+  margin-top: 1px;
+  background-color: white !important;
+  margin-left: 5px !important;
+  padding: 3px! important;
 }
 [data-rust-css="rustful"][data-rust-identity="input"] * {
   display: inline-block !important;
 }
-
-
