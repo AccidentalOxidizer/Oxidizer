@@ -1,7 +1,7 @@
 {
   "name": "Oxidizer",
   "description": "The Commenting System of the Internet",
-  "version": "0.2",
+  "version": "0.3",
   "permissions": [
     "http://localhost:3000/test/comments",
     "http://127.0.0.1:3000/test/comments",
@@ -21,7 +21,7 @@
     "http://localhost:3000/*"
   ],
   "background": {
-    "scripts": ["oxidizer.js"],
+    "scripts": ["background.js"],
     "persistent": false
   },
   "browser_action": {
@@ -47,11 +47,14 @@
     "chrome_style": true
   },
   "web_accessible_resources": [
-    "cleanslate.css"
+    "cleanslate.css",
+    "sideframe.html"
   ],
   "content_scripts": [{
     "css": ["cleanslate.css", "comment.css"],
-    "matches": ["*://*/*"]
+    "js": ["contentscript.js"],
+    "matches": ["*://*/*"],
+    "run_at": "document_end"
   }],
   "manifest_version": 2
 }
