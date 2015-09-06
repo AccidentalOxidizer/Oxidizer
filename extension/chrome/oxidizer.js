@@ -58,7 +58,7 @@ chrome.runtime.onMessage.addListener(
           paramString.push(key + '=' + params[key]);
         }
       }
-      
+
       paramString = paramString.join('&');
       var apiURL = config.server + "/api/comments/get?" + paramString;
       xhr.open("GET", apiURL);
@@ -170,19 +170,12 @@ chrome.tabs.onUpdated.addListener(function(tabId, info) {
   }
 });
 chrome.commands.onCommand.addListener(function(command) {
-  chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
-    chrome.tabs.sendMessage(tabs[0].id, {command: "toggle"});
+  chrome.tabs.query({
+    active: true,
+    currentWindow: true
+  }, function(tabs) {
+    chrome.tabs.sendMessage(tabs[0].id, {
+      command: "toggle"
+    });
   });
 });
-
-
-
-
-
-
-
-
-
-
-
-
