@@ -10,10 +10,7 @@ if (!location.ancestorOrigins.contains(extensionOrigin)) {
   iframe.src = chrome.runtime.getURL('sideframe.html');
   iframe.setAttribute('data-oxidizer-identity', 'iframe');
   iframe.setAttribute('allowtransparency', 'true');
-
   iframe.style.cssText = iframeStyleClosed;
-
-
 
   document.body.appendChild(iframe);
 }
@@ -28,12 +25,21 @@ document.body.appendChild(section);
 
 // Create listener to fire trigger to open iframe
 document.querySelector('[data-oxidizer-identity="trigger"]').addEventListener('mouseover', function(evt) {
+  // make iframe visible
   document.querySelector('[data-oxidizer-identity="iframe"').style.cssText = iframeStyleOpened;
+  // tell iframe to fire / reload content that needs refreshing (we can't use chrome messages here)
+  var iframe = document.querySelector('[data-oxidizer-identity="iframe"');
+  iframe.contentWindow.postMessage({
+    type: 'fire',
+    url: document.location.href
+  }, iframe.src);
+
 });
 
-// Event listener for ALL incoming messages
-chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
 
+
+// Event listener for incoming messages
+chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
 
   if (request.from === 'background' && request.message === 'close iframe') {
     console.log('need to close iframe');

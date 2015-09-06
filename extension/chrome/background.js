@@ -1,4 +1,6 @@
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
+  /* Generic callback passing along an inital round trip message */
+
   if (request.from === 'iframe' && request.message === 'callback') {
     chrome.tabs.query({
       active: true,
