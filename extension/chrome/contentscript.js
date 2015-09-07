@@ -10,6 +10,7 @@ if (!location.ancestorOrigins.contains(extensionOrigin)) {
   iframe.src = chrome.runtime.getURL('sideframe.html');
   iframe.setAttribute('data-oxidizer-identity', 'iframe');
   iframe.setAttribute('allowtransparency', 'true');
+  iframe.setAttribute('data-oxidizer-state', 'closed');
   iframe.style.cssText = iframeStyleClosed;
 
   document.body.appendChild(iframe);
@@ -25,28 +26,27 @@ document.body.appendChild(section);
 
 // Create listener to fire trigger to open iframe
 document.querySelector('[data-oxidizer-identity="trigger"]').addEventListener('mouseover', function(evt) {
-  // make iframe visible
-  document.querySelector('[data-oxidizer-identity="iframe"').style.cssText = iframeStyleOpened;
-  // tell iframe to fire / reload content that needs refreshing (we can't use chrome messages here)
-  var iframe = document.querySelector('[data-oxidizer-identity="iframe"');
-  iframe.contentWindow.postMessage({
-    type: 'fire',
-    url: document.location.href
-  }, iframe.src);
-
+  openIframe();
 });
-
 
 
 // Event listener for incoming messages
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
 
   if (request.from === 'background' && request.message === 'close iframe') {
-    console.log('need to close iframe');
-    document.querySelector('[data-oxidizer-identity="iframe"').style.cssText = iframeStyleClosed;
+    closeIframe();
     sendResponse({
       data: 'close iframe'
     })
+  }
+  // toggle open and close of iframe via keyboard shortcut
+  if (request.command === "toggle") {
+    var state = document.querySelector('[data-oxidizer-identity="iframe"').getAttribute('data-oxidizer-state');
+    if (state === 'closed') {
+      openIframe();
+    } else {
+      closeIframe();
+    }
   }
 
   /* Generic callback passing along an inital round trip message */
@@ -56,3 +56,25 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
     });
   }
 });
+
+function openIframe() {
+  var iframe = document.querySelector('[data-oxidizer-identity="iframe"');
+  iframe.setAttribute('data-oxidizer-state', 'opened');
+  iframe.style.cssText = iframeStyleOpened;
+  iframe.contentWindow.postMessage({
+    type: 'open',
+    url: document.location.href
+  }, iframe.src);
+}
+
+function closeIframe() {
+  var iframe = document.querySelector('[data-oxidizer-identity="iframe"');
+  iframe.contentWindow.postMessage({
+    type: 'close'
+  }, iframe.src);
+  setTimeout(function() {
+    iframe.style.cssText = iframeStyleClosed;
+    iframe.setAttribute('data-oxidizer-state', 'closed');
+
+  }, 500)
+}

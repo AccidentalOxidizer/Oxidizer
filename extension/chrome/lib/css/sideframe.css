@@ -111,7 +111,7 @@ html, body {
 }*/
 
 .cd-panel-close {
-  height: 60px;
+  height: 50px;
   z-index: 5;
   float: left;
   left: calc(50% - 60px);
@@ -125,6 +125,9 @@ html, body {
   text-indent: 100%;
   white-space: nowrap;
 }
+
+
+
 
 .cd-panel-close::before, .cd-panel-close::after {
   /* close icon created in CSS */
@@ -201,6 +204,21 @@ html, body {
   .cd-panel-container {
     width: 100%;
   }
+
+.cd-panel-close {
+  float: right;
+  right: 0px !important;
+  left: calc(100% - 60px);
+}
+.cd-panel-close:hover {
+  background-color: #444; 
+}
+.cd-panel-close::before, .cd-panel-close::after {
+  background-color: #444;
+}
+.cd-panel-close:hover::before, .cd-panel-close:hover::after {
+  background-color: #fff;
+}
 }
 /*@media only screen and (min-width: 1170px) {
   .cd-panel-container {

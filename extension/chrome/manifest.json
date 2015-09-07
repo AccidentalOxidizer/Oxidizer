@@ -51,7 +51,7 @@
     "sideframe.html"
   ],
   "content_scripts": [{
-    "css": ["cleanslate.css", "comment.css"],
+    "css": ["cleanslate.css"],
     "js": ["contentscript.js"],
     "matches": ["*://*/*"],
     "run_at": "document_end"

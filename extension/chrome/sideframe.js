@@ -1,13 +1,16 @@
 var server = 'http://api.oxidizer.io';
 var url = '';
+
+// tracks if we have a pending http request so that we don't receive back the same comments twice
+var requestReturned = true;
+
 document.addEventListener("DOMContentLoaded", function(e) {
 
   // when ever we have a trigger event from the parent window 
   // it will tell the iframe to reload and redo what is needed
 
   window.addEventListener("message", function(e) {
-    console.log(e.data);
-    if (e.data.type === 'fire') {
+    if (e.data.type === 'open') {
       url = e.data.url;
       // show the panel with animation
       $('.cd-panel').addClass('is-visible');
@@ -15,7 +18,13 @@ document.addEventListener("DOMContentLoaded", function(e) {
       loadContent(url);
 
     }
-  }, false)
+  }, false);
+
+  window.addEventListener("message", function(e) {
+    if (e.data.type === 'close') {
+      $('.cd-panel').removeClass('is-visible');
+    }
+  }, false);
 
 
   // send message to background script to tell content script to close this iframe
@@ -42,8 +51,68 @@ document.addEventListener("DOMContentLoaded", function(e) {
   });
 
   // this can't work, the event listeners need to be atached individually after loading
-  document.getElementsByClassName('heart').addEventListener('click', function() {});
-  document.getElementsByClassName('flag').addEventListener('click', function() {});
+  // document.getElementsByClassName('heart').addEventListener('click', function() {});
+  // document.getElementsByClassName('flag').addEventListener('click', function() {});
+
+
+
+  // sends request for new comments when we get to the bottom of comments
+  document.getElementById('comment-container').addEventListener('scroll', function() {
+    var commentContainer = document.getElementsByClassName('comment-container');
+
+    // tracks is we've gotten all of the comments
+    var endOfComments = false;
+
+    // calculates how much space is left to scroll through the comments
+    var spaceLeft = commentContainer.scrollHeight - (commentContainer.clientHeight + commentContainer.scrollTop);
+
+    //if we are towards the bottom of the div, and we haven't gotten all comments, and we don't have a pending request
+    if (spaceLeft < 300 && !endOfComments && requestReturned) {
+
+      // toggle requestReturned so that we don't send two requests concurrently
+      requestReturned = false;
+
+      var params = {
+        url: encodeURIComponent(request.url),
+        lastUpdateId: request.lastUpdateId,
+        isPrivate: false
+      };
+      var paramString = [];
+      for (var key in params) {
+        if (params.hasOwnProperty(key)) {
+          paramString.push(key + '=' + params[key]);
+        }
+      }
+
+      paramString = paramString.join('&');
+      var apiURL = server + "/api/comments/get?" + paramString;
+
+
+      var request = $.ajax({
+        url: apiURL,
+        method: "GET",
+        contentType: "application/json",
+      });
+
+      request.done(function(msg) {
+
+        if (msg.comments.length === 0) {
+          endOfComments = true;
+        }
+        // set lastLoadedCommentId
+        if (msg.comments.length > 0) {
+          lastLoadedCommentId = msg.comments[msg.comments.length - 1].id;
+        }
+        // compile and append new comments
+        compileAppendComments(msg.comments);
+      });
+
+      request.fail(function(jqXHR, textStatus) {
+        console.log("Request failed: " + textStatus);
+      });
+
+    }
+  });
 
 
   /***********/
@@ -66,8 +135,6 @@ document.addEventListener("DOMContentLoaded", function(e) {
       console.log('iframe callback message:', response);
     });
 });
-
-//
 
 
 
@@ -97,6 +164,9 @@ function loadContent(url) {
   });
 
   request.done(function(msg) {
+    if (msg.comments.length > 0) {
+      lastLoadedCommentId = msg.comments[msg.comments.length - 1].id;
+    }
     // clean the DOM
     $(".cd-panel-content").html('');
     // compile and append new comments
