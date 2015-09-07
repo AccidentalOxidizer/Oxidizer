@@ -170,7 +170,9 @@ function loadContent(url) {
     // clean the DOM
     $(".cd-panel-content").html('');
     // compile and append new comments
-    compileAppendComments(msg.comments);
+    console.log(msg.comments);
+    var html = compileComments(msg.comments);
+    $(".cd-panel-content").append(html);
   });
 
   request.fail(function(jqXHR, textStatus) {
@@ -197,8 +199,11 @@ function postComment(text) {
   });
 
   request.done(function(msg) {
+    console.log(msg.comments);
     // compile and append successfully saved and returned message to DOM
-    compileAppendComments(msg.comments);
+    var html = compileComments(msg.comments);
+    $(".cd-panel-content").prepend(html);
+
   });
 
   request.fail(function(jqXHR, textStatus) {
@@ -207,9 +212,8 @@ function postComment(text) {
 }
 
 
-function compileAppendComments(comments) {
+function compileComments(comments) {
   var source = $("#comment-entry-template").html();
   var template = Handlebars.compile(source);
-  var html = template(comments);
-  $(".cd-panel-content").append(html);
+  return template(comments);
 }

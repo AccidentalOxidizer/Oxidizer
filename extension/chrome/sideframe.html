@@ -55,7 +55,7 @@
         <div class="col-xs-12 comment">
             <div class="row">
                 <div class="col-xs-6 comment-username">{{User.name}}</div>
-                <div class="col-xs-6 comment-timestamp">{{updatedAt}}</div>
+                <div class="col-xs-6 comment-timestamp">{{createdAt}}</div>
             </div>
             <div class="row">
                 <div class="col-xs-12 comment-text">{{text}}</div>
@@ -64,13 +64,17 @@
                 <div class="col-xs-12 comment-engage">
                 <div id="heart" class="heart" style="float:left;">
                  <i class="fa fa-heart-o"></i>&nbsp;{{Hearts}}&nbsp;</div> 
-                <div id="flag" class="flag" style="float:right; text-align:right;">
+                <div id="flag" data-comment-id="{{id}}" class="flag" style="float:right; text-align:right;">
                 <i class="fa fa-flag-o"></i>&nbsp; </div></div>
             </div>
         </div>
          {{/each}}
     </script>
 
+
+    <script id="confirm-flag-template" type="text/x-handlebars-template">
+      <div>Comment ID to flag: {{id}}</div>
+    </script>
 
     <script src="lib/js/jquery-2.1.4.min.js"></script>
     <script src="lib/js/handlebars-v4.0.2.js"></script>
