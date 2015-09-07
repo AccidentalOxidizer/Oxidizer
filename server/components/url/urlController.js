@@ -1,5 +1,6 @@
 var Url = require('../').Url;
 var parseUrl = require('../../utils/parseURL.js');
+var url = require('url');
 
 /** 
  *  This controller is responsible for getting and 
@@ -23,7 +24,9 @@ var copyObject = function(obj) {
     }
   }
 
-  parsedObject.url = parseUrl(parsedObject.url);
+  var parsedURL = parseUrl(parsedObject.url);
+  parsedObject.host = parsedURL.host;
+  parsedObject.url = parsedURL.url;
 
   return parsedObject;
 };

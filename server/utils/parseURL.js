@@ -29,5 +29,9 @@ module.exports = function(unparsedURL) {
   }
 
   // return parsed url
-  return parsedURL.host + parsedURL.pathname;
-}
+  return {
+    url: parsedURL.host + parsedURL.pathname,
+    host: parsedURL.host,
+    pathname: parsedURL.pathname
+  };
+};
