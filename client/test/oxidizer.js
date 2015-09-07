@@ -64,6 +64,7 @@ $(document).ready(function() {
 
         var commentArrayHTML = '';
         // Render comment HTML
+        console.log('DATA??????', data);
         data['comments'].forEach(function(element, index) {
           commentArrayHTML = commentArrayHTML.concat(buildComments(data['comments'][index]));
         });

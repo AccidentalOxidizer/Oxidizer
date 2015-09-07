@@ -21,25 +21,44 @@ var get = function(searchObject) {
 };
 
 var fave = function(searchObject) {
-  //console.log("FAVE OBJECT: ", searchObject);
-  //var newFave = Heart.build(searchObject);
-  return Heart.findOrCreate({
+  //First: Search
+  // if a fave for this particular user and comment combination already exists.
+  return Heart.findOne({
       where: searchObject
     })
-    .then(function(favorite) {
-      return get({
-        CommentId: searchObject.CommentId
+    .then(function(result) {
+      // Check if the result is null. 
+      // If so, this means the user hasn't fave this item before.
+      if (result === null) {
+        console.log('No existing faves for this user and comment have been found. Creating new fave.');
+        var newHeart = Heart.build(searchObject);
+        return newHeart.save();
+      } else {
+        // User has already faved this item before. Let's remove the fave!
+        console.log('Faved result already found. Removing existing result.');
+        return Heart.destroy({
+          where: searchObject
+        });
+      }
+    })
+    .then(function() {
+      //console.log(searchObject.CommentId);
+      return Heart.findAndCountAll({
+        where: {
+          CommentId: searchObject.CommentId
+        }
       });
     })
-    .then(function(faves) {
-      // NUMBER OF FAVORITES!
-      console.log("GET FAVES: ", faves.length);
-      return faves.length;
+    .then(function(result) {
+      // Return total number of faves found for this comment.
+      console.log('GET TOTAL FAVE COUNT!!!!: ', result.count);
+      return result.count;
     })
     .catch(function(err) {
-      console.log('this is the error', err);
-      throw err;
+      console.log("Fave error: ", err);
+      return;
     });
+
 };
 
 exports.get = get;

@@ -20,7 +20,6 @@ var flag = function(searchObject) {
 
   //First: Search
   // if a flag for this particular user and comment combination already exists.
-  console.log('SEARCHING: ', searchObject);
   return Flag.findOne({
       where: searchObject
     })
@@ -41,17 +40,16 @@ var flag = function(searchObject) {
     })
     .then(function() {
       //console.log(searchObject.CommentId);
-      var getCount = get({
-        CommentId: searchObject.CommentId
+      return Flag.findAndCountAll({
+        where: {
+          CommentId: searchObject.CommentId
+        }
       });
-
-      if (getCount[0].dataValues === undefined) {
-        getCount = 0;
-      } else {
-        getCount = getCount[0].dataValues.length;
-      }
-
-      console.log('COUNT!!!!: ', getCount);
+    })
+    .then(function(result) {
+      // Return total number of flags found for this comment.
+      console.log('GET TOTAL FLAG COUNT!!!!: ', result.count);
+      return result.count;
     })
     .catch(function(err) {
       console.log("Flag error: ", err);
