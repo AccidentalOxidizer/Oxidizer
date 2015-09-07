@@ -264,12 +264,10 @@ function registerCommentEventListeners() {
 
 function flagPost(id) {
   // this function is called when user confirms flagging a comment
-  console.log('to flag:', id);
-
+  console.log('Comment to flag:', id);
   var data = JSON.stringify({
     CommentId: id
   });
-
   var request = $.ajax({
     url: server + '/api/comments/flag',
     method: "POST",
@@ -277,13 +275,11 @@ function flagPost(id) {
     data: data,
     dataType: 'json'
   });
-
   request.done(function(msg) {
     console.log('successfully flagged (or unflagged) comment', msg);
     // we should rerender can change the color of the flag, 
     // plus set a marker that prevents poping up confirmation for unflags
   });
-
   request.fail(function(err) {
     console.log("Awww, man. Couldn't flag! -- Dave", err);
   });
@@ -309,7 +305,9 @@ function favePost(id) {
     // <i class="fa fa-heart"></i>
     // <i class="fa fa-heart-o"></i>
 
-
+  });
+  request.fail(function(err) {
+    console.log('Darn. something went wrong, could not fave comment', err);
   })
 }
 
