@@ -32,6 +32,8 @@ module.exports = function(app) {
 
   // Get all favorites for a specific comment
   app.get('/api/comments/faves/get', jsonParser, function(req, res, next) {
+    console.log('getting');
+    
     var favesToGet = {
       url: req.body.commentId
     };
@@ -67,7 +69,6 @@ module.exports = function(app) {
   // TODO: isLoggedIn
   // Get all comments for a specific URL
   app.get('/api/comments/get', jsonParser, function(req, res, next) {
-
     // Handle undefined URLs to prevent crashing? Maybe...
     if (req.query.url === undefined) {
       return;
@@ -76,12 +77,26 @@ module.exports = function(app) {
     var urlToGet = {
       url: req.query.url
     };
-    console.log(req.query.lastUpdateId);
+
+    // if there is no repliesTo parameter, set it to null
+    if (req.query.repliesToId === undefined || req.query.repliesToId === 'undefined') {
+      req.query.repliesToId = null;
+    }
+
+    // translate public/private from string ('true' or 'false') to number (1 or 0)
+    if (req.query.isPrivate === 'false'){
+      req.query.isPrivate = 0;
+    } else {
+      req.query.isPrivate = 1;
+    }
+    
     Url.get(urlToGet)
       .then(function(url) {
         if (url !== null) {
           return Comment.get({
-            UrlId: url.id
+            UrlId: url.id,
+            isPrivate: req.query.isPrivate,
+            repliesToId: req.query.repliesToId
           }, req.query.lastUpdateId);
         } else {
           // We expect an empty comments array to be returned
@@ -158,8 +173,8 @@ module.exports = function(app) {
 
   // add isAuth
   app.post('/api/comments/add', jsonParser, auth.isLoggedIn, function(req, res, next) {
+    console.log(req.body);
     // Add a new comment!
-
     Url.save({
         url: req.body.url
       })
@@ -179,7 +194,8 @@ module.exports = function(app) {
           text: text,
           isPrivate: isPrivate,
           UserId: req.user.id,
-          UrlId: url.get('id')
+          UrlId: url.get('id'),
+          repliesToId: req.body.repliesToId
         });
       })
       .then(function(comment) {

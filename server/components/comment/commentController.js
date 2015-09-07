@@ -5,7 +5,8 @@ var Flag = require('../').Flag;
 var Url = require('../').Url;
 
 var get = function(searchObject, lastCommentId) {
-  var attributes = ['text', 'User.name']; 
+  console.log('line 8 comment cotrl',searchObject);
+  var attributes = ['text', 'User.name', 'RepliesTo']; 
   var queryObject = {
     where: searchObject,
     include: [{
@@ -21,9 +22,9 @@ var get = function(searchObject, lastCommentId) {
         model: Url,
         attributes: ['url']
       }]
-  };
-  if (lastCommentId !== 'undefined') {
-    console.log(lastCommentId);
+    };
+
+  if (!(lastCommentId === 'undefined' || lastCommentId === undefined)) {
     queryObject.where.id = {};
     queryObject.where.id.$lt = lastCommentId;
   } 
@@ -53,6 +54,9 @@ var get = function(searchObject, lastCommentId) {
 // takes an object with the following format
 var post = function(commentObject) {
   var newComment = Comment.build(commentObject);
+  if (newComment.repliesToId === undefined){
+    newComment.repliesToId = null;
+  }
   return newComment.save()
     .then(function(comment) {
       return comment;
