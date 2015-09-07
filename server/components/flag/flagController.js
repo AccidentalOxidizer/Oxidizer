@@ -17,8 +17,24 @@ var get = function(searchObject) {
 };
 
 var flag = function(searchObject) {
-  //console.log("FLAG OBJECT: ", searchObject);
-  //var newFlag = Flag.build(searchObject);
+
+  // First: Search if a flag for this particular user and comment combination already exists.
+  // return Flag.findOne({
+  //     where: searchObject
+  //   })
+  //   .then(function(result) {
+  //     console.log('FLAGGING ITEM', result);
+  //     return result;
+  //   })
+  //   .catch(function(err) {
+  //     console.log("Flag error: ", err);
+  //     return;
+  //   });
+
+
+
+  console.log("FLAG OBJECT: ", searchObject);
+  var newFlag = Flag.build(searchObject);
   return Flag.findOrCreate({
       where: searchObject
     })
