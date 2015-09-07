@@ -5,6 +5,7 @@ var Flag = require('../').Flag;
 var Url = require('../').Url;
 
 var get = function(searchObject, lastCommentId) {
+  console.log('getting');
   var attributes = ['text', 'User.name']; 
   var queryObject = {
     where: searchObject,
@@ -20,6 +21,9 @@ var get = function(searchObject, lastCommentId) {
       }, {
         model: Url,
         attributes: ['url']
+      }, {
+        model: Comment,
+        attributes: []
       }]
   };
   if (lastCommentId !== 'undefined') {
@@ -36,6 +40,7 @@ var get = function(searchObject, lastCommentId) {
   console.log('query', queryObject);
   return Comment.findAll(queryObject)
     .then(function(results) {
+      console.log(results);
       // Iterate over our results array and update the number of hearts and favorites so
       // we don't return the ENTIRE array.
       results.forEach(function(element, index, array) {
