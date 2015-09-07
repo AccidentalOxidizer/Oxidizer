@@ -231,8 +231,7 @@ function registerCommentEventListeners() {
   var flags = document.getElementsByClassName('flag');
   for (var i = 0; i < flags.length; i++) {
     flags[i].addEventListener('click', function() {
-      console.log('flag clicked');
-      // step 1: remove modal from DOM that has been appended / used before.
+      // remove modal from DOM that has been appended / used before.
       $('#confirm-modal').remove();
       var id = this.getAttribute('data-comment-id');
       var source = $("#confirm-flag-x-handlebars-template").html();
