@@ -67,9 +67,9 @@ module.exports = function(passport, config) {
       // We will potentially allow a user to link more than one social
       // account for authentication and authorization with the email
       // address being the common field
-      User.findOne({
+      User.findOne({ where: {
           email: email
-        })
+        }})
         .then(function(user) {
           if (user) {
             console.log("GoogleStrategy: found valid user with email " + email);
@@ -123,7 +123,9 @@ module.exports = function(passport, config) {
 
       var email = profile.emails[0].value;
 
-      User.findOne({email: email})
+      User.findOne({ where: {
+          email: email
+        }})
         .then(function(user) {
           if (user) {
             console.log("FacebookStrategy: found valid user with email " + email);
