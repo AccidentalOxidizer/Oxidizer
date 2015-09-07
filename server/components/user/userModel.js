@@ -65,7 +65,7 @@ module.exports = function(sequelize, dataTypes) {
     indexes: [{
       // Create a unique index on email
         unique: true,
-        fields: ['name']
+        fields: ['email']
       }],
   });
 };

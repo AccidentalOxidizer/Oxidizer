@@ -18,6 +18,7 @@ var Website = React.createClass({
     return (
       <div>
       <h2>{this.props.params}</h2>
+      </div>
 
     );
   }
