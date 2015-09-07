@@ -64,11 +64,12 @@ $(document).ready(function() {
 
         var commentArrayHTML = '';
         // Render comment HTML
+        console.log('DATA??????', data);
         data['comments'].forEach(function(element, index) {
           commentArrayHTML = commentArrayHTML.concat(buildComments(data['comments'][index]));
         });
 
-        $('#comments').html('<p>URL: ' + testSettings.url + '</p>' + commentArrayHTML);
+        $('#comments').html('<p>URL: <a href="' + testSettings.url + '" target="_blank">' + testSettings.url + '</a></p>' + commentArrayHTML);
       },
       error: function(err) {
         $('#comments').html('Please login with Google credentials first :)');

@@ -5,35 +5,37 @@ var Flag = require('../').Flag;
 var Url = require('../').Url;
 
 var get = function(searchObject, lastCommentId) {
-  console.log('line 8 comment cotrl',searchObject);
-  var attributes = ['text', 'User.name', 'RepliesTo']; 
+  console.log('line 8 comment cotrl', searchObject);
+  var attributes = ['text', 'User.name', 'RepliesTo'];
   var queryObject = {
     where: searchObject,
     include: [{
-        model: User,
-        attributes: ['name']
-      }, {
-        model: Heart,
-        attributes: ['id']
-      }, {
-        model: Flag,
-        attributes: ['id']
-      }, {
-        model: Url,
-        attributes: ['url']
-      }]
-    };
+      model: User,
+      attributes: ['name']
+    }, {
+      model: Heart,
+      attributes: ['id']
+    }, {
+      model: Flag,
+      attributes: ['id']
+    }, {
+      model: Url,
+      attributes: ['url']
+    }]
+  };
 
   if (!(lastCommentId === 'undefined' || lastCommentId === undefined)) {
     queryObject.where.id = {};
     queryObject.where.id.$lt = lastCommentId;
-  } 
+  }
 
   // limit the number of comments we send to the user
   queryObject.limit = 25;
 
   // return in ascending order of commentid
-  queryObject.order = [['id', 'DESC']];
+  queryObject.order = [
+    ['id', 'DESC']
+  ];
   console.log('query', queryObject);
   return Comment.findAll(queryObject)
     .then(function(results) {
@@ -54,7 +56,7 @@ var get = function(searchObject, lastCommentId) {
 // takes an object with the following format
 var post = function(commentObject) {
   var newComment = Comment.build(commentObject);
-  if (newComment.repliesToId === undefined){
+  if (newComment.repliesToId === undefined) {
     newComment.repliesToId = null;
   }
   return newComment.save()
