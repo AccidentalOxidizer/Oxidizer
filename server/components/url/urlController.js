@@ -1,5 +1,5 @@
 var Url = require('../').Url;
-var parseUrl = require('../../utils/parseURL.js').parseUrl;
+var parseUrl = require('../../utils/parseURL.js');
 var url = require('url');
 
 /** 
@@ -24,9 +24,10 @@ var copyObject = function(obj) {
     }
   }
 
-  parsedObject.hose = url.parse(parsedObject.url).host;
-  parsedObject.url = parseUrl(parsedObject.url);
-  console.log(parsedObject);
+  var parsedURL = parseUrl(parsedObject.url);
+  parsedObject.host = parsedURL.host;
+  parsedObject.url = parsedURL.url;
+
   return parsedObject;
 };
 
