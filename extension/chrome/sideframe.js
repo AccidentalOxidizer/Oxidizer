@@ -40,78 +40,21 @@ document.addEventListener("DOMContentLoaded", function(e) {
   // Post new comment
   document.getElementById('comment-input-field').addEventListener('keydown', function(e) {
     if (e.keyCode === 13) {
-      // trigger post
       postComment(document.getElementById('comment-input-field').value);
       document.getElementById('comment-input-field').value = '';
     }
   });
+
   document.getElementById('comment-submit-button').addEventListener('click', function() {
     postComment(document.getElementById('comment-input-field').value);
     document.getElementById('comment-input-field').value = '';
   });
 
-  // this can't work, the event listeners need to be atached individually after loading
-  // document.getElementsByClassName('heart').addEventListener('click', function() {});
-  // document.getElementsByClassName('flag').addEventListener('click', function() {});
-
 
 
   // sends request for new comments when we get to the bottom of comments
   document.getElementById('comment-container').addEventListener('scroll', function() {
-    var commentContainer = document.getElementsByClassName('comment-container');
-
-    // tracks is we've gotten all of the comments
-    var endOfComments = false;
-
-    // calculates how much space is left to scroll through the comments
-    var spaceLeft = commentContainer.scrollHeight - (commentContainer.clientHeight + commentContainer.scrollTop);
-
-    //if we are towards the bottom of the div, and we haven't gotten all comments, and we don't have a pending request
-    if (spaceLeft < 300 && !endOfComments && requestReturned) {
-
-      // toggle requestReturned so that we don't send two requests concurrently
-      requestReturned = false;
-
-      var params = {
-        url: encodeURIComponent(request.url),
-        lastUpdateId: request.lastUpdateId,
-        isPrivate: false
-      };
-      var paramString = [];
-      for (var key in params) {
-        if (params.hasOwnProperty(key)) {
-          paramString.push(key + '=' + params[key]);
-        }
-      }
-
-      paramString = paramString.join('&');
-      var apiURL = server + "/api/comments/get?" + paramString;
-
-
-      var request = $.ajax({
-        url: apiURL,
-        method: "GET",
-        contentType: "application/json",
-      });
-
-      request.done(function(msg) {
-
-        if (msg.comments.length === 0) {
-          endOfComments = true;
-        }
-        // set lastLoadedCommentId
-        if (msg.comments.length > 0) {
-          lastLoadedCommentId = msg.comments[msg.comments.length - 1].id;
-        }
-        // compile and append new comments
-        compileAppendComments(msg.comments);
-      });
-
-      request.fail(function(jqXHR, textStatus) {
-        console.log("Request failed: " + textStatus);
-      });
-
-    }
+    loadMoreComments();
   });
 
 
@@ -173,6 +116,7 @@ function loadContent(url) {
     console.log(msg.comments);
     var html = compileComments(msg.comments);
     $(".cd-panel-content").append(html);
+    registerCommentEventListeners();
   });
 
   request.fail(function(jqXHR, textStatus) {
@@ -203,11 +147,12 @@ function postComment(text) {
     // compile and append successfully saved and returned message to DOM
     var html = compileComments(msg.comments);
     $(".cd-panel-content").prepend(html);
+    registerCommentEventListeners();
 
   });
 
   request.fail(function(jqXHR, textStatus) {
-    alert("Request failed: " + textStatus);
+    console.log("Request failed: " + textStatus);
   });
 }
 
@@ -217,3 +162,160 @@ function compileComments(comments) {
   var template = Handlebars.compile(source);
   return template(comments);
 }
+
+
+function loadMoreComments() {
+  var commentContainer = document.getElementsByClassName('comment-container');
+
+  // tracks is we've gotten all of the comments
+  var endOfComments = false;
+
+  // calculates how much space is left to scroll through the comments
+  var spaceLeft = commentContainer.scrollHeight - (commentContainer.clientHeight + commentContainer.scrollTop);
+
+  //if we are towards the bottom of the div, and we haven't gotten all comments, and we don't have a pending request
+  if (spaceLeft < 300 && !endOfComments && requestReturned) {
+
+    // toggle requestReturned so that we don't send two requests concurrently
+    requestReturned = false;
+
+    var params = {
+      url: encodeURIComponent(request.url),
+      lastUpdateId: request.lastUpdateId,
+      isPrivate: false
+    };
+    var paramString = [];
+    for (var key in params) {
+      if (params.hasOwnProperty(key)) {
+        paramString.push(key + '=' + params[key]);
+      }
+    }
+
+    paramString = paramString.join('&');
+    var apiURL = server + "/api/comments/get?" + paramString;
+
+
+    var request = $.ajax({
+      url: apiURL,
+      method: "GET",
+      contentType: "application/json",
+    });
+
+    request.done(function(msg) {
+
+      if (msg.comments.length === 0) {
+        endOfComments = true;
+      }
+      // set lastLoadedCommentId
+      if (msg.comments.length > 0) {
+        lastLoadedCommentId = msg.comments[msg.comments.length - 1].id;
+      }
+      // compile and append new comments
+      compileComments(msg.comments);
+      $(".cd-panel-content").append(html);
+      registerCommentEventListeners();
+    });
+
+    request.fail(function(jqXHR, textStatus) {
+      console.log("Request failed: " + textStatus);
+    });
+
+  }
+}
+
+
+function registerCommentEventListeners() {
+
+  var replies = document.getElementsByClassName('reply');
+
+  var flags = document.getElementsByClassName('flag');
+  for (var i = 0; i < flags.length; i++) {
+    flags[i].addEventListener('click', function() {
+      console.log('flag clicked');
+      // step 1: remove modal from DOM that has been appended / used before.
+      $('#confirm-modal').remove();
+      var id = this.getAttribute('data-comment-id');
+      var source = $("#confirm-flag-x-handlebars-template").html();
+      var template = Handlebars.compile(source);
+      var html = template({
+        modalId: 'confirm-modal',
+        commentId: id
+      });
+      $('body').append(html);
+      // we need an event listener in case user confirms the flag
+      document.getElementById('confirm-flag').addEventListener('click', function() {
+        flagPost(id);
+      })
+      $('#confirm-modal').modal();
+    });
+  };
+
+  var hearts = document.getElementsByClassName('heart');
+  for (var i = 0; i < hearts.length; i++) {
+    hearts[i].addEventListener('click', function() {
+      console.log('heart clicked');
+      var id = this.getAttribute('data-comment-id');
+      // var faved = this.getAttribute('data-faved-state');
+      favePost(id);
+    });
+  };
+  //
+}
+
+function flagPost(id) {
+  // this function is called when user confirms flagging a comment
+  console.log('to flag:', id);
+
+  var data = JSON.stringify({
+    CommentId: id
+  });
+
+  var request = $.ajax({
+    url: server + '/api/comments/flag',
+    method: "POST",
+    contentType: "application/json",
+    data: data,
+    dataType: 'json'
+  });
+
+  request.done(function(msg) {
+    console.log('successfully flagged (or unflagged) comment', msg);
+    // we should rerender can change the color of the flag, 
+    // plus set a marker that prevents poping up confirmation for unflags
+  });
+
+  request.fail(function(err) {
+    console.log("Awww, man. Couldn't flag! -- Dave", err);
+  });
+}
+
+function favePost(id) {
+  console.log('Comment to fave:', id);
+  var data = JSON.stringify({
+    CommentId: id
+  });
+  var request = $.ajax({
+    url: server + '/api/comment/fave',
+    method: "POST",
+    contentType: "application/json",
+    data: data,
+    dataType: 'json'
+  });
+  request.done(function(msg) {
+    console.log('successfully faved (or unfaved) comment,', msg);
+
+    // msg will contain info if faved or unfaved. 
+    // we should toggle color and form of icon here.
+    // <i class="fa fa-heart"></i>
+    // <i class="fa fa-heart-o"></i>
+
+
+  })
+}
+
+function unFavePost(id) {
+  // function to unfave a post.
+}
+
+// repliesToId
+// isPrivate

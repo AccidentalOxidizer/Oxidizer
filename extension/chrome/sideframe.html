@@ -51,7 +51,7 @@
   </div> -->
     </div>
     <script id="comment-entry-template" type="text/x-handlebars-template">
-       {{#each this}}
+        {{#each this}}
         <div class="col-xs-12 comment">
             <div class="row">
                 <div class="col-xs-6 comment-username">{{User.name}}</div>
@@ -62,20 +62,39 @@
             </div>
             <div class="row " style="margin-top:5px;">
                 <div class="col-xs-12 comment-engage">
-                <div id="heart" class="heart" style="float:left;">
-                 <i class="fa fa-heart-o"></i>&nbsp;{{Hearts}}&nbsp;</div> 
-                <div id="flag" data-comment-id="{{id}}" class="flag" style="float:right; text-align:right;">
-                <i class="fa fa-flag-o"></i>&nbsp; </div></div>
+                    <div id="heart" class="heart" style="float:left;">
+                        <i class="fa fa-heart-o"></i>&nbsp;{{Hearts}}&nbsp;</div>
+                    <div id="flag" data-comment-id="{{id}}" class="flag" style="float:right; text-align:right;">
+                        <i class="fa fa-flag-o"></i>&nbsp; </div>
+                </div>
             </div>
         </div>
-         {{/each}}
+        {{/each}}
     </script>
-
-
-    <script id="confirm-flag-template" type="text/x-handlebars-template">
-      <div>Comment ID to flag: {{id}}</div>
+    <!-- Modal popup to confirm flagging of a comment -->
+    <script id="confirm-flag-x-handlebars-template" type="text/x-handlebars-template">
+        <div class="modal fade" id="{{modalId}}">
+            <div class="modal-dialog modal-sm" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                        <h4 class="modal-title" id="myModalLabel">Are you sure? </h4>
+                    </div>
+                    <div class="modal-body">
+                        <p>You are about to flag a comment as inappropriate.
+                        Please confirm.</p>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-block btn-default" data-dismiss="modal">Never Mind</button>
+                        <button type="button" class="btn btn-block btn-danger" data-dismiss="modal" id="confirm-flag">Yes! Flag the comment!</button>
+                    </div>
+                </div>
+            </div>
+        </div>
     </script>
-
+    <!-- Send reply to comment-->
+    <script id="post-reply-x-handlebars-template" type="text/x-handlebars-template">
+    </script>
     <script src="lib/js/jquery-2.1.4.min.js"></script>
     <script src="lib/js/handlebars-v4.0.2.js"></script>
     <script src="lib/js/bootstrap.min.js"></script>
