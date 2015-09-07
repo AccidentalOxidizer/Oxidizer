@@ -76,7 +76,7 @@ var save = function(urlObject) {
 // but this might not matter since we won't display
 // them anyway.
 var remove = function(url) {
-  url = parseUrl(url);
+  url = parseUrl(url).url;
   return Url.destroy({
       where: {
         url: url
