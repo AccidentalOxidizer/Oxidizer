@@ -30,6 +30,7 @@ bower_components/
 server/config.js
 client/dist
 
+
 # Elastic Beanstalk Files
 .elasticbeanstalk/*
 !.elasticbeanstalk/*.cfg.yml
@@ -39,3 +40,4 @@ client/dist
 .DS_Store
 extension/.DS_Store
 extension/chrome/.DS_Store
+
