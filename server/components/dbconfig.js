@@ -25,10 +25,13 @@ var sequelize = models.sequelize;
 
   // Comment can reply to one other comment
   m.Comment.belongsTo(m.Comment, {
-    as: 'RepliesTo'
+    as: 'repliesTo', 
+    foreignKey: 'repliesToId'
   });
+
   m.Comment.hasMany(m.Comment, {
-    as: 'RepliesTo'
+    as: 'repliesTo',
+    foreignKey: 'repliesToId'
   });
 
   // Heart is required to have one User
