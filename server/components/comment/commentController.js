@@ -7,15 +7,37 @@ var Flag = require('../').Flag;
 var flagController = require('../flag');
 var Url = require('../').Url;
 
-var get = function(searchObject, lastCommentId, userId) {
-  var comments; // variable so our return comments are available throughout the .then string 
-  // track if we need to check if the comments are liked by a user
-  var filterByUser = userId || false; 
+// <<<<<<< HEAD
+// var get = function(searchObject, lastCommentId, userId) {
+//   var comments; // variable so our return comments are available throughout the .then string 
+//   // track if we need to check if the comments are liked by a user
+//   var filterByUser = userId || false; 
 
+//   var userHearts;
+//   var userFlags;
+
+// =======
+
+// @param userId: userId for filtering to obtain hearts and flags
+// 
+// @param getTotalCount: undefined if the total count of these
+// comment types is not needed.
+//
+// @param urlToFind: Comes from req.query.url -- set to 'undefined' if 
+// not actively searching on this field.
+var get = function(searchObject, lastCommentId, userId, getTotalCount, urlToFind) {
+  var comments; // variable so our return comments are available throughout the .then string 
   var userHearts;
   var userFlags;
-
   var attributes = ['text', 'User.name', 'RepliesTo'];
+  var urlQuery = {};
+
+  // Set up a url filter if needed.
+  if (urlToFind !== 'undefined') {
+    console.log("Comments get: filtering on url " + urlToFind);
+    urlQuery = {url: {$like: '%' + urlToFind + '%'}};
+  }
+
   var queryObject = {
     where: searchObject,
     include: [{
@@ -29,7 +51,8 @@ var get = function(searchObject, lastCommentId, userId) {
       attributes: ['id']
     }, {
       model: Url,
-      attributes: ['url']
+      attributes: ['url'],
+      where: urlQuery
     }]
   };
 
@@ -38,7 +61,7 @@ var get = function(searchObject, lastCommentId, userId) {
     queryObject.where.id.$lt = lastCommentId;
   }
 
-  if (queryObject.where.isPrivate == 0 || queryObject.where.isPrivate == false){
+  if (queryObject.where.isPrivate == 0 || queryObject.where.isPrivate === 'false') {
     queryObject.where.isPrivate = false;
   } else {
     queryObject.where.isPrivate = true;
@@ -53,15 +76,17 @@ var get = function(searchObject, lastCommentId, userId) {
   ];
 
   console.log('query', queryObject);
-  return Comment.findAll(queryObject)
+
+  return Comment.findAndCountAll(queryObject)
     .then(function(results) {
-      comments = results;
+      comments = results.rows;
+
       // if there is a userId to filter by, see if they have hearted/flagged
       if (userId){
         var searchObject = {
           CommentId: {
-            $lte: results[0].id,
-            $gte: results[results.length - 1].id
+            $lte: comments[0].id,
+            $gte: comments[comments.length - 1].id
           },
         };
 
@@ -76,13 +101,15 @@ var get = function(searchObject, lastCommentId, userId) {
               return flag.CommentId;
             });
 
-            return comments; 
+            return results; 
           });
       } else {
-        return comments;
+        return getTotalCount ? results : comments; 
       }
     })
-    .then(function(comments){
+    .then(function(results){
+      comments = results.rows;
+
       comments.forEach(function(comment, index, array) {
         if (userHearts !== undefined ) {
           comment.dataValues.heartedByUser = false;
@@ -105,7 +132,7 @@ var get = function(searchObject, lastCommentId, userId) {
         comment.dataValues.Flags = comment.dataValues.Flags.length;
       });
 
-      return comments;
+      return getTotalCount ? results : comments; 
     })
     .catch(function(err) {
       console.log("Err getting comments: ", err);

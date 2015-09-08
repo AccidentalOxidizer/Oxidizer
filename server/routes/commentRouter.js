@@ -147,15 +147,30 @@ module.exports = function(app) {
     }
 
     var userId = req.user.id;
-    var maxCommentId = req.query.maxCommentId || null;
-    console.log("Comments: get comments for userId " + userId + " maxCommentId " + maxCommentId);
+    console.log("Comments: get comments for userId " + userId + " maxCommentId " + req.query.oldestLoadedCommentId);
     console.log("Comments: get comments req.query");
     console.log(req.query);
 
-    Comment.get({UserId: userId}, maxCommentId)
-      .then(function(comments) {
+    var searchObj = { 
+      UserId: userId,
+      isPrivate: req.query.isPrivate
+    };
+
+    // If this request is searching for a string in the comments, add it
+    // to our search query
+    if (req.query.text !== 'undefined') {
+      searchObj.text = {$like: '%' + req.query.text + '%'};
+      console.log("Comments: get - updated searchObj: ");
+      console.log(searchObj);
+    }
+
+    Comment.get(searchObj, req.query.oldestLoadedCommentId, userId, true, req.query.url)
+      .then(function(data) {
         res.send(200, {
-          comments: comments,
+          displayName: req.user.name,
+          comments: data.rows,
+          numComments: data.count,
+          currentTime: new Date()
         });
       })
       .catch(function(err) {
