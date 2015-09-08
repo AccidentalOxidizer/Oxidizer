@@ -1,0 +1,6 @@
+[data-oxidizer-identity="trigger"]{
+  position: fixed !important;
+  bottom: 0px !important; 
+  right: 0px !important;
+  background: red !important;
+}

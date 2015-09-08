@@ -6,7 +6,6 @@ chrome.runtime.sendMessage({
   },
   function(response) {
     settings = response.settings;
-    console.log(settings);
     if (settings.showtrigger === true) {
       createIframe(); //  we might need to create that anyways for popup trigger?
       createAndShowTrigger();
@@ -35,11 +34,14 @@ function createIframe() {
 
 function createAndShowTrigger() {
   // Create trigger
-  var section = document.createElement('section');
+  var section = document.createElement('div');
   section.setAttribute('data-oxidizer-identity', 'trigger');
   section.className = 'oxidizer cleanslate';
   section.style.cssText = 'position:fixed !important; bottom:0 !important; right:0 !important; background: red;';
+  // console.log(document.querySelector('[data-oxidizer-identity="trigger"'));
+  section.style.cssText = 'position:fixed !important; bottom:0 !important; right:0 !important; background: red;';
   section.innerHTML = 'TRIGGER'; // this should be a nice SVG element
+  // console.log(section.style.cssText);
   document.body.appendChild(section);
 
   // Create listener to fire trigger to open iframe
