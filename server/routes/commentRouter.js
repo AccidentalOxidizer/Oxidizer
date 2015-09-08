@@ -13,7 +13,7 @@ module.exports = function(app) {
   // Users marks a specific comment as a new favorite.
   app.post('/api/comments/fave', jsonParser, function(req, res, next) {
     Heart.fave({
-        UserId: req.body.UserId,
+        UserId: req.user.id,
         CommentId: req.body.CommentId
       })
       .then(function(result) {
@@ -42,7 +42,7 @@ module.exports = function(app) {
   // Users marks a specific comment as flagged for bad behavior.
   app.post('/api/comments/flag', jsonParser, function(req, res, next) {
     Flag.flag({
-        UserId: req.body.UserId,
+        UserId: req.user.id,
         CommentId: req.body.CommentId
       })
       .then(function(result) {
@@ -84,12 +84,12 @@ module.exports = function(app) {
     }
 
     // translate public/private from string ('true' or 'false') to number (1 or 0)
-    if (req.query.isPrivate === 'false'){
-      req.query.isPrivate = 0;
-    } else {
+    if (req.query.isPrivate === 'true' || req.query.isPrivate === '1'){
       req.query.isPrivate = 1;
+    } else {
+      req.query.isPrivate = 0;
     }
-    
+
     Url.get(urlToGet)
       .then(function(url) {
         if (url !== null) {
@@ -97,7 +97,7 @@ module.exports = function(app) {
             UrlId: url.id,
             isPrivate: req.query.isPrivate,
             repliesToId: req.query.repliesToId
-          }, req.query.lastUpdateId);
+          }, req.query.lastUpdateId, req.user.id);
         } else {
           // We expect an empty comments array to be returned
           // for any webpage that we haven't yet visited / added
@@ -116,7 +116,6 @@ module.exports = function(app) {
       .then(function(comments) {
         // TODO: Handle case where URL exists but no comments??
         // TODO: Make this look like contract!
-
         res.send(200, {
           comments: comments,
           currentTime: new Date(), // TODO: Fill this out!
