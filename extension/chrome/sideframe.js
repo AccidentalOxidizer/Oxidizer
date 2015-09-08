@@ -8,7 +8,6 @@ var requestReturned = true;
 
 document.addEventListener("DOMContentLoaded", function(e) {
 
-
   // when ever we have a trigger event from the parent window 
   // it will tell the iframe to reload and redo what is needed
   // on 'open' we get 2 pieces of information from the parent content script:
@@ -18,7 +17,7 @@ document.addEventListener("DOMContentLoaded", function(e) {
     if (e.data.type === 'open') {
       url = e.data.url;
       settings = e.data.settings;
-      console.log(settings);
+      console.log(settings.server);
       // show the panel with animation
       $('.cd-panel').addClass('is-visible');
       // do what needs to be done. load content, etc..
@@ -104,7 +103,7 @@ function loadContent(url) {
   }
 
   paramString = paramString.join('&');
-  var apiURL = server + "/api/comments/get?" + paramString;
+  var apiURL = settings.server + "/api/comments/get?" + paramString;
 
 
   var request = $.ajax({
@@ -133,16 +132,17 @@ function loadContent(url) {
 }
 
 // function to post new comments
-function postComment(text) {
+function postComment(text, replyId) {
 
   var data = JSON.stringify({
     url: url,
     text: text,
+    replyId: replyId || undefined,
     isPrivate: false
   });
 
   var request = $.ajax({
-    url: server + '/api/comments/add',
+    url: settings.server + '/api/comments/add',
     method: "POST",
     contentType: "application/json",
     data: data,
@@ -153,7 +153,9 @@ function postComment(text) {
     console.log(msg.comments);
     // compile and append successfully saved and returned message to DOM
     var html = compileComments(msg.comments);
-    $(".cd-panel-content").prepend(html);
+    if (!replyId) {
+      $(".cd-panel-content").prepend(html);
+    }
     registerCommentEventListeners();
 
   });
@@ -199,7 +201,7 @@ function loadMoreComments() {
     }
 
     paramString = paramString.join('&');
-    var apiURL = server + "/api/comments/get?" + paramString;
+    var apiURL = settings.server + "/api/comments/get?" + paramString;
 
 
     var request = $.ajax({
@@ -231,9 +233,18 @@ function loadMoreComments() {
 }
 
 
+// EVENT LISTENERS
 function registerCommentEventListeners() {
 
   var replies = document.getElementsByClassName('reply');
+  for (var i = 0; i < replies.length; i++) {
+    replies[i].addEventListener('click', function() {
+      var commentId = this.getAttribute('data-comment-id');
+      console.log('Reply to: ', commentId);
+      $(this).toggleClass('active');
+      $('#' + commentId + ' .reply-form').toggleClass('hidden');
+    })
+  }
 
   var flags = document.getElementsByClassName('flag');
   for (var i = 0; i < flags.length; i++) {
@@ -251,7 +262,7 @@ function registerCommentEventListeners() {
       // we need an event listener in case user confirms the flag
       document.getElementById('confirm-flag').addEventListener('click', function() {
         flagPost(id);
-      })
+      });
       $('#confirm-modal').modal();
     });
   };
@@ -268,14 +279,16 @@ function registerCommentEventListeners() {
   //
 }
 
-function flagPost(id) {
+// FUNCTIONS
+
+function flagPost(commentId) {
   // this function is called when user confirms flagging a comment
-  console.log('Comment to flag:', id);
+  console.log('Comment to flag:', commentId);
   var data = JSON.stringify({
-    CommentId: id
+    CommentId: commentId
   });
   var request = $.ajax({
-    url: server + '/api/comments/flag',
+    url: settings.server + '/api/comments/flag',
     method: "POST",
     contentType: "application/json",
     data: data,
@@ -291,13 +304,13 @@ function flagPost(id) {
   });
 }
 
-function favePost(id) {
-  console.log('Comment to fave:', id);
+function favePost(commentId) {
+  console.log('Comment to fave:', commentId);
   var data = JSON.stringify({
-    CommentId: id
+    CommentId: commentId
   });
   var request = $.ajax({
-    url: server + '/api/comment/fave',
+    url: settings.server + '/api/comment/fave',
     method: "POST",
     contentType: "application/json",
     data: data,

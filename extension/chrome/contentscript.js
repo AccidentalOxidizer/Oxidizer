@@ -74,7 +74,7 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
 
   /* Generic callback passing along an inital round trip message */
   if (request.from === 'background' && request.message === 'callback') {
-    console.log('REQUEST', request);
+    // console.log('REQUEST', request);
     sendResponse({
       data: 'callback'
     });
