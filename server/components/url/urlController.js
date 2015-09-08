@@ -32,12 +32,15 @@ var copyObject = function(obj) {
 };
 
 // GET all comments for a URL from the database
-var get = function(searchObject) {
+// user is an optional arg - if present this query will include if a comment has been faved or heared by the user
+var get = function(searchObject, userid) {
   var parsedObject = copyObject(searchObject);
 
-  return Url.findOne({
-      where: parsedObject
-    })
+  var queryObject = { 
+    where: parsedObject
+  };
+
+  return Url.findOne(queryObject)
     .then(function(result) {
       if (result !== null) {
         urlInfo = {};
@@ -76,7 +79,7 @@ var save = function(urlObject) {
 // but this might not matter since we won't display
 // them anyway.
 var remove = function(url) {
-  url = parseUrl(url);
+  url = parseUrl(url).url;
   return Url.destroy({
       where: {
         url: url

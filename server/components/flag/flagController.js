@@ -2,12 +2,15 @@ var Flag = require('../').Flag;
 
 // Get the number of flags for a particular comment
 // or from a particular user?
-var get = function(searchObject) {
+var get = function(searchObject, userId) {
+  if (userId !== undefined){
+    searchObject.UserId = userId;
+  }
+
   return Flag.findAll({
       where: searchObject
     })
-    .then(function(result) {
-      console.log(result);
+    .then(function(result){
       return result;
     })
     .catch(function(err) {

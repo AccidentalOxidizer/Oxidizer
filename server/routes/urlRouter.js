@@ -16,7 +16,7 @@ module.exports = function(app) {
     var urlToGet = {
       path: fullPath
     };
-
+    
     Url.get(urlToGet)
       .then(function(url) {
         res.send(200, url);
