@@ -10,6 +10,10 @@ var React = require('react');
 // - Show # Hearts?
 //
 var Comment = React.createClass({
+  propTypes: {
+    comment: React.PropTypes.object.isRequired
+  },
+  
   render: function() {
     return (
       <div>
