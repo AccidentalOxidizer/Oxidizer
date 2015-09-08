@@ -7,7 +7,6 @@ var Flag = require('../').Flag;
 var flagController = require('../flag');
 var Url = require('../').Url;
 
-// <<<<<<< HEAD
 // var get = function(searchObject, lastCommentId, userId) {
 //   var comments; // variable so our return comments are available throughout the .then string 
 //   // track if we need to check if the comments are liked by a user
@@ -15,8 +14,6 @@ var Url = require('../').Url;
 
 //   var userHearts;
 //   var userFlags;
-
-// =======
 
 // @param userId: userId for filtering to obtain hearts and flags
 // 
@@ -96,7 +93,7 @@ var get = function(searchObject, lastCommentId, userId, getTotalCount, urlToFind
             userHearts = hearts.map(function(heart){
               return heart.CommentId;
             });          
-            console.log('oooooooooooo', userHearts);
+
             userFlags = flags.map(function(flag){
               return flag.CommentId;
             });

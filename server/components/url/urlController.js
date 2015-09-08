@@ -25,6 +25,7 @@ var copyObject = function(obj) {
   }
 
   var parsedURL = parseUrl(parsedObject.url);
+  
   parsedObject.host = parsedURL.host;
   parsedObject.url = parsedURL.url;
 
@@ -60,8 +61,8 @@ var get = function(searchObject, userid) {
 
 // Write a new URL to the database
 var save = function(urlObject) {
-  var parsedObject = copyObject(urlObject);
 
+  var parsedObject = copyObject(urlObject);
   return Url.findOrCreate({
       where: parsedObject
     })

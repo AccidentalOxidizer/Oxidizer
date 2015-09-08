@@ -1,6 +1,6 @@
 var settings = {};
 
-var server = 'http://api.oxidizer.io'; // this is bad.
+var server = 'http://localhost:3000'; // this is bad.
 var url = '';
 
 // tracks if we have a pending http request so that we don't receive back the same comments twice
@@ -114,6 +114,7 @@ function loadContent(url) {
   });
 
   request.done(function(msg) {
+
     if (msg.comments.length > 0) {
       lastLoadedCommentId = msg.comments[msg.comments.length - 1].id;
     }

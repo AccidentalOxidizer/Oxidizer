@@ -44,6 +44,12 @@ module.exports = function(sequelize, dataTypes) {
 
     status: dataTypes.INTEGER,
 
+    // user notifications
+    repliesToCheck: dataTypes.INTEGER,
+    heartsToCheck: dataTypes.INTEGER,
+    flagsToCheck: dataTypes.INTEGER,
+    lastCheckedUpdates: dataTypes.DATE
+
     // additional profile info here
   }, {
     instanceMethods: {

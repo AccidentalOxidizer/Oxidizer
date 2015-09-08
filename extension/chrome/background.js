@@ -1,6 +1,6 @@
 // DEFAULTS
 var settings = {
-  server: 'http://api.oxidizer.io',
+  server: 'http://localhost:3000',
   keepprivate: false,
   autoshow: true,
   showtrigger: true

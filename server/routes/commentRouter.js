@@ -1,3 +1,4 @@
+
 var auth = require('../middleware').auth;
 var Promise = require('bluebird');
 var xssFilters = require('xss-filters');
@@ -137,7 +138,6 @@ module.exports = function(app) {
   // comments for the logged in user.
   // TODO? Add support to load comments for a given user via user id.
   app.get('/api/comments/get/user', jsonParser, function(req, res, next) {
-
     // TODO: when we have our middleware checks in place,
     // this shouldn't be necessary
     if (req.user === undefined) {
