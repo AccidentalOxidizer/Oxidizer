@@ -59,6 +59,15 @@ var Profile = React.createClass({
     this.loadUserComments();
   },
 
+  handleUrlSearch: function() {
+    var url = this.refs.searchUrl.getDOMNode().value;
+    this.refs.searchUrl.getDOMNode().value = '';
+
+    console.log("Profile: handleUrlSearch for " + url);
+
+    // TODO: load the comments that match the URL we are searching for
+  },
+
   render: function() {
     var comments = this.state.comments.map(function(comment) {
       return <Comment key={comment.id} comment={comment} />;
@@ -71,6 +80,14 @@ var Profile = React.createClass({
           <p>Total Comments: {this.state.numComments}</p>
         </div>
         <div className="col-md-8">
+          <form onSubmit={this.handleUrlSearch}>
+            <div className="form-group col-sm-7">
+              <input type="text" className="form-control" placeholder="Search for URL" ref="searchUrl" />
+            </div>
+            <div className="form-group col-sm-5">
+              <button type="submit" className="btn btn-block btn-primary">Search</button>
+            </div>
+          </form>
           {comments}
         </div>
       </div>
