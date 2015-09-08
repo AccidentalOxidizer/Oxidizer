@@ -2,7 +2,6 @@ var User = require('../').User;
 var Sequelize = require('sequelize');
 
 var getAll = function(searchObject){
-  console.log('here');
   return User.findAll(searchObject);
 };
 

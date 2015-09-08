@@ -3,6 +3,6 @@
   "keepprivate": false,
   "autoshow": true,
   "showtrigger": true,
-  "server": "http://api.oxidizer.io",
+  "server": "http://localhost:3000",
   "visible": "true"
 }

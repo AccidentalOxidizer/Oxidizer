@@ -27,7 +27,7 @@ var get = function(searchObject, lastCommentId, userId, getTotalCount, urlToFind
   var userHearts;
   var userFlags;
   var attributes = ['text', 'User.name', 'RepliesTo'];
-  var urlQuery = {};
+  var urlQuery = {url: {$like: '%%'}};
 
   // Set up a url filter if needed.
   if (urlToFind !== 'undefined') {
@@ -76,6 +76,7 @@ var get = function(searchObject, lastCommentId, userId, getTotalCount, urlToFind
 
   return Comment.findAndCountAll(queryObject)
     .then(function(results) {
+      console.log(results);
       comments = results.rows;
 
       // if there is a userId to filter by, see if they have hearted/flagged
@@ -144,6 +145,7 @@ var post = function(commentObject) {
   }
   return newComment.save()
     .then(function(comment) {
+
       return comment;
     })
     .catch(function(err) {
