@@ -65,7 +65,8 @@ var Profile = React.createClass({
     this.loadComments({
       oldestLoadedCommentId: this.state.oldestLoadedCommentId,
       url: 'undefined',
-      text: 'undefined'
+      text: 'undefined',
+      isPrivate: 'false'
     });
   },
 
@@ -74,7 +75,8 @@ var Profile = React.createClass({
     this.loadComments({
       oldestLoadedCommentId: 'undefined',
       url: url,
-      text: 'undefined'
+      text: 'undefined',
+      isPrivate: 'false'
     });
   },
 
@@ -83,7 +85,8 @@ var Profile = React.createClass({
     this.loadComments({
       oldestLoadedCommentId: 'undefined',
       url: 'undefined',
-      text: text
+      text: text,
+      isPrivate: 'false'
     });
   },
 

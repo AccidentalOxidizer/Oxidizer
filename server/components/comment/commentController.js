@@ -18,14 +18,17 @@ var Url = require('../').Url;
 
 // =======
 
+// @param userId: userId for filtering to obtain hearts and flags
+// 
 // @param getTotalCount: undefined if the total count of these
 // comment types is not needed.
 //
 // @param urlToFind: Comes from req.query.url -- set to 'undefined' if 
 // not actively searching on this field.
-var get = function(searchObject, lastCommentId, getTotalCount, urlToFind) {
-  console.log('line 8 comment cotrl', searchObject);
-// >>>>>>> Reconstructs work on Profile component and comments API.
+var get = function(searchObject, lastCommentId, userId, getTotalCount, urlToFind) {
+  var comments; // variable so our return comments are available throughout the .then string 
+  var userHearts;
+  var userFlags;
   var attributes = ['text', 'User.name', 'RepliesTo'];
   var urlQuery = {};
 
@@ -47,8 +50,6 @@ var get = function(searchObject, lastCommentId, getTotalCount, urlToFind) {
       model: Flag,
       attributes: ['id']
     }, {
-      // XXX EE: experimenting with adding a where clause here to
-      // search for a url
       model: Url,
       attributes: ['url'],
       where: urlQuery
@@ -60,7 +61,7 @@ var get = function(searchObject, lastCommentId, getTotalCount, urlToFind) {
     queryObject.where.id.$lt = lastCommentId;
   }
 
-  if (queryObject.where.isPrivate == 0 || queryObject.where.isPrivate == false){
+  if (queryObject.where.isPrivate == 0 || queryObject.where.isPrivate === 'false') {
     queryObject.where.isPrivate = false;
   } else {
     queryObject.where.isPrivate = true;
@@ -78,76 +79,60 @@ var get = function(searchObject, lastCommentId, getTotalCount, urlToFind) {
 
   return Comment.findAndCountAll(queryObject)
     .then(function(results) {
-// <<<<<<< HEAD
-//       comments = results;
-//       // if there is a userId to filter by, see if they have hearted/flagged
-//       if (userId){
-//         var searchObject = {
-//           CommentId: {
-//             $lte: results[0].id,
-//             $gte: results[results.length - 1].id
-//           },
-//         };
+      comments = results.rows;
 
-//         return Promise.all([heartController.get(searchObject, userId), flagController.get(searchObject, userId)])
-//           .spread(function(hearts, flags){
+      // if there is a userId to filter by, see if they have hearted/flagged
+      if (userId){
+        var searchObject = {
+          CommentId: {
+            $lte: comments[0].id,
+            $gte: comments[comments.length - 1].id
+          },
+        };
 
-//             userHearts = hearts.map(function(heart){
-//               return heart.CommentId;
-//             });          
-//             console.log('oooooooooooo', userHearts);
-//             userFlags = flags.map(function(flag){
-//               return flag.CommentId;
-//             });
+        return Promise.all([heartController.get(searchObject, userId), flagController.get(searchObject, userId)])
+          .spread(function(hearts, flags){
 
-//             return comments; 
-//           });
-//       } else {
-//         return comments;
-//       }
-//     })
-//     .then(function(comments){
-//       comments.forEach(function(comment, index, array) {
-//         if (userHearts !== undefined ) {
-//           comment.dataValues.heartedByUser = false;
-//           if(userHearts.indexOf(comment.id) > -1) {
-//             comment.dataValues.heartedByUser = true;
+            userHearts = hearts.map(function(heart){
+              return heart.CommentId;
+            });          
+            console.log('oooooooooooo', userHearts);
+            userFlags = flags.map(function(flag){
+              return flag.CommentId;
+            });
+
+            return results; 
+          });
+      } else {
+        return getTotalCount ? results : comments; 
+      }
+    })
+    .then(function(results){
+      comments = results.rows;
+
+      comments.forEach(function(comment, index, array) {
+        if (userHearts !== undefined ) {
+          comment.dataValues.heartedByUser = false;
+          if(userHearts.indexOf(comment.id) > -1) {
+            comment.dataValues.heartedByUser = true;
             
-//           }
-//         }
+          }
+        }
 
-//         if (userFlags !== undefined ) {
-//           comment.dataValues.flaggedByUser = false;
-//           if(userFlags.indexOf(comment.id) > -1) {
-//             comment.dataValues.flaggedByUser = true;
-//           }
-//         }
+        if (userFlags !== undefined ) {
+          comment.dataValues.flaggedByUser = false;
+          if(userFlags.indexOf(comment.id) > -1) {
+            comment.dataValues.flaggedByUser = true;
+          }
+        }
 
-//         // Iterate over our results array and update the number of hearts and favorites so
-//         // we don't return the ENTIRE array.
-//         comment.dataValues.Hearts = comment.dataValues.Hearts.length;
-//         comment.dataValues.Flags = comment.dataValues.Flags.length;
-//       });
-
-//       return comments;
-// =======
-
-      // Iterate over our results array and update the number of hearts and favorites so
-      // we don't return the ENTIRE array.
-      var resultRows = results.rows;
-      resultRows.forEach(function(element, index, array) {
-        resultRows[index].dataValues.Hearts = resultRows[index].dataValues.Hearts.length;
-        resultRows[index].dataValues.Flags = resultRows[index].dataValues.Flags.length;
+        // Iterate over our results array and update the number of hearts and favorites so
+        // we don't return the ENTIRE array.
+        comment.dataValues.Hearts = comment.dataValues.Hearts.length;
+        comment.dataValues.Flags = comment.dataValues.Flags.length;
       });
 
-      // If we don't require the count value, return the rows only
-      console.log("Commments get: total count " + results.count);
-      if (!getTotalCount) {
-        return results.rows;
-      } else {
-        return results;
-      }
-// >>>>>>> Reconstructs work on Profile component and comments API.
+      return getTotalCount ? results : comments; 
     })
     .catch(function(err) {
       console.log("Err getting comments: ", err);

@@ -151,7 +151,10 @@ module.exports = function(app) {
     console.log("Comments: get comments req.query");
     console.log(req.query);
 
-    var searchObj = { UserId: userId };
+    var searchObj = { 
+      UserId: userId,
+      isPrivate: req.query.isPrivate
+    };
 
     // If this request is searching for a string in the comments, add it
     // to our search query
@@ -161,7 +164,7 @@ module.exports = function(app) {
       console.log(searchObj);
     }
 
-    Comment.get(searchObj, req.query.oldestLoadedCommentId, true, req.query.url)
+    Comment.get(searchObj, req.query.oldestLoadedCommentId, userId, true, req.query.url)
       .then(function(data) {
         res.send(200, {
           displayName: req.user.name,
