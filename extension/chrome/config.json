@@ -1,5 +1,8 @@
 {
-  "config": "test",
+  "config": "default",
+  "keepprivate": false,
+  "autoshow": true,
+  "showtrigger": true,
   "server": "http://api.oxidizer.io",
   "visible": "true"
 }

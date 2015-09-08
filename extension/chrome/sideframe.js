@@ -1,4 +1,6 @@
-var server = 'http://api.oxidizer.io';
+var settings = {};
+
+var server = 'http://api.oxidizer.io'; // this is bad.
 var url = '';
 
 // tracks if we have a pending http request so that we don't receive back the same comments twice
@@ -6,12 +8,17 @@ var requestReturned = true;
 
 document.addEventListener("DOMContentLoaded", function(e) {
 
+
   // when ever we have a trigger event from the parent window 
   // it will tell the iframe to reload and redo what is needed
-
+  // on 'open' we get 2 pieces of information from the parent content script:
+  // 1. the URL of the parent window
+  // 2. the extension settings, which includes the server information 
   window.addEventListener("message", function(e) {
     if (e.data.type === 'open') {
       url = e.data.url;
+      settings = e.data.settings;
+      console.log(settings);
       // show the panel with animation
       $('.cd-panel').addClass('is-visible');
       // do what needs to be done. load content, etc..
