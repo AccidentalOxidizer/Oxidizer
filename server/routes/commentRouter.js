@@ -151,7 +151,17 @@ module.exports = function(app) {
     console.log("Comments: get comments req.query");
     console.log(req.query);
 
-    Comment.get({UserId: userId}, req.query.oldestLoadedCommentId, true)
+    var searchObj = { UserId: userId };
+
+    // If this request is searching for a string in the comments, add it
+    // to our search query
+    if (req.query.text !== 'undefined') {
+      searchObj.text = {$like: '%' + req.query.text + '%'};
+      console.log("Comments: get - updated searchObj: ");
+      console.log(searchObj);
+    }
+
+    Comment.get({UserId: userId}, req.query.oldestLoadedCommentId, true, req.query.url)
       .then(function(data) {
         res.send(200, {
           displayName: req.user.name,
