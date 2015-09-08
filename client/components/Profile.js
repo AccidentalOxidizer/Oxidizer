@@ -3,11 +3,6 @@ var Comment = require('./Comment');
 
 // At the moment, Profile will only be used to display your personal
 // profile, not that of others.
-// 
-// Load all the comments for this user into this.state.comments
-// Need to store maxCommentId ... last comment in array id
-// comments[length - 1].id
-// 
 var Profile = React.createClass({
   getInitialState: function() {
     return {
@@ -20,11 +15,11 @@ var Profile = React.createClass({
     };
   },
 
-  // TODO: refactor to use to load additional comments too.
-  init: function() {
+  loadComments: function(queryObj) {
     $.ajax({
       url: window.location.origin + '/api/comments/get/user',
-      data: {oldestLoadedCommentId: this.state.oldestLoadedCommentId},
+      // data: {oldestLoadedCommentId: this.state.oldestLoadedCommentId},
+      data: queryObj,
       method: 'GET',
       dataType: 'json',
       success: function(data) {
@@ -52,8 +47,16 @@ var Profile = React.createClass({
     });
   },
 
+  loadUserComments: function() {
+    console.log("Profile: loadUserComments, " + this.state.oldestLoadedCommentId);
+    this.loadComments({
+      oldestLoadedCommentId: this.state.oldestLoadedCommentId,
+      url: 'undefined'
+    });
+  },
+
   componentDidMount: function() {
-    this.init();
+    this.loadUserComments();
   },
 
   render: function() {
