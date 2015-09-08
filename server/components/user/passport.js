@@ -30,10 +30,18 @@ module.exports = function(passport, config) {
     function(req, email, password, done) {
       console.log('Passport: using LocalStrategy');
       User.findOne({
-          email: email
+          where: {
+            email: email
+          }
         })
         .then(function(user) {
           if (!user) {
+            // This is for local development purposes only:
+            if (config.secret === 'development') {
+
+            }
+
+
             return done(null, false, {
               message: 'Invalid email address.'
             });
@@ -49,6 +57,7 @@ module.exports = function(passport, config) {
           return done(null, user);
         })
         .catch(function(err) {
+          console.log('Err: User not found?', err);
           return done(err);
         });
     }));
@@ -67,9 +76,11 @@ module.exports = function(passport, config) {
       // We will potentially allow a user to link more than one social
       // account for authentication and authorization with the email
       // address being the common field
-      User.findOne({ where: {
-          email: email
-        }})
+      User.findOne({
+          where: {
+            email: email
+          }
+        })
         .then(function(user) {
           if (user) {
             console.log("GoogleStrategy: found valid user with email " + email);
@@ -82,7 +93,7 @@ module.exports = function(passport, config) {
               user.googleToken = accessToken;
               user.googleName = profile.displayName;
               return user.save()
-                .then(function(){
+                .then(function() {
                   return done(null, user);
                 });
             } else {
@@ -103,7 +114,7 @@ module.exports = function(passport, config) {
               .then(function(user) {
                 return done(null, user);
               });
-          }        
+          }
         })
         .catch(function(err) {
           console.log('danger will robinson', err);
@@ -123,9 +134,11 @@ module.exports = function(passport, config) {
 
       var email = profile.emails[0].value;
 
-      User.findOne({ where: {
-          email: email
-        }})
+      User.findOne({
+          where: {
+            email: email
+          }
+        })
         .then(function(user) {
           if (user) {
             console.log("FacebookStrategy: found valid user with email " + email);
@@ -138,7 +151,7 @@ module.exports = function(passport, config) {
               user.fbToken = accessToken;
               user.fbName = profile.displayName;
               return user.save()
-                .then(function(){
+                .then(function() {
                   return done(null, user);
                 });
             } else {
@@ -157,7 +170,7 @@ module.exports = function(passport, config) {
             });
 
             return newUser.save()
-              .then(function(){
+              .then(function() {
                 return done(null, user);
               });
           }
@@ -165,7 +178,6 @@ module.exports = function(passport, config) {
         .catch(function(err) {
           return done(err);
         });
-    })
-  );
+    }));
 
 };
