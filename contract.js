@@ -24,9 +24,13 @@ var commentsForAPath = {
     isPrivate: 'boolean'
   }],
   currentTime: 'timestamp',
+  repliesToId: 'Id of the comment it is responding to',
   userInfo: {
     username: 'string'
-  }
+  },
+  // these two only if a userId is passed
+  flaggedByUser: 'boolean',
+  heartedByUser: 'boolean'
 };
 
 // POST request to api/comments
