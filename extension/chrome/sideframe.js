@@ -124,6 +124,7 @@ function loadContent(url) {
     // compile and append new comments
 
     var html = compileComments(msg.comments);
+
     $(".cd-panel-content").append(html);
     registerCommentEventListeners();
   });
@@ -170,7 +171,7 @@ function postComment(text, replyId) {
 
 
 function compileComments(comments) {
-  var source = $("#comment-entry-template").html(); 
+  var source = $("#comment-entry-template").html();
   var template = Handlebars.compile(source);
   return template(comments);
 }
@@ -187,7 +188,7 @@ function loadMoreComments(url) {
 
   //if we are towards the bottom of the div, and we haven't gotten all comments, and we don't have a pending request
   if (spaceLeft < 300 && !endOfComments && requestReturned) {
-  
+
     // toggle requestReturned so that we don't send two requests concurrently
     requestReturned = false;
 
@@ -223,7 +224,7 @@ function loadMoreComments(url) {
       if (msg.comments.length > 0) {
         lastLoadedCommentId = msg.comments[msg.comments.length - 1].id;
       }
-      
+
       // compile and append new comments
       var html = compileComments(msg.comments);
       $(".cd-panel-content").append(html);
@@ -247,7 +248,7 @@ function registerCommentEventListeners(comment) {
       var commentId = this.getAttribute('data-comment-id');
       console.log('Reply to: ', commentId);
       $(this).toggleClass('active');
-      $('#' + commentId + ' .reply-form').toggleClass('hidden');
+      $(this).parents('#' + commentId).children('.reply-form').toggleClass('hidden');
     });
   }
 
@@ -354,7 +355,7 @@ Handlebars.registerHelper('dateFormat', function(context, block) {
     // TO PARSE WITH A DATE USE MOMENT FORMATTING:
     // var f = block.hash.format || "MMM Do, YYYY";
     // return moment(Date(context)).format(f);
-  }else{
-    return context;   //  moment plugin not available. return data as is.
+  } else {
+    return context; //  moment plugin not available. return data as is.
   }
 });
