@@ -59,8 +59,8 @@ document.addEventListener("DOMContentLoaded", function(e) {
 
 
   // sends request for new comments when we get to the bottom of comments
-  document.getElementById('comment-container').addEventListener('scroll', function() {
-    loadMoreComments();
+  document.querySelector('.cd-panel-content').addEventListener('scroll', function(e) {
+    loadMoreComments(document.referrer);
   });
 
 
@@ -95,6 +95,7 @@ function loadContent(url) {
     lastUpdateId: 'undefined',
     isPrivate: false
   };
+
   var paramString = [];
   for (var key in params) {
     if (params.hasOwnProperty(key)) {
@@ -119,7 +120,7 @@ function loadContent(url) {
     // clean the DOM
     $(".cd-panel-content").html('');
     // compile and append new comments
-    console.log(msg.comments);
+
     var html = compileComments(msg.comments);
     $(".cd-panel-content").append(html);
     registerCommentEventListeners();
@@ -167,16 +168,16 @@ function postComment(text, replyId) {
 
 
 function compileComments(comments) {
-  var source = $("#comment-entry-template").html();
+  var source = $("#comment-entry-template").html(); 
   var template = Handlebars.compile(source);
   return template(comments);
 }
 
 
-function loadMoreComments() {
-  var commentContainer = document.getElementsByClassName('comment-container');
+function loadMoreComments(url) {
+  var commentContainer = document.getElementsByClassName('cd-panel-content')[0];
 
-  // tracks is we've gotten all of the comments
+  // tracks if we've gotten all of the comments
   var endOfComments = false;
 
   // calculates how much space is left to scroll through the comments
@@ -184,15 +185,16 @@ function loadMoreComments() {
 
   //if we are towards the bottom of the div, and we haven't gotten all comments, and we don't have a pending request
   if (spaceLeft < 300 && !endOfComments && requestReturned) {
-
+  
     // toggle requestReturned so that we don't send two requests concurrently
     requestReturned = false;
 
     var params = {
-      url: encodeURIComponent(request.url),
-      lastUpdateId: request.lastUpdateId,
+      url: encodeURIComponent(url),
+      lastUpdateId: 'undefined',
       isPrivate: false
     };
+
     var paramString = [];
     for (var key in params) {
       if (params.hasOwnProperty(key)) {
@@ -219,8 +221,9 @@ function loadMoreComments() {
       if (msg.comments.length > 0) {
         lastLoadedCommentId = msg.comments[msg.comments.length - 1].id;
       }
+      
       // compile and append new comments
-      compileComments(msg.comments);
+      var html = compileComments(msg.comments);
       $(".cd-panel-content").append(html);
       registerCommentEventListeners();
     });
@@ -234,7 +237,7 @@ function loadMoreComments() {
 
 
 // EVENT LISTENERS
-function registerCommentEventListeners() {
+function registerCommentEventListeners(comment) {
 
   var replies = document.getElementsByClassName('reply');
   for (var i = 0; i < replies.length; i++) {
@@ -243,7 +246,7 @@ function registerCommentEventListeners() {
       console.log('Reply to: ', commentId);
       $(this).toggleClass('active');
       $('#' + commentId + ' .reply-form').toggleClass('hidden');
-    })
+    });
   }
 
   var flags = document.getElementsByClassName('flag');
@@ -327,7 +330,7 @@ function favePost(commentId) {
   });
   request.fail(function(err) {
     console.log('Darn. something went wrong, could not fave comment', err);
-  })
+  });
 }
 
 function unFavePost(id) {
@@ -336,3 +339,20 @@ function unFavePost(id) {
 
 // repliesToId
 // isPrivate
+
+//  format an ISO date using Moment.js
+//  http://momentjs.com/
+//  moment syntax example: moment(Date("2011-07-18T15:50:52")).format("MMMM YYYY")
+//  usage: {{dateFormat creation_date format="MMMM YYYY"}}
+Handlebars.registerHelper('dateFormat', function(context, block) {
+  if (window.moment) {
+    var date = new Date(context);
+    return moment(context).fromNow();
+
+    // TO PARSE WITH A DATE USE MOMENT FORMATTING:
+    // var f = block.hash.format || "MMM Do, YYYY";
+    // return moment(Date(context)).format(f);
+  }else{
+    return context;   //  moment plugin not available. return data as is.
+  }
+});

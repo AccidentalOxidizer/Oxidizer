@@ -47,7 +47,7 @@
         <div class="col-xs-12 comment" id="{{id}}">
             <div class="row">
                 <div class="col-xs-6 comment-username">{{User.name}}</div>
-                <div class="col-xs-6 comment-timestamp">{{createdAt}}</div>
+                <div class="col-xs-6 comment-timestamp">{{dateFormat createdAt format="MMMM YYYY"}}</div>
             </div>
             <div class="row">
                 <div class="col-xs-12 comment-text">{{text}}</div>
@@ -99,6 +99,7 @@
     <script src="lib/js/jquery-2.1.4.min.js"></script>
     <script src="lib/js/handlebars-v4.0.2.js"></script>
     <script src="lib/js/bootstrap.min.js"></script>
+    <script src="lib/js/moment.js"></script>
     <script src="sideframe.js"></script>
 </body>
 
