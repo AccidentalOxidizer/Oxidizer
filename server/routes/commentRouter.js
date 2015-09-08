@@ -161,7 +161,7 @@ module.exports = function(app) {
       console.log(searchObj);
     }
 
-    Comment.get({UserId: userId}, req.query.oldestLoadedCommentId, true, req.query.url)
+    Comment.get(searchObj, req.query.oldestLoadedCommentId, true, req.query.url)
       .then(function(data) {
         res.send(200, {
           displayName: req.user.name,
