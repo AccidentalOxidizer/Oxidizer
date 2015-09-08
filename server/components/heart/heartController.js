@@ -1,5 +1,6 @@
 var Heart = require('../').Heart;
-
+var User = require('../').User;
+var Comment = require('../').Comment;
 // Get the number of favorites for a particular comment
 // or from a particular user?
 var get = function(searchObject, userId) {
@@ -27,6 +28,7 @@ var get = function(searchObject, userId) {
 var fave = function(searchObject) {
   //First: Search
   // if a fave for this particular user and comment combination already exists.
+  
   return Heart.findOne({
       where: searchObject
     })
@@ -36,7 +38,22 @@ var fave = function(searchObject) {
       if (result === null) {
         console.log('No existing faves for this user and comment have been found. Creating new fave.');
         var newHeart = Heart.build(searchObject);
-        return newHeart.save();
+        return newHeart.save()
+          // tell the author that their post was faved
+          .then(function(heart){
+            return Comment.findOne({
+              where: {
+                id: heart.CommentId 
+              }, 
+              include: [{
+                model: User,
+                attributes: ['id']
+              }]
+            })       
+          })
+          .then(function(comment){
+            console.log(comment.User);
+          });
       } else {
         // User has already faved this item before. Let's remove the fave!
         console.log('Faved result already found. Removing existing result.');
@@ -62,9 +79,9 @@ var fave = function(searchObject) {
       console.log("Fave error: ", err);
       return;
     });
-
 };
 
+fave({UserId: 1, CommentId: 1});
 // get({ CommentId: { '$lte': 14, '$gte': 10}, UserId: 1})
 //   .then(function(result){
 //     console.log(result);
