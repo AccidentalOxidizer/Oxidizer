@@ -1,8 +1,8 @@
 // Deployment only: 
 if (process.env.NODE_ENV === 'production') {
-  require('look').start();
-  require('newrelic');
+// require('newrelic');
 }
+
 // EXPRESS
 var express = require('express');
 var http = require('http');
