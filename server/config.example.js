@@ -1,5 +1,6 @@
 var config = {
   production: {
+    port: 80,
     mysql: {
       host: process.env.OPENSHIFT_MYSQL_DB_HOST,
       url: process.env.OPENSHIFT_MYSQL_DB_URL,
@@ -20,6 +21,7 @@ var config = {
     secret: 'some secret for production'
   },
   development: {
+    port: 3000,
     mysql: {
       host: process.env.OPENSHIFT_MYSQL_DB_HOST,
       url: process.env.OPENSHIFT_MYSQL_DB_URL,
