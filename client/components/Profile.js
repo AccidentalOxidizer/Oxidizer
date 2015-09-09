@@ -1,6 +1,6 @@
 var React = require('react');
 var Comment = require('./Comment');
-// var InfiniteScroll = require('react-infinite-scroll')(React);
+var InfiniteScroll = require('react-infinite-scroll')(React);
 
 // At the moment, Profile will only be used to display your personal
 // profile, not that of others.
@@ -111,16 +111,11 @@ var Profile = React.createClass({
     });
   },
 
-  //
-  // For the next three functions, firstLoad indicates that this feed needs to
-  // be (re)initialized.
-  // 
-  loadUserComments: function(firstLoad) {
+  loadUserComments: function() {
     console.log("Profile: loadUserComments, oldestLoadedCommentId " + this.oldestLoadedCommentId);
 
-    this.oldestLoadedCommentId = firstLoad ? 'undefined' : this.oldestLoadedCommentId;
-    this.numLoads = firstLoad ? 0 : this.numLoads;
-
+    this.oldestLoadedCommentId = 'undefined';
+    this.numLoads = 0;
 
     // Clear out state for Url and Text search if we are loading all comments
     this.urlSearch = '';
@@ -129,13 +124,11 @@ var Profile = React.createClass({
     this.loadComments();
   },
 
-  loadUserCommentsForUrl: function(url, firstLoad) {
+  loadUserCommentsForUrl: function(url) {
     console.log("Profile: loadUserCommentsForUrl, " + url);
 
-    this.oldestLoadedCommentId = firstLoad ? 'undefined' : this.oldestLoadedCommentId;
-    this.numLoads = firstLoad ? 0 : this.numLoads;
-
-    console.log("oldestLoadedCommentId: " + this.oldestLoadedCommentId + " numLoads " + this.numLoads);
+    this.oldestLoadedCommentId = 'undefined';
+    this.numLoads = 0;
 
     // Only allow search on Url or Text, not both
     this.urlSearch = url;
@@ -144,11 +137,11 @@ var Profile = React.createClass({
     this.loadComments();
   },
 
-  loadUserCommentsForText: function(text, firstLoad) {
+  loadUserCommentsForText: function(text) {
     console.log("Profile: loadUserCommentsForText, " + text);
 
-    this.oldestLoadedCommentId = firstLoad ? 'undefined' : this.oldestLoadedCommentId;
-    this.numLoads = firstLoad ? 0 : this.numLoads;
+    this.oldestLoadedCommentId = 'undefined';
+    this.numLoads = 0;
 
     // Only allow search on Url or Text, not both
     this.urlSearch = '';
@@ -158,39 +151,29 @@ var Profile = React.createClass({
   },
 
   // Used by InfiniteScroll addon
-  // We make a new request to load comments based on oldestLoadedCommentId ...
-  // XXX - loadMoreComments appears to be called right away ... and then
-  // loadUserComments is called again ... maybe remove call in componentDidMount?
-  // XXX - should we be calling the loading function that we last used?
-  // e.g. we were last loading for URL search, so we should continue doing so ...
-  // Or maybe this whole thing would be better as pagination ...
   loadMoreComments: function() {
     console.log("Profile: loadMoreComments");
-
-    // XXX - at this point, we've already moved the query params into
-    // loadComments, so I think we don't even need to call the different
-    // load functions ... and we may not need to have the loadType ...
-    // this.loadComments();
+    this.loadComments();
   },
 
-  // XXX EE: does this get called early enough to initialize state???
+  // XXX EE: does this get called early enough to initialize state??? Seems to.
   componentDidMount: function() {
     this.initLoadState();
-    this.loadUserComments(true);
+    this.loadUserComments();
   },
 
   handleUrlSearch: function() {
     var url = this.refs.searchUrl.getDOMNode().value;
     this.refs.searchUrl.getDOMNode().value = '';
 
-    this.loadUserCommentsForUrl(url, true);
+    this.loadUserCommentsForUrl(url);
   },
 
   handleTextSearch: function() {
     var text = this.refs.searchText.getDOMNode().value;
     this.refs.searchText.getDOMNode().value = '';
 
-    this.loadUserCommentsForText(text, true);
+    this.loadUserCommentsForText(text);
   },
 
   render: function() {
@@ -198,9 +181,6 @@ var Profile = React.createClass({
       return <Comment key={comment.id} comment={comment} />;
     });
 
-          // <InfiniteScroll pageStart="0" loadMore={this.loadMoreComments} hasMore={this.state.hasMoreComments} 
-          //     loader={<div className="loader">Loading ...</div>}>
-          // </InfiniteScroll>
     return (
       <div className="row">
         <div className="col-md-4">
@@ -224,7 +204,10 @@ var Profile = React.createClass({
               <button type="submit" className="btn btn-block btn-primary">Search</button>
             </div>
           </form>
-          {comments}
+          <InfiniteScroll pageStart="0" loadMore={this.loadMoreComments} hasMore={this.hasMoreComments} 
+              loader={<div className="loader">Loading ...</div>}>
+            {comments}
+          </InfiniteScroll>
         </div>
       </div>
     );
