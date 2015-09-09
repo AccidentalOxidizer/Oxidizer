@@ -36,6 +36,7 @@ module.exports = function(passport, config) {
         })
         .then(function(user) {
           // This is for local development purposes only!
+          // This is user creation pathway is not enabled on production.
           // Easily create a new user that we can use to authenticate stuff with.
           if (user === null && config.secret === 'development') {
             console.log('DEVELOPMENT: Creating new user!');

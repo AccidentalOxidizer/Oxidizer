@@ -7,7 +7,7 @@
  * your server's environment is set to "development".
  */
 
-// LOAD MODULES
+// LOAD REQUIRED MODULES
 var Promise = require('bluebird');
 var request = Promise.promisifyAll(require('request'));
 
@@ -63,24 +63,3 @@ request.postAsync({
   .catch(function(err) {
     console.log(err);
   });
-
-// request.post(testServer + '/api/auth/local', {
-//   form: {
-//     email: 'testUser@test.com',
-//     password: 'something'
-//   }
-// }, function(err, res, body) {
-//   console.log(err);
-//   console.log(res);
-//   console.log(body);
-// });
-
-// })
-// .then(function(user) {
-//   console.log(user);
-// })
-// .catch(function(err) {
-//   console.log('Err:', err);
-// });
-
-//console.log(config);
