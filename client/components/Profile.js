@@ -23,7 +23,6 @@ var Profile = React.createClass({
       dataType: 'json',
       success: function(data) {
         console.log('Profile init: successfully loaded user comments');
-        console.log(data);
 
         // XXX EE: what's the right thing to store here?
         // For now, if no comments returned, keep it the same as it was.

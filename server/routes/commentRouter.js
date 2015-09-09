@@ -6,6 +6,7 @@ var Url = Promise.promisifyAll(require('../components/url'));
 var Heart = Promise.promisifyAll(require('../components/heart'));
 var Flag = Promise.promisifyAll(require('../components/flag'));
 var Comment = Promise.promisifyAll(require('../components/comment'));
+var User = Promise.promisifyAll(require('../components/user'));
 var bodyParser = require('body-parser');
 var jsonParser = bodyParser.json();
 
@@ -25,6 +26,11 @@ module.exports = function(app) {
           favs: result
         };
         res.send(faveCount);
+
+        return Comment.getUserId(req.body.CommentId)
+          .then(function(userId){
+            return User.updateNotification(userId, 'hearts')
+          });
       })
       .catch(function(err) {
         console.log("Error: Comment not faved...", err);

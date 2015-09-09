@@ -3014,7 +3014,7 @@
         var days     = round(duration.as('d'));
         var months   = round(duration.as('M'));
         var years    = round(duration.as('y'));
-        console.log(seconds, minutes, hours,days);
+
         var a = seconds < thresholds.s && ['s', seconds]  ||
                 minutes === 1          && ['m']           ||
                 minutes < thresholds.m && ['mm', minutes] ||
