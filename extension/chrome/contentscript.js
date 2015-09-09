@@ -1,5 +1,6 @@
 // Initialize & get extension settings or defaults.
 var settings = {};
+
 chrome.runtime.sendMessage({
     from: 'content script',
     message: 'get settings'
