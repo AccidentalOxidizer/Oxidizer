@@ -1,3 +1,6 @@
+// Deployment only: 
+// require('newrelic');
+
 // EXPRESS
 var express = require('express');
 var http = require('http');
