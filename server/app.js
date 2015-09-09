@@ -25,6 +25,7 @@ var utils = require('./utils');
 
 // CONFIG
 var config = require('./config.js').get(process.env.NODE_ENV);
+var port = config.port || 3000;
 
 // initialize passport settings
 require('./components/user/passport')(passport, config);
@@ -34,7 +35,6 @@ require('./components/dbconfig');
 
 // ROUTES
 var routes = require('./routes');
-
 sequelize.sync().then(function() {
   app.use(morgan('dev'));
   app.use(cookieParser());
@@ -51,23 +51,16 @@ sequelize.sync().then(function() {
   app.use(passport.session());
 
   routes(express, app, passport);
-
-  http.createServer(app, function(req, res) {
-    console.log('http running..');
-  }).listen(3000);
+  http.createServer(app).listen(port);
 
   if (process.env.NODE_ENV === 'production') {
     var options = {
       key: fs.readFileSync(__dirname + '/../keys/key.pem', 'utf-8'),
       cert: fs.readFileSync(__dirname + '/../keys/api_oxidizer_io.crt', 'utf-8')
-    };
-
-    https.createServer(options, app, function(req, res) {
-      console.log('https running..');
-    }).listen(443);
+    }
+    https.createServer(options, app).listen(443);
   }
 });
-
 
 /*
 
