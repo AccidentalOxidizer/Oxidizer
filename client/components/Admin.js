@@ -140,7 +140,7 @@ var Admin = React.createClass({
 
     return (
       <div className="row">
-        Hello! ADMIN PAGE!
+        <h1>Hello! ADMIN PAGE!</h1>
         <div className="col-md-8">
           <form onSubmit={this.handleUrlSearch}>
             <div className="form-group col-sm-7">
