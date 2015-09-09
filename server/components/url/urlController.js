@@ -35,7 +35,6 @@ var copyObject = function(obj) {
 
 var getId = function(url){
   var parsedUrl = parseUrl(url).url;
-
   return Url.findOne({where: {url: parsedUrl}})
     .then(function(url){
       return url.get('id');
@@ -73,6 +72,7 @@ var get = function(searchObject, userid) {
 var save = function(urlObject) {
 
   var parsedObject = copyObject(urlObject);
+
   return Url.findOrCreate({
       where: parsedObject
     })

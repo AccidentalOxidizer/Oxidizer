@@ -14,6 +14,7 @@ module.exports = function(unparsedURL) {
   // not working totally, because it also triggers for 'wwwSOMETHING.domain.com'
   // it would be valuable to learn how to solve this with regular expressions to replace also www1. www2.
   
+  console.log(parsedURL);
   if (parsedURL.host.indexOf('www.') === 0) {
     parsedURL.host = parsedURL.host.replace('www.', '');
   }

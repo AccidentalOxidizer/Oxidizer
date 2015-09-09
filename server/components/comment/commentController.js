@@ -25,12 +25,13 @@ var Url = require('../').Url;
 
 
 var get = function(searchObject, urlString) {
+  console.log('##############################',searchObject);
+  
   var userHearts;
   var userFlags;
   var attributes = ['text', 'User.name', 'RepliesTo'];
 
   // Set up a url filter if needed.
-
 
   var queryObject = {
     where: searchObject,
@@ -200,6 +201,15 @@ var countHeartsAndFlags = function(comments, userId){
     });
 };
 
+var getUserId = function(commentId){
+  return Comment.findOne({where: {id: commentId}})
+    .then(function(comment){
+      return comment.get('UserId');
+    })
+    .catch(function(err){
+      console.log(err);
+    });
+}
 exports.get = get;
 exports.post = post;
 exports.put = put;

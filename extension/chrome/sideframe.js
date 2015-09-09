@@ -58,7 +58,7 @@ document.addEventListener("DOMContentLoaded", function(e) {
 
   // sends request for new comments when we get to the bottom of comments
   document.querySelector('.cd-panel-content').addEventListener('scroll', function(e) {
-    loadMoreComments(document.referrer);
+    loadMoreComments(url);
   });
 
 
@@ -112,8 +112,6 @@ function loadContent(url) {
   });
 
   request.success(function(msg) {
-    console.log(msg);
-
     if (msg.comments.length > 0) {
       lastLoadedCommentId = msg.comments[msg.comments.length - 1].id;
     }
@@ -152,7 +150,6 @@ function postComment(text, repliesToId) {
   });
 
   request.done(function(msg) {
-    console.log(msg.comments);
     // compile and append successfully saved and returned message to DOM
     var html = compileComments(msg.comments);
     console.log(msg.comments);
