@@ -1,4 +1,3 @@
-
 var auth = require('../middleware').auth;
 var Promise = require('bluebird');
 var xssFilters = require('xss-filters');
@@ -27,6 +26,11 @@ module.exports = function(app) {
           faved: result.faved
         };
         res.send(faveCount);
+
+        return Comment.getUserId(req.body.CommentId)
+          .then(function(userId){
+            return User.updateNotification(userId, 'hearts');
+          });
       })
       .catch(function(err) {
         console.log("Error: Comment not faved...", err);
@@ -98,6 +102,10 @@ module.exports = function(app) {
       searchObject.repliesToId = null;
     }
 
+    if (req.query.lastCommentId) {
+      searchObject.lastCommentId = req.query.lastCommentId;
+    }
+
     if (req.query.textSearch) {
       searchObject.text = {$like: '%' + req.query.textSearch + '%'};
       console.log("Comments: get - updated searchObj: ");
@@ -130,7 +138,7 @@ module.exports = function(app) {
         var userInfo = {
           userId: undefined,
           username: undefined
-        }
+        };
 
         if (req.user !== undefined){
           userInfo = {
@@ -138,7 +146,7 @@ module.exports = function(app) {
             username: req.user.name,
             repliesToCheck: result[1].repliesToCheck,
             heartsToCheck: result[1].heartsToCheck,
-          }
+          };
 
         }
 
