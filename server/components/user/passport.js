@@ -35,17 +35,26 @@ module.exports = function(passport, config) {
           }
         })
         .then(function(user) {
+          // This is for local development purposes only!
+          // Easily create a new user that we can use to authenticate stuff with.
+          if (user === null && config.secret === 'development') {
+            console.log('DEVELOPMENT: Creating new user!');
+            var newUser = User.build({
+              name: req.body.name || 'Testy McTesterson',
+              email: email
+            });
+            return newUser.save()
+              .then(function() {
+                return done(null, user);
+              });
+          }
+
           if (!user) {
-            // This is for local development purposes only:
-            if (config.secret === 'development') {
-
-            }
-
-
             return done(null, false, {
               message: 'Invalid email address.'
             });
           }
+
           // found user -> check if password is correct
           if (!user.validPassword(password)) {
             return done(null, false, {
