@@ -4,11 +4,11 @@
 // extension sends in parameter the url (and later group/ maybe isPrivate)
 var requestAllCommentsForPath = {
   url: 'string unparsed url',
-  mostRecentCommentId: 'number ',
-  lastUpdateTimestamp: 'lastUpdate',
+  lastCommentId: 'number',
   isPrivate: 'boolean'
+  urlString: 'url search term',
+  textString: 'text search term'
 };
-// will add date 
 
 // server responds 
 var commentsForAPath = {
