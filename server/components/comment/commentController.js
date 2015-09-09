@@ -22,18 +22,15 @@ var Url = require('../').Url;
 //
 // @param urlToFind: Comes from req.query.url -- set to 'undefined' if 
 // not actively searching on this field.
-var get = function(searchObject, lastCommentId, userId, getTotalCount, urlToFind) {
-  var comments; // variable so our return comments are available throughout the .then string 
+
+
+var get = function(searchObject, urlString) {
   var userHearts;
   var userFlags;
   var attributes = ['text', 'User.name', 'RepliesTo'];
-  var urlQuery = {};
 
   // Set up a url filter if needed.
-  if (urlToFind !== 'undefined') {
-    console.log("Comments get: filtering on url " + urlToFind);
-    urlQuery = {url: {$like: '%' + urlToFind + '%'}};
-  }
+
 
   var queryObject = {
     where: searchObject,
@@ -49,20 +46,19 @@ var get = function(searchObject, lastCommentId, userId, getTotalCount, urlToFind
     }, {
       model: Url,
       attributes: ['url'],
-      where: urlQuery
     }]
   };
 
-  if (!(lastCommentId === 'undefined' || lastCommentId === undefined)) {
+  if (searchObject.lastCommentId){
     queryObject.where.id = {};
     queryObject.where.id.$lt = lastCommentId;
   }
 
-  if (queryObject.where.isPrivate == 0 || queryObject.where.isPrivate === 'false') {
-    queryObject.where.isPrivate = false;
-  } else {
-    queryObject.where.isPrivate = true;
-  } 
+  if (urlString !== undefined) {
+    console.log("Comments get: filtering on url " + urlString);
+    var urlQuery = {url: {$like: '%' + urlString + '%'}};
+    queryObject.include[3].where = urlQuery;
+  }
 
   // limit the number of comments we send to the user
   queryObject.limit = 25;
@@ -72,47 +68,42 @@ var get = function(searchObject, lastCommentId, userId, getTotalCount, urlToFind
     ['id', 'DESC']
   ];
 
-  console.log('query', queryObject);
 
   return Comment.findAndCountAll(queryObject)
     .then(function(results) {
-      comments = results.rows;
+      var comments = results.rows;
 
       // if there is a userId to filter by, see if they have hearted/flagged
-      if (userId){
-        var searchObject = {
+      if (searchObject.userId){
+        searchObject = {
           CommentId: {
             $lte: comments[0].id,
             $gte: comments[comments.length - 1].id
           },
         };
-
-        return Promise.all([heartController.get(searchObject, userId), flagController.get(searchObject, userId)])
+        // get all hearts and flags for a user within the CommentId range
+        return Promise.all([heartController.get(searchObject, searchObject.userId), flagController.get(searchObject, searchObject.userId)])
           .spread(function(hearts, flags){
-
             userHearts = hearts.map(function(heart){
               return heart.CommentId;
             });          
-
             userFlags = flags.map(function(flag){
               return flag.CommentId;
             });
-
             return results; 
           });
       } else {
-        return getTotalCount ? results : comments; 
+        return results; 
       }
     })
     .then(function(results){
-      comments = results.rows;
-
+      var comments = results.rows;
+      
       comments.forEach(function(comment, index, array) {
         if (userHearts !== undefined ) {
           comment.dataValues.heartedByUser = false;
           if(userHearts.indexOf(comment.id) > -1) {
-            comment.dataValues.heartedByUser = true;
-            
+            comment.dataValues.heartedByUser = true;      
           }
         }
 
@@ -122,14 +113,13 @@ var get = function(searchObject, lastCommentId, userId, getTotalCount, urlToFind
             comment.dataValues.flaggedByUser = true;
           }
         }
-
         // Iterate over our results array and update the number of hearts and favorites so
         // we don't return the ENTIRE array.
         comment.dataValues.Hearts = comment.dataValues.Hearts.length;
         comment.dataValues.Flags = comment.dataValues.Flags.length;
       });
 
-      return getTotalCount ? results : comments; 
+      return results; 
     })
     .catch(function(err) {
       console.log("Err getting comments: ", err);
@@ -144,6 +134,7 @@ var post = function(commentObject) {
   }
   return newComment.save()
     .then(function(comment) {
+
       return comment;
     })
     .catch(function(err) {
