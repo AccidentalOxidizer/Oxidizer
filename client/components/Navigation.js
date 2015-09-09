@@ -6,6 +6,7 @@ var Navigation = React.createClass({
   render: function() {
     return (
       <nav className="navbar navbar-default" role="navigation">
+      <div className="container">
         <div className="navbar-header">
           <a className="navbar-brand" href="#">Oxidizer</a>
         </div>
@@ -15,6 +16,7 @@ var Navigation = React.createClass({
           <li><Link to="signup">Sign Up</Link></li>
           <li><Link to="login">Login</Link></li>
         </ul>
+        </div>
       </nav>
     );
   }
