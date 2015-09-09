@@ -4,6 +4,10 @@ module.exports = function(sequelize, dataTypes) {
       type: dataTypes.STRING,
       unique: true,
       allowNull: false
+    },
+    host: {
+      type: dataTypes.STRING,
+      allowNull: false
     }
   });
 };

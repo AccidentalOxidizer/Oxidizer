@@ -1,5 +1,6 @@
 var Url = require('../').Url;
 var parseUrl = require('../../utils/parseURL.js');
+var url = require('url');
 
 /** 
  *  This controller is responsible for getting and 
@@ -23,18 +24,34 @@ var copyObject = function(obj) {
     }
   }
 
-  parsedObject.url = parseUrl(parsedObject.url);
+  var parsedURL = parseUrl(parsedObject.url);
+  
+  parsedObject.host = parsedURL.host;
+  parsedObject.url = parsedURL.url;
 
   return parsedObject;
 };
 
-// GET all comments for a URL from the database
-var get = function(searchObject) {
-  var parsedObject = copyObject(searchObject);
 
-  return Url.findOne({
-      where: parsedObject
+var getId = function(url){
+  var parsedUrl = parseUrl(url).url;
+
+  return Url.findOne({where: {url: parsedUrl}})
+    .then(function(url){
+      return url.get('id');
     })
+};
+
+// GET all comments for a URL from the database
+// user is an optional arg - if present this query will include if a comment has been faved or heared by the user
+var get = function(searchObject, userid) {
+  var parsedObject = copyObject(searchObject);      
+
+  var queryObject = { 
+    where: parsedObject
+  };
+  
+  return Url.findOne(queryObject)
     .then(function(result) {
       if (result !== null) {
         urlInfo = {};
@@ -54,8 +71,8 @@ var get = function(searchObject) {
 
 // Write a new URL to the database
 var save = function(urlObject) {
-  var parsedObject = copyObject(urlObject);
 
+  var parsedObject = copyObject(urlObject);
   return Url.findOrCreate({
       where: parsedObject
     })
@@ -73,7 +90,7 @@ var save = function(urlObject) {
 // but this might not matter since we won't display
 // them anyway.
 var remove = function(url) {
-  url = parseUrl(url);
+  url = parseUrl(url).url;
   return Url.destroy({
       where: {
         url: url
@@ -96,3 +113,4 @@ var remove = function(url) {
 exports.get = get;
 exports.save = save;
 exports.remove = remove;
+exports.getId = getId;

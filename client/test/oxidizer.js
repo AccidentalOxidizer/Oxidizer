@@ -38,7 +38,7 @@ $(document).ready(function() {
   // That way we can update the server if I input a new URL to look at in the
   // input box at the top of the screen.
   var getComments = function(url) {
-    testSettings.url = url || 'http://reddit.com/r/kerbalspaceprogram';
+    testSettings.url = url || 'http://develiot.com';
     // Default website to show comments from on page load.
     // If this is for a POST request, we need to JSON.stringify() data.
     // If it's for a GET request, we don't need to stringify data.
@@ -64,11 +64,12 @@ $(document).ready(function() {
 
         var commentArrayHTML = '';
         // Render comment HTML
-        data['comments'].forEach(function(element, index) {
+        console.log('DATA??????', data.comments);
+        data.comments.forEach(function(element, index) {
           commentArrayHTML = commentArrayHTML.concat(buildComments(data['comments'][index]));
         });
 
-        $('#comments').html('<p>URL: ' + testSettings.url + '</p>' + commentArrayHTML);
+        $('#comments').html('<p>URL: <a href="' + testSettings.url + '" target="_blank">' + testSettings.url + '</a></p>' + commentArrayHTML);
       },
       error: function(err) {
         $('#comments').html('Please login with Google credentials first :)');

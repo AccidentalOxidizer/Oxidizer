@@ -1,5 +1,6 @@
 {
-  "config": "test",
-  "server": "http://localhost:3000",
-  "visible": "true"
+  "keepprivate": false,
+  "autoshow": true,
+  "showtrigger": true,
+  "server": "http://api.oxidizer.io"
 }

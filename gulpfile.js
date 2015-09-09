@@ -9,6 +9,8 @@ var plumber = require('gulp-plumber');
 var stylish = require('jshint-stylish');
 var tape = require('gulp-tape');
 var uglify = require('gulp-uglify');
+var webpack = require('webpack');
+var webpackConfig = require('./webpack.config.js');
 
 /** 
  *  NOTES:
@@ -48,10 +50,26 @@ gulp.task('linter', function() {
     .pipe(jshint.reporter(stylish))
 });
 
+// Use webpack to build the client side bundle
+gulp.task('webpack', function(done) {
+  webpack(webpackConfig, function(err, stats) {
+    if (err) {
+      console.log('Webpack Error: ', err);
+    } else {
+      // console.log(stats.toString());
+    }
+    done();
+  });
+});
+
+gulp.task('build-client', function() {
+  gulp.watch(['client/**/*'], ['webpack']);
+});
+
 // DEFAULT TASKS
-gulp.task('default', ['test', 'linter']);
+gulp.task('default', ['webpack', 'test', 'linter']);
 
 // WATCH TASK
 gulp.task('watch', function() {
-  gulp.watch(['server/**/*.js', 'test/*.js'], ['default']);
+  gulp.watch(['server/**/*.js', 'client/**/*.js', 'test/*.js'], ['default']);
 });

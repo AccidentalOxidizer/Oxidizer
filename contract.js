@@ -4,26 +4,60 @@
 // extension sends in parameter the url (and later group/ maybe isPrivate)
 var requestAllCommentsForPath = {
   url: 'string unparsed url',
-  lastUpdateTimestamp: 'lastUpdate',
+  lastCommentId: 'number',
   isPrivate: 'boolean'
+  urlString: 'url search term',
+  textString: 'text search term'
 };
-// will add date 
 
 // server responds 
 var commentsForAPath = {
   comments: [{
-    url: 'parsedUrl',
-    user: {
+    Url: {
+      url: 'parsedUrl',
+    },
+    User: {
       name: 'string'
     },
     text: 'string',
-    timestamp: 'date',
+    createdAt: 'date',
     isPrivate: 'boolean'
   }],
   currentTime: 'timestamp',
+  repliesToId: 'Id of the comment it is responding to',
   userInfo: {
     username: 'string'
-  }
+  },
+  // these two only if a userId is passed
+  flaggedByUser: 'boolean',
+  heartedByUser: 'boolean'
+};
+
+// GET to /api/comments/get/user - get comments for logged in user
+// + total comments for the user.
+// Similar to above API, but also returns total number of comments
+// in the returned data.
+// Client sends:
+var requestCommentsForUser = {
+  oldestLoadedCommentId: 'number', // undefined on initial load
+}
+
+// Server returns:
+var data {
+  displayName: 'string',
+  comments: [{
+    Url: {
+      url: 'parsedUrl',
+    },
+    User: {
+      name: 'string'
+    },
+    text: 'string',
+    createdAt: 'date',
+    isPrivate: 'boolean'
+  }],
+  numComments: 'int',
+  currentTime: 'date'
 };
 
 // POST request to api/comments

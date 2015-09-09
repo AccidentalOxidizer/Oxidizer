@@ -1,4 +1,5 @@
 module.exports = function(req, res, next) {
+  
   if (req.isAuthenticated()) {
     next();
   } else {
@@ -12,7 +13,7 @@ module.exports = function(req, res, next) {
       res.redirect('/login');
     }
   }
-}
+};
 
 
 // TOKENS 
