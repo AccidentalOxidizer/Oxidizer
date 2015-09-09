@@ -73,24 +73,17 @@ module.exports = function(app) {
   });
 
   // Get all comments with search parameters in query string
-  app.get('/api/comments/get', jsonParser, function(req, res, next) {
+  // With auth.isLoggedIn middleware, we should always have a 
+  // valid req.user.
+  app.get('/api/comments/get', jsonParser, auth.isLoggedIn, function(req, res, next) {
     var searchObject = {};
+
+    console.log("Comments get: req.query: ");
+    console.log(req.query);
     
-    // if there is a userId, add it to searhcObject
-    if (req.user) {
+    // Are we requesting comments for the logged in user?
+    if (req.query.filterByUser) {
       searchObject.UserId = req.user.id;
-    }
-
-    // if there is a isPrivate parameter, add it to the searchObject
-    if(req.query.isPrivate !== undefined){
-      searchObject.isPrivate = req.query.isPrivate;
-    }
-
-    if (req.query.repliesToId){
-      searchObject.repliesToId = req.query.repliesToId;
-    } else {
-      // if we don't include repliesToId, only return non-replies
-      searchObject.repliesToId = null;
     }
 
     // translate public/private from string ('true' or 'false') to number (1 or 0)
@@ -100,8 +93,21 @@ module.exports = function(app) {
       searchObject.isPrivate = 0;
     }
 
+    if (req.query.repliesToId){
+      searchObject.repliesToId = req.query.repliesToId;
+    } else {
+      // if we don't include repliesToId, only return non-replies
+      searchObject.repliesToId = null;
+    }
+
     if (req.query.lastCommentId) {
       searchObject.lastCommentId = req.query.lastCommentId
+    }
+
+    if (req.query.textSearch) {
+      searchObject.text = {$like: '%' + req.query.textSearch + '%'};
+      console.log("Comments: get - updated searchObj: ");
+      console.log(searchObject);
     }
 
     return new Promise(function(resolve, reject){
@@ -112,20 +118,18 @@ module.exports = function(app) {
               searchObject.UrlId = urlId;
               resolve(searchObject);
             });
-        //if there is a urlString parameter, get Comments with the string
-        } else if (req.query.urlString !== undefined){
-          resolve(searchObject, req.query.urlString);
-        // if there is no url or urlString, just search comments
         } else {
           resolve(searchObject);
         }
       })
-      .then(function(searchObj, urlStr){
-        return Comment.get(searchObj, urlStr);
+      .then(function(searchObj){
+        return Comment.get(searchObj, req.query.urlSearch);
       })
       .then(function(result) {
         // TODO: Handle case where URL exists but no comments??
         // TODO: Make this look like contract!
+
+        // XXX: req.user should never be undefined if logged in.
         var userInfo = {
           userId: undefined,
           username: undefined
@@ -149,53 +153,6 @@ module.exports = function(app) {
         res.send(200);
       });
   });
-
-
-  // // Get all comments for a given user. Defaults to loading all the
-  // // comments for the logged in user.
-  // // TODO? Add support to load comments for a given user via user id.
-  // app.get('/api/comments/get/user', jsonParser, function(req, res, next) {
-  //   // TODO: when we have our middleware checks in place,
-  //   // this shouldn't be necessary
-  //   if (req.user === undefined) {
-  //     console.log("Comments: get comments for user - user not logged in.");
-  //     res.send(401); // unauthorized
-  //     return;
-  //   }
-
-  //   var userId = req.user.id;
-  //   console.log("Comments: get comments for userId " + userId + " maxCommentId " + req.query.oldestLoadedCommentId);
-  //   console.log("Comments: get comments req.query");
-  //   console.log(req.query);
-
-  //   var searchObj = { 
-  //     UserId: userId,
-  //     isPrivate: req.query.isPrivate
-  //   };
-
-  //   // If this request is searching for a string in the comments, add it
-  //   // to our search query
-  //   if (req.query.text !== 'undefined') {
-  //     searchObj.text = {$like: '%' + req.query.text + '%'};
-  //     console.log("Comments: get - updated searchObj: ");
-  //     console.log(searchObj);
-  //   }
-
-  //   Comment.get(searchObj, req.query.oldestLoadedCommentId, userId, true, req.query.url)
-  //     .then(function(data) {
-  //       res.send(200, {
-  //         displayName: req.user.name,
-  //         comments: data.rows,
-  //         numComments: data.count,
-  //         currentTime: new Date()
-  //       });
-  //     })
-  //     .catch(function(err) {
-  //       console.log("Comments: get comments for user error ", err);
-  //       res.send(500);
-  //     });
-  // });
-
 
   app.get('/api/comments/id/:id', jsonParser, auth.isLoggedIn, function(req, res, next) {
     // Get individual comment
