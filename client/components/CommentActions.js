@@ -16,11 +16,15 @@ var React = require('react');
 var userStatus = 1;
 
 var CommentActions = React.createClass({
+  removeComment: function() {
+    alert('HELLO! ' + this.props.commentid);
+  },
+
   render: function() {
     console.log('COMMENT ID: ', this.props.commentid);
     if (userStatus === 1) {
       return (
-          <p>DELETE COMMENT | REMOVE FLAG</p>
+          <p><a onClick={this.removeComment}>DELETE COMMENT</a> | REMOVE FLAG</p>
       );    
     } else {
       return null;  
