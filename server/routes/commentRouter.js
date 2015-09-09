@@ -70,55 +70,61 @@ module.exports = function(app) {
   // TODO: isLoggedIn
   // Get all comments for a specific URL
   app.get('/api/comments/get', jsonParser, function(req, res, next) {
-    // Handle undefined URLs to prevent crashing? Maybe...
-    if (req.query.url === undefined) {
-      return;
+    var searchObject = {};
+    
+    // if there is a userId, add it to searhcObject
+    if (req.user) {
+      searchObject.UserId = req.user.id;
     }
 
-    var urlToGet = {
-      url: req.query.url
-    };
+    // if there is a isPrivate parameter, add it to the searchObject
+    if(req.query.isPrivate !== undefined){
+      searchObject.isPrivate = req.query.isPrivate;
+    }
 
-    // if there is no repliesTo parameter, set it to null
-    if (req.query.repliesToId === undefined || req.query.repliesToId === 'undefined') {
-      req.query.repliesToId = null;
+    if (req.query.repliesToId){
+      searchObject.repliesToId = req.query.repliesToId;
+    } else {
+      // if we don't include repliesToId, only return non-replies
+      searchObject.repliesToId = null;
     }
 
     // translate public/private from string ('true' or 'false') to number (1 or 0)
     if (req.query.isPrivate === 'true' || req.query.isPrivate === '1'){
-      req.query.isPrivate = 1;
+      searchObject.isPrivate = 1
     } else {
-      req.query.isPrivate = 0;
+      searchObject.isPrivate = 0;
     }
 
-    Url.get(urlToGet)
-      .then(function(url) {
-        if (url !== null) {
-          return Comment.get({
-            UrlId: url.id,
-            isPrivate: req.query.isPrivate,
-            repliesToId: req.query.repliesToId
-          }, req.query.lastUpdateId, req.user.id);
-        } else {
-          // We expect an empty comments array to be returned
-          // for any webpage that we haven't yet visited / added
-          // comments to.
+    if (req.query.lastCommentId) {
+      searchObject.lastCommentId = req.query.lastCommentId
+    }
 
-          // var emptyComment = {
-          //   comments: [],
-          //   currentTime: '',
-          //   userInfo: {
-          //     username: ''
-          //   }
-          // };
-          return [];
+    return new Promise(function(resolve, reject){
+      // if there is a url search parameter, get the urls id, then search comments
+        if (req.query.url !== undefined) {
+          Url.getId(req.query.url)
+            .then(function(urlId){
+              searchObject.UrlId = urlId;
+              resolve(searchObject);
+            });
+        //if there is a urlString parameter, get Comments with the string
+        } else if (req.query.urlString !== undefined){
+          resolve(searchObject, req.query.urlString);
+        // if there is no url or urlString, just search comments
+        } else {
+          resolve(searchObject);
         }
       })
-      .then(function(comments) {
+      .then(function(searchObj, urlStr){
+        return Comment.get(searchObj, urlStr);
+      })
+      .then(function(result) {
         // TODO: Handle case where URL exists but no comments??
         // TODO: Make this look like contract!
-        res.send(200, {
-          comments: comments,
+        res.send({
+          comments: result.rows,
+          numComments: result.count,
           currentTime: new Date(), // TODO: Fill this out!
           userInfo: {
             userId: req.user.id || undefined,
@@ -127,10 +133,10 @@ module.exports = function(app) {
         });
       })
       .catch(function(err) {
+        throw err;
         console.log("User not logged in", err);
         res.send(200);
       });
-
   });
 
 
@@ -187,7 +193,6 @@ module.exports = function(app) {
 
   // add isAuth
   app.post('/api/comments/add', jsonParser, auth.isLoggedIn, function(req, res, next) {
-    console.log(req.body);
     // Add a new comment!
     Url.save({
         url: req.body.url

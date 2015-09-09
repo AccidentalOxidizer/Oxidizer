@@ -113,8 +113,9 @@ function loadContent(url) {
     contentType: "application/json",
   });
 
-  request.done(function(msg) {
-
+  request.success(function(msg) {
+    console.log(msg);
+    
     if (msg.comments.length > 0) {
       lastLoadedCommentId = msg.comments[msg.comments.length - 1].id;
     }

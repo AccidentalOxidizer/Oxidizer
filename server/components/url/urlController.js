@@ -32,15 +32,25 @@ var copyObject = function(obj) {
   return parsedObject;
 };
 
+
+var getId = function(url){
+  var parsedUrl = parseUrl(url).url;
+
+  return Url.findOne({where: {url: parsedUrl}})
+    .then(function(url){
+      return url.get('id');
+    })
+};
+
 // GET all comments for a URL from the database
 // user is an optional arg - if present this query will include if a comment has been faved or heared by the user
 var get = function(searchObject, userid) {
-  var parsedObject = copyObject(searchObject);
+  var parsedObject = copyObject(searchObject);      
 
   var queryObject = { 
     where: parsedObject
   };
-
+  
   return Url.findOne(queryObject)
     .then(function(result) {
       if (result !== null) {
@@ -103,3 +113,4 @@ var remove = function(url) {
 exports.get = get;
 exports.save = save;
 exports.remove = remove;
+exports.getId = getId;
