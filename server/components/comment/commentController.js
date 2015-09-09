@@ -7,31 +7,14 @@ var Flag = require('../').Flag;
 var flagController = require('../flag');
 var Url = require('../').Url;
 
-// var get = function(searchObject, lastCommentId, userId) {
-//   var comments; // variable so our return comments are available throughout the .then string 
-//   // track if we need to check if the comments are liked by a user
-//   var filterByUser = userId || false; 
 
-//   var userHearts;
-//   var userFlags;
-
-// @param userId: userId for filtering to obtain hearts and flags
-// 
-// @param getTotalCount: undefined if the total count of these
-// comment types is not needed.
-//
-// @param urlToFind: Comes from req.query.url -- set to 'undefined' if 
-// not actively searching on this field.
-
-
-var get = function(searchObject, urlString) {
+// @param urlSearch: a url fragment to filter by
+var get = function(searchObject, urlSearch) {
   console.log('##############################',searchObject);
   
   var userHearts;
   var userFlags;
   var attributes = ['text', 'User.name', 'RepliesTo'];
-
-  // Set up a url filter if needed.
 
   var queryObject = {
     where: searchObject,
@@ -55,9 +38,10 @@ var get = function(searchObject, urlString) {
     queryObject.where.id.$lt = lastCommentId;
   }
 
-  if (urlString !== undefined) {
-    console.log("Comments get: filtering on url " + urlString);
-    var urlQuery = {url: {$like: '%' + urlString + '%'}};
+  console.log("urlSearch is: " + urlSearch);
+  if (urlSearch !== undefined) {
+    console.log("Comments get: filtering on url " + urlSearch);
+    var urlQuery = {url: {$like: '%' + urlSearch + '%'}};
     queryObject.include[3].where = urlQuery;
   }
 
@@ -69,6 +53,8 @@ var get = function(searchObject, urlString) {
     ['id', 'DESC']
   ];
 
+  console.log("Comments get: queryObject");
+  console.log(queryObject);
 
   return Comment.findAndCountAll(queryObject)
     .then(function(results) {
