@@ -41,6 +41,7 @@
     "passport-google-oauth": "^0.2.0",
     "passport-local": "^1.0.0",
     "react": "^0.13.3",
+    "react-infinite-scroll": "^0.1.5",
     "react-router": "^0.13.3",
     "request": "^2.61.0",
     "sequelize": "^3.6.0",

@@ -100,10 +100,6 @@ module.exports = function(app) {
       searchObject.repliesToId = null;
     }
 
-    if (req.query.lastCommentId) {
-      searchObject.lastCommentId = req.query.lastCommentId
-    }
-
     if (req.query.textSearch) {
       searchObject.text = {$like: '%' + req.query.textSearch + '%'};
       console.log("Comments: get - updated searchObj: ");
@@ -123,7 +119,7 @@ module.exports = function(app) {
         }
       })
       .then(function(searchObj){
-        return Comment.get(searchObj, req.query.urlSearch);
+        return Comment.get(searchObj, req.query.lastCommentId, req.query.urlSearch);
       })
       .then(function(result) {
         // TODO: Handle case where URL exists but no comments??

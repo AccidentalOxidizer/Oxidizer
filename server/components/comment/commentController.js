@@ -9,8 +9,10 @@ var Url = require('../').Url;
 
 
 // @param urlSearch: a url fragment to filter by
-var get = function(searchObject, urlSearch) {
+var get = function(searchObject, lastCommentId, urlSearch) {
   console.log('##############################',searchObject);
+  console.log('lastCommentId: ' + lastCommentId);
+  console.log('urlSearch: ' + urlSearch);
   
   var userHearts;
   var userFlags;
@@ -33,12 +35,11 @@ var get = function(searchObject, urlSearch) {
     }]
   };
 
-  if (searchObject.lastCommentId){
+  if (lastCommentId) {
     queryObject.where.id = {};
     queryObject.where.id.$lt = lastCommentId;
   }
 
-  console.log("urlSearch is: " + urlSearch);
   if (urlSearch !== undefined) {
     console.log("Comments get: filtering on url " + urlSearch);
     var urlQuery = {url: {$like: '%' + urlSearch + '%'}};
