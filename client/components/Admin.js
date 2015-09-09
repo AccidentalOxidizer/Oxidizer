@@ -16,6 +16,7 @@ var AuthenticatedUser = {
 // profile, not that of others.
 var Admin = React.createClass({
   mixins: [AuthenticatedUser], // Use the mixin
+
   getInitialState: function() {
     return {
       displayName: '',
@@ -27,14 +28,62 @@ var Admin = React.createClass({
     };
   },
 
-  loadComments: function(queryObj) {
-    var tempData = {
+  initLoadState: function() {
+    this.oldestLoadedCommentId = 'undefined';
+    this.currentTime = undefined;
+
+    // Used by InfiniteScroll addon
+    this.hasMoreComments = true;
+
+    // How many times have we loaded this current feed? 
+    // (Really only matters if 0)
+    this.numLoads = 0;
+
+    // If neither of these are set, load all comments.
+    // Otherwise search on one should clear the other.
+    this.urlSearch = '';
+    this.textSearch =  '';
+  },
+
+  // XXX EE: does this get called early enough to initialize state???
+  componentDidMount: function() {
+    this.initLoadState();
+    this.loadComments();
+  },
+
+  // Query fields:
+  //  * filterByUser: set to true to indicate to load
+  //      comments for the logged in user
+  //  - isPrivate: currently 'false'
+  //  - repliesToId (n/a for this route?)
+  //  - lastCommentId: oldestLoadedCommentId
+  //  - url (n/a for this route)
+  //  * urlSearch 
+  //  * textSearch
+  loadComments: function() {
+    var query = {
+      filterByUser: false,
+      isPrivate: false
     };
 
-    queryObj = queryObj || tempData;
+    // Don't send this query value on first load.
+    if (this.numLoads !== 0) {
+      query.lastCommentId = this.oldestLoadedCommentId;
+    }
+
+    if (this.urlSearch !== '') {
+      query.urlSearch = this.urlSearch;
+    }
+
+    if (this.textSearch !== '') {
+      query.textSearch = this.textSearch;
+    }
+
+    console.log("Profile loadComments: query ", query);
+
     $.ajax({
       url: window.location.origin + '/api/comments/get',
-      data: queryObj,
+      data: query,
       method: 'GET',
       dataType: 'json',
       success: function(data) {
@@ -43,30 +92,38 @@ var Admin = React.createClass({
         // XXX EE: what's the right thing to store here?
         // For now, if no comments returned, keep it the same as it was.
         // What if you have comments, but then you run a query -> 0 comments returned?
-        var oldestLoadedCommentId = data.comments.length > 0 ?
-          data.comments[data.comments.length - 1].id : oldestLoadedCommentId;
+        this.oldestLoadedCommentId = data.comments.length > 0 ?
+          data.comments[data.comments.length - 1].id : this.oldestLoadedCommentId;
+        console.log('Profile init: oldestLoadedCommentId ' + this.oldestLoadedCommentId);
+
+        // Update the time ...
+        this.currentTime = data.currentTime;
+
+        // If the number of loaded comments is less than 25 (XXX - should have a 
+        // constant for this), we've loaded all the comments of this type.
+        this.hasMoreComments = (data.comments.length < 25) ? false : true;
 
         // If reloading for a search query, reset the comments array;
         // otherwise append older comments now loaded to the end.
         // Also, only update the numComments total if not querying.
         var updatedComments;
-        var updatedNumComments;
 
-        // XXX: edge case where a user searches on 'undefined'
-        if (queryObj.url !== 'undefined' || queryObj.text !== 'undefined') {
+        // If loading a comment feed for the first time, intialize the comments; 
+        // otherwise, append the new comments.
+        if (this.numLoads === 0) {
           updatedComments = data.comments;
-          updatedNumComments = this.state.numComments;
         } else {
           updatedComments = this.state.comments.concat(data.comments);
-          updatedNumComments = data.numComments;
         }
+        this.numLoads++;
+
+        // Only update the numComments total if not null, i.e. on first load
+        var updatedNumComments = this.state.numComments || data.numComments;
 
         this.setState({
-          displayName: data.displayName,
+          displayName: data.userInfo.username,
           comments: updatedComments,
           numComments: updatedNumComments,
-          oldestLoadedCommentId: oldestLoadedCommentId,
-          currentTime: data.currentTime
         });
       }.bind(this),
       error: function(xhr, status, err) {
@@ -101,7 +158,7 @@ var Admin = React.createClass({
               <button type="submit" className="btn btn-block btn-primary">Search</button>
             </div>
           </form>
-          comments go here....
+          {comments}
         </div>
       </div>
     );
