@@ -1,6 +1,4 @@
 var settings = {};
-
-var server = 'http://localhost:3000'; // this is bad.
 var url = '';
 
 // tracks if we have a pending http request so that we don't receive back the same comments twice
@@ -163,7 +161,8 @@ function postComment(text, repliesToId) {
     if (!repliesToId) {
       $(".cd-panel-content").prepend(html);
     } else {
-      console.log(html);
+      console.log(html, repliesToId);
+      $(repliesToId).append(html);
     }
     registerCommentEventListeners();
 
@@ -273,7 +272,9 @@ function registerCommentEventListeners(comment) {
       // replyForms[i].querySelector('.reply-input').addEventListener('keydown', function(e) {
       if (e.keyCode === 13) {
         console.log('enter pressed .. ');
-
+        var text = $(replyForms[i]).find('.reply-input').value;
+        var repliesToId = $(this).parents('.reply-form').attr('data-comment-id');
+        postComment(text, repliesToId);
       }
     });
 

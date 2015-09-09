@@ -1,36 +1,5 @@
-// DEFAULTS
-var settings = {
-  server: 'http://localhost:3000',
-  keepprivate: false,
-  autoshow: true,
-  showtrigger: true
-};
-// sync chrome storage against default settings 
-chrome.storage.sync.get({
-  server: settings.server,
-  keepprivate: settings.keepprivate,
-  autoshow: settings.autoshow,
-  showtrigger: settings.showtrigger
-}, function(store) {
-  settings.server = store.server;
-  settings.keepprivate = store.keepprivate;
-  settings.autoshow = store.keepprivate;
-  settings.showtrigger = store.showtrigger;
-});
-// update settings as they are changed in the chrome storage
-chrome.storage.onChanged.addListener(function(changes, namespace) {
-  for (key in changes) {
-    if (settings.hasOwnProperty(key)) {
-      var storageChange = changes[key];
-      settings[key] = storageChange.newValue;
-    }
-  }
-});
-
-
+// CHROME EVENT LISTENERS
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
-
-
   /* Generic callback passing along an inital round trip message */
   if (request.from === 'iframe' && request.message === 'callback') {
     chrome.tabs.query({
@@ -82,11 +51,33 @@ chrome.commands.onCommand.addListener(function(command) {
   });
 });
 
+// on installation of extension read config.json and save defaults in chrome storage
+var settings = {};
+chrome.runtime.onInstalled.addListener(function(details) {
+  var xhr = new XMLHttpRequest();
+  xhr.onreadystatechange = function() {
+    settings = JSON.parse(xhr.responseText);
+    chrome.storage.sync.set({
+      server: settings.server,
+      keepprivate: settings.keepprivate,
+      autoshow: settings.autoshow,
+      showtrigger: settings.showtrigger
+    }, function() {});
+  };
+  xhr.open("GET", chrome.extension.getURL('config.json'), true);
+  xhr.send();
+});
 
-// on installation of extension.
-// chrome.runtime.onInstalled.addListener(function(details) {
-//  
-// });
+// update settings as they are changed in the chrome storage
+chrome.storage.onChanged.addListener(function(changes, namespace) {
+  for (key in changes) {
+    if (settings.hasOwnProperty(key)) {
+      var storageChange = changes[key];
+      settings[key] = storageChange.newValue;
+    }
+  }
+});
+
 
 // once in a while we should run a requestUpdateCheck
 // chrome.runtime.onUpdateAvailable(function(details) {
