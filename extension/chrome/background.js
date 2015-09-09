@@ -38,6 +38,7 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
     });
     return true;
   }
+
 });
 
 chrome.commands.onCommand.addListener(function(command) {
@@ -67,6 +68,14 @@ chrome.runtime.onInstalled.addListener(function(details) {
   xhr.open("GET", chrome.extension.getURL('config.json'), true);
   xhr.send();
 });
+
+chrome.storage.sync.get(['server', 'keepprivate', 'autoshow', 'showtrigger'],
+  function(store) {
+    settings.server = store.server;
+    settings.keepprivate = store.keepprivate;
+    settings.autoshow = store.keepprivate;
+    settings.showtrigger = store.showtrigger;
+  });
 
 // update settings as they are changed in the chrome storage
 chrome.storage.onChanged.addListener(function(changes, namespace) {
