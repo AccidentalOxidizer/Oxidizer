@@ -115,7 +115,7 @@ function loadContent(url) {
 
   request.success(function(msg) {
     console.log(msg);
-    
+
     if (msg.comments.length > 0) {
       lastLoadedCommentId = msg.comments[msg.comments.length - 1].id;
     }
@@ -315,7 +315,7 @@ function favePost(commentId) {
     CommentId: commentId
   });
   var request = $.ajax({
-    url: settings.server + '/api/comment/fave',
+    url: settings.server + '/api/comments/fave',
     method: "POST",
     contentType: "application/json",
     data: data,
