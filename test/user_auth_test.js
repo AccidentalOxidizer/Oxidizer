@@ -19,40 +19,44 @@ request.postAsync({
     url: testServer + '/api/auth/local',
     method: 'POST',
     json: {
+      name: 'Testy McTesterson',
       email: 'testUser@test.com',
       password: 'paaasssssword'
     }
   })
   .then(function(user) {
-    cookie = user[0].headers['set-cookie'][0]
-    console.log('COOKIE: ', user[0].headers['set-cookie'][0]);
-    console.log('HEADERS: ', user[0].headers);
-    console.log('RAW HEADERS: ', user[0].rawHeaders);
-    console.log('Attempting to add a new comment');
+
+    console.log('New user created!', user);
+
+    // Set cookie for our newly created user.
+    cookie = user[0].headers['set-cookie'][0];
+    //console.log('COOKIE: ', user[0].headers['set-cookie'][0]);
+    //console.log('HEADERS: ', user[0].headers);
+    //console.log('RAW HEADERS: ', user[0].rawHeaders);
+    //console.log('Attempting to add a new comment');
 
     // Let's create a new comment somewhere!
     var testUrl = "http://zombo.com/";
-    request.postAsync({
-        url: testServer + '/api/comments/add',
-        method: 'POST',
-        headers: {
-          'Cookie': cookie
-        },
-        json: {
-          url: testUrl,
-          text: "This is a test comment. There are many like it. But this one is mine.",
-          isPrivate: false
-        }
-      }, function(err, res) {
-        //console.log(err);
-        //console.log(res);
-      })
-      .then(function(url, res) {
-        //console.log(url);
-      })
-      .catch(function(err) {
-        console.log(err);
-      });
+    return request.postAsync({
+      url: testServer + '/api/comments/add',
+      method: 'POST',
+      headers: {
+        'Cookie': cookie
+      },
+      json: {
+        url: testUrl,
+        text: "This is a test comment. There are many like it. But this one is mine.",
+        isPrivate: false
+      }
+    });
+  })
+  .then(function(comment) {
+    var commentResponse = comment[1];
+    //console.log('New Comment Added!\n Comment response:\n', commentResponse);
+
+  })
+  .catch(function(err) {
+    console.log(err);
   });
 
 // request.post(testServer + '/api/auth/local', {

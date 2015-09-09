@@ -41,7 +41,8 @@ module.exports = function(passport, config) {
             console.log('DEVELOPMENT: Creating new user!');
             var newUser = User.build({
               name: req.body.name || 'Testy McTesterson',
-              email: email
+              email: email,
+              password: password || 'aaaaaaa'
             });
             return newUser.save()
               .then(function() {
