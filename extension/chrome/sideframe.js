@@ -1,8 +1,17 @@
 var settings = {};
 var url = '';
 
-// tracks if we have a pending http request so that we don't receive back the same comments twice
-var requestReturned = true;
+// requestReturned tracks if we have a pending http request so that we don't receive back the same comments twice
+// tracking.mainLastComment - id tracks last comments we've retrieved for main thread, endOfComments tracks if we've returned all of the comments there are. When we get replies, we will set a key with the comments id and a value of the last loaded reply
+var tracking = {
+  requestReturned: true,
+  mainLastComment: {
+    id: null,
+    endOfComments: false
+  }
+};
+
+
 
 document.addEventListener("DOMContentLoaded", function(e) {
 
@@ -54,11 +63,21 @@ document.addEventListener("DOMContentLoaded", function(e) {
     document.getElementById('comment-input-field').value = '';
   });
 
-
-
   // sends request for new comments when we get to the bottom of comments
   document.querySelector('.cd-panel-content').addEventListener('scroll', function(e) {
-    loadMoreComments(url);
+
+    var commentContainer = document.getElementsByClassName('cd-panel-content')[0];
+
+    // calculates how much space is left to scroll through the comments
+    var spaceLeft = commentContainer.scrollHeight - (commentContainer.clientHeight + commentContainer.scrollTop);
+
+    //if we are towards the bottom of the div, and we haven't gotten all comments, and we don't have a pending request
+    if (spaceLeft < 300 && !tracking.mainLastComment.endOfComments && tracking.requestReturned) {
+
+      // toggle requestReturned so that we don't send two requests concurrently
+      tracking.requestReturned = false;
+      loadMoreComments($(".cd-panel-content"), url);
+    }
   });
 
 
@@ -72,7 +91,6 @@ document.addEventListener("DOMContentLoaded", function(e) {
   Send a message from the iframe script (sideframe.js) to the background script (background.js)
   The background script on receiveing the message sends a message to the content script
   which in turn sends back a message to the iframe. 
-
   */
   chrome.runtime.sendMessage({
       from: 'iframe',
@@ -113,7 +131,9 @@ function loadContent(url) {
 
   request.success(function(msg) {
     if (msg.comments.length > 0) {
-      lastLoadedCommentId = msg.comments[msg.comments.length - 1].id;
+      tracking.mainLastComment.id = msg.comments[msg.comments.length - 1].id;
+    } else {
+      tracking.mainLastComment.endOfComments
     }
     // clean the DOM
     $(".cd-panel-content").html('');
@@ -133,7 +153,6 @@ function loadContent(url) {
 
 // function to post new comments
 function postComment(text, repliesToId) {
-
   var data = JSON.stringify({
     url: url,
     text: text,
@@ -174,66 +193,76 @@ function compileComments(comments) {
   return template(comments);
 }
 
+// destination is a jquery object that you want to append to
+function loadMoreComments(destination, url, repliesToId) {
+  console.log('))))))))))))))))))))))', destination, url, repliesToId);
+  var params = {
+    url: encodeURIComponent(url),
+    isPrivate: false
+  };
 
-function loadMoreComments(url) {
-  var commentContainer = document.getElementsByClassName('cd-panel-content')[0];
+  if (repliesToId !== undefined) {
+    // check if we've received comments, and add to params if we have
+    if (tracking[repliesToId] !== undefined){
+      params.lastCommentId = tracking[repliesToId].id;
+    } else {   
+      tracking[repliesToId] = {
+        endOfComments: false
+      }
+    }
+    
+    params.repliesToId = repliesToId;
+  } else {
+    params.lastCommentId = tracking.mainLastComment.id;
+  }
 
-  // tracks if we've gotten all of the comments
-  var endOfComments = false;
+  var paramString = [];
+  for (var key in params) {
+    if (params.hasOwnProperty(key)) {
+      paramString.push(key + '=' + params[key]);
+    }
+  }
 
-  // calculates how much space is left to scroll through the comments
-  var spaceLeft = commentContainer.scrollHeight - (commentContainer.clientHeight + commentContainer.scrollTop);
+  paramString = paramString.join('&');
+  var apiURL = settings.server + "/api/comments/get?" + paramString;
 
-  //if we are towards the bottom of the div, and we haven't gotten all comments, and we don't have a pending request
-  if (spaceLeft < 300 && !endOfComments && requestReturned) {
 
-    // toggle requestReturned so that we don't send two requests concurrently
-    requestReturned = false;
+  var request = $.ajax({
+    url: apiURL,
+    method: "GET",
+    contentType: "application/json",
+  });
 
-    var params = {
-      url: encodeURIComponent(url),
-      lastUpdateId: 'undefined',
-      isPrivate: false
-    };
+  request.done(function(msg) {
 
-    var paramString = [];
-    for (var key in params) {
-      if (params.hasOwnProperty(key)) {
-        paramString.push(key + '=' + params[key]);
+    if (msg.comments.length === 0) {
+      endOfComments = true;
+    }
+
+    // set lastLoadedCommentId
+    if (repliesToId === undefined){
+      if (msg.comments.length > 0) {
+        tracking.mainLastComment.id = msg.comments[msg.comments.length - 1].id;
+      } else {
+        tracking.mainLastComment.endOfComments = true
+      }
+    } else {
+      if (msg.comments.length > 0) {
+        tracking[repliesToId].id = msg.comments[msg.comments.length - 1].id;
+      } else {
+        tracking.mainLastComment.endOfComments = true
       }
     }
 
-    paramString = paramString.join('&');
-    var apiURL = settings.server + "/api/comments/get?" + paramString;
+    // compile and append new comments
+    var html = compileComments(msg.comments);
+    destination.append(html);
+    registerCommentEventListeners();
+  });
 
-
-    var request = $.ajax({
-      url: apiURL,
-      method: "GET",
-      contentType: "application/json",
-    });
-
-    request.done(function(msg) {
-
-      if (msg.comments.length === 0) {
-        endOfComments = true;
-      }
-      // set lastLoadedCommentId
-      if (msg.comments.length > 0) {
-        lastLoadedCommentId = msg.comments[msg.comments.length - 1].id;
-      }
-
-      // compile and append new comments
-      var html = compileComments(msg.comments);
-      $(".cd-panel-content").append(html);
-      registerCommentEventListeners();
-    });
-
-    request.fail(function(jqXHR, textStatus) {
-      console.log("Request failed: " + textStatus);
-    });
-
-  }
+  request.fail(function(jqXHR, textStatus) {
+    console.log("Request failed: " + textStatus);
+  });
 }
 
 
@@ -282,6 +311,16 @@ function registerCommentEventListeners(comment) {
         // post it!
         postComment(text, repliesToId);
       }
+    });
+  }
+
+  // get elements 
+  var showReplies = document.getElementsByClassName('replies');
+  for (var i = 0; i < showReplies.length; i++){
+    $(showReplies[i]).off('click').on('click', function() {
+      var target = $(this).parents('.comment');
+      var repliesToId = $($(this)[0]).attr('data-comment-id');
+      loadMoreComments(target, url, repliesToId);
     });
   }
 
@@ -355,6 +394,7 @@ function favePost(commentId) {
     data: data,
     dataType: 'json'
   });
+
   request.done(function(msg) {
     console.log('successfully faved (or unfaved) comment,', msg);
 
