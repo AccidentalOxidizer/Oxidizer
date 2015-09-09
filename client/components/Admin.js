@@ -28,8 +28,12 @@ var Admin = React.createClass({
   },
 
   loadComments: function(queryObj) {
+    var tempData = {
+    };
+
+    queryObj = queryObj || tempData;
     $.ajax({
-      url: window.location.origin + '/api/comments/get/user',
+      url: window.location.origin + '/api/comments/get',
       data: queryObj,
       method: 'GET',
       dataType: 'json',
@@ -76,7 +80,7 @@ var Admin = React.createClass({
     var comments = this.state.comments.map(function(comment) {
       return <Comment key={comment.id} comment={comment} />;
     });
-    
+
     return (
       <div className="row">
         Hello! ADMIN PAGE!
