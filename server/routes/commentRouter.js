@@ -31,9 +31,8 @@ module.exports = function(app) {
       });
   });
 
-  // Get all favorites for a specific comment
+  // Count favorites for a specific comment
   app.get('/api/comments/faves/get', jsonParser, function(req, res, next) {
-    console.log('getting');
     
     var favesToGet = {
       url: req.body.commentId
@@ -67,8 +66,7 @@ module.exports = function(app) {
     };
   });
 
-  // TODO: isLoggedIn
-  // Get all comments for a specific URL
+  // Get all comments with search parameters in query string
   app.get('/api/comments/get', jsonParser, function(req, res, next) {
     var searchObject = {};
     
@@ -122,14 +120,21 @@ module.exports = function(app) {
       .then(function(result) {
         // TODO: Handle case where URL exists but no comments??
         // TODO: Make this look like contract!
+        var userInfo = {
+          userId: undefined,
+          username: undefined
+        }
+
+        if (req.user !== undefined){
+          userInfo.userId = req.user.id;
+          userInfo.username = req.user.name;
+        }
+
         res.send({
           comments: result.rows,
           numComments: result.count,
           currentTime: new Date(), // TODO: Fill this out!
-          userInfo: {
-            userId: req.user.id || undefined,
-            username: req.user.name || undefined // TODO: Fill this out!
-          }
+          userInfo: userInfo
         });
       })
       .catch(function(err) {
@@ -140,50 +145,50 @@ module.exports = function(app) {
   });
 
 
-  // Get all comments for a given user. Defaults to loading all the
-  // comments for the logged in user.
-  // TODO? Add support to load comments for a given user via user id.
-  app.get('/api/comments/get/user', jsonParser, function(req, res, next) {
-    // TODO: when we have our middleware checks in place,
-    // this shouldn't be necessary
-    if (req.user === undefined) {
-      console.log("Comments: get comments for user - user not logged in.");
-      res.send(401); // unauthorized
-      return;
-    }
+  // // Get all comments for a given user. Defaults to loading all the
+  // // comments for the logged in user.
+  // // TODO? Add support to load comments for a given user via user id.
+  // app.get('/api/comments/get/user', jsonParser, function(req, res, next) {
+  //   // TODO: when we have our middleware checks in place,
+  //   // this shouldn't be necessary
+  //   if (req.user === undefined) {
+  //     console.log("Comments: get comments for user - user not logged in.");
+  //     res.send(401); // unauthorized
+  //     return;
+  //   }
 
-    var userId = req.user.id;
-    console.log("Comments: get comments for userId " + userId + " maxCommentId " + req.query.oldestLoadedCommentId);
-    console.log("Comments: get comments req.query");
-    console.log(req.query);
+  //   var userId = req.user.id;
+  //   console.log("Comments: get comments for userId " + userId + " maxCommentId " + req.query.oldestLoadedCommentId);
+  //   console.log("Comments: get comments req.query");
+  //   console.log(req.query);
 
-    var searchObj = { 
-      UserId: userId,
-      isPrivate: req.query.isPrivate
-    };
+  //   var searchObj = { 
+  //     UserId: userId,
+  //     isPrivate: req.query.isPrivate
+  //   };
 
-    // If this request is searching for a string in the comments, add it
-    // to our search query
-    if (req.query.text !== 'undefined') {
-      searchObj.text = {$like: '%' + req.query.text + '%'};
-      console.log("Comments: get - updated searchObj: ");
-      console.log(searchObj);
-    }
+  //   // If this request is searching for a string in the comments, add it
+  //   // to our search query
+  //   if (req.query.text !== 'undefined') {
+  //     searchObj.text = {$like: '%' + req.query.text + '%'};
+  //     console.log("Comments: get - updated searchObj: ");
+  //     console.log(searchObj);
+  //   }
 
-    Comment.get(searchObj, req.query.oldestLoadedCommentId, userId, true, req.query.url)
-      .then(function(data) {
-        res.send(200, {
-          displayName: req.user.name,
-          comments: data.rows,
-          numComments: data.count,
-          currentTime: new Date()
-        });
-      })
-      .catch(function(err) {
-        console.log("Comments: get comments for user error ", err);
-        res.send(500);
-      });
-  });
+  //   Comment.get(searchObj, req.query.oldestLoadedCommentId, userId, true, req.query.url)
+  //     .then(function(data) {
+  //       res.send(200, {
+  //         displayName: req.user.name,
+  //         comments: data.rows,
+  //         numComments: data.count,
+  //         currentTime: new Date()
+  //       });
+  //     })
+  //     .catch(function(err) {
+  //       console.log("Comments: get comments for user error ", err);
+  //       res.send(500);
+  //     });
+  // });
 
 
   app.get('/api/comments/id/:id', jsonParser, auth.isLoggedIn, function(req, res, next) {
@@ -243,11 +248,11 @@ module.exports = function(app) {
       });
   });
 
-  app.put('/api/comments/:id', jsonParser, auth.isAuthorized, function(req, res, next) {
-    // Updates a comment!
-  });
+  // app.put('/api/comments/:id', jsonParser, auth.isAuthorized, function(req, res, next) {
+  //   // Updates a comment!
+  // });
 
-  app.delete('/api/comments/:id', jsonParser, auth.isAuthorized, function(req, res, next) {
-    // Delete a comment!
-  });
+  // app.delete('/api/comments/:id', jsonParser, auth.isAuthorized, function(req, res, next) {
+  //   // Delete a comment!
+  // });
 };
