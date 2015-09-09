@@ -9,18 +9,21 @@ var CommentActions = require('./CommentActions');
 // - Show a delete link if this comment belongs to the logged in user?
 //   How does the comment get deleted from the feed?
 // - Show # Hearts?
-//
+
+// We're passing the comment.id into the CommentActions component
+// as a property, that way we can carry out actions on a specific comment.
+
 var Comment = React.createClass({
   propTypes: {
     comment: React.PropTypes.object.isRequired
   },
-  
+
   render: function() {
-    
     return (
       <div>
         <p><strong>{this.props.comment.User.name}</strong> | {this.props.comment.Url.url} | {this.props.comment.createdAt}</p>
         <p>{this.props.comment.text}</p>
+        <CommentActions commentid={this.props.comment.id}/>
       </div>
     );
   }
