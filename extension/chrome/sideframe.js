@@ -152,13 +152,10 @@ function postComment(text, repliesToId) {
   request.done(function(msg) {
     // compile and append successfully saved and returned message to DOM
     var html = compileComments(msg.comments);
-    console.log(msg.comments);
-    console.log(msg.comments[0]);
 
     if (!repliesToId) {
       $(".cd-panel-content").prepend(html);
     } else {
-      console.log(html, repliesToId);
       $(repliesToId).append(html);
     }
     registerCommentEventListeners();
@@ -254,29 +251,38 @@ function registerCommentEventListeners(comment) {
   }
 
   var replyForms = document.getElementsByClassName('reply-form');
+
   for (var i = 0; i < replyForms.length; i++) {
-    $(replyForms[i]).find('.reply-button').off('click').on('click', function() {
+    var $replyForm = $(replyForms[i]);
 
-      // replyForms[i].querySelector('.reply-button').addEventListener('click', function() {
+    $replyForm.find('.reply-button').off('click').on('click', function() {
       console.log('reply clicked...');
-      // repliesToId
-      // postComment(text, repliesToId);
-      // repliesToId
-      // isPrivate
 
+      // get input text
+      var text = $(this).parents('.reply-form').find('.reply-input').val();
+      // clear text field
+      $(this).parents('.reply-form').find('.reply-input').val('');
+      // get id of what we're replying to
+      var repliesToId = $(this).parents('.reply-form').attr('data-comment-id');
+
+      // send to the server
+      postComment(text, repliesToId);
     });
+
     $(replyForms[i]).find('.reply-input').off('keydown').on('keydown', function(e) {
-      // replyForms[i].querySelector('.reply-input').addEventListener('keydown', function(e) {
+
       if (e.keyCode === 13) {
         console.log('enter pressed .. ');
-        var text = $(replyForms[i]).find('.reply-input').value;
+        // get input text
+        var text = $(this).val();
+        //reset the input field
+        $(this).val('');
+        // get the commentId that we're replying to
         var repliesToId = $(this).parents('.reply-form').attr('data-comment-id');
+        // post it!
         postComment(text, repliesToId);
       }
     });
-
-    // reply-button
-    // reply-input
   }
 
   var flags = document.getElementsByClassName('flag');

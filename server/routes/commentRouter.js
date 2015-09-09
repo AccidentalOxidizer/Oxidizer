@@ -23,14 +23,10 @@ module.exports = function(app) {
         console.log('Faved result: ', result);
         // The result returned is the number of favorites for this particular comment.
         var faveCount = {
-          favs: result
+          favs: result.count,
+          faved: result.faved
         };
         res.send(faveCount);
-
-        return Comment.getUserId(req.body.CommentId)
-          .then(function(userId){
-            return User.updateNotification(userId, 'hearts')
-          });
       })
       .catch(function(err) {
         console.log("Error: Comment not faved...", err);
@@ -150,14 +146,10 @@ module.exports = function(app) {
       });
   });
 
-  app.get('/api/comments/id/:id', jsonParser, auth.isLoggedIn, function(req, res, next) {
-    // Get individual comment
-    res.send(200);
-  });
-
   // add isAuth
   app.post('/api/comments/add', jsonParser, auth.isLoggedIn, function(req, res, next) {
     // Add a new comment!
+    console.log(req.body.repliesToId);
     Url.save({
         url: req.body.url
       })
@@ -182,6 +174,19 @@ module.exports = function(app) {
         });
       })
       .then(function(comment) {
+        // if this is a reply, add to the original user's notification
+        var repliesToId = comment.get('repliesToId');
+
+        if (repliesToId !== null){
+          Comment.get({id: repliesToId})
+            .then(function(comment){
+              User.incrementNotification(comment.rows[0].UserId, "replies");
+            })
+            .catch(function(err){
+              console.log('error adding to repliesToCheck', err);
+            })
+          ;
+        }
 
         formatComment = {
           UrlId: comment.get('UrlId'),
