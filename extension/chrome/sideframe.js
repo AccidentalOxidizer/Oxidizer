@@ -1,6 +1,4 @@
 var settings = {};
-
-var server = 'http://localhost:3000'; // this is bad.
 var url = '';
 
 // tracks if we have a pending http request so that we don't receive back the same comments twice
@@ -124,6 +122,7 @@ function loadContent(url) {
     // compile and append new comments
 
     var html = compileComments(msg.comments);
+
     $(".cd-panel-content").append(html);
     registerCommentEventListeners();
   });
@@ -135,12 +134,12 @@ function loadContent(url) {
 }
 
 // function to post new comments
-function postComment(text, replyId) {
+function postComment(text, repliesToId) {
 
   var data = JSON.stringify({
     url: url,
     text: text,
-    replyId: replyId || undefined,
+    repliesToId: repliesToId || undefined,
     isPrivate: false
   });
 
@@ -156,8 +155,14 @@ function postComment(text, replyId) {
     console.log(msg.comments);
     // compile and append successfully saved and returned message to DOM
     var html = compileComments(msg.comments);
-    if (!replyId) {
+    console.log(msg.comments);
+    console.log(msg.comments[0]);
+
+    if (!repliesToId) {
       $(".cd-panel-content").prepend(html);
+    } else {
+      console.log(html, repliesToId);
+      $(repliesToId).append(html);
     }
     registerCommentEventListeners();
 
@@ -170,7 +175,7 @@ function postComment(text, replyId) {
 
 
 function compileComments(comments) {
-  var source = $("#comment-entry-template").html(); 
+  var source = $("#comment-entry-template").html();
   var template = Handlebars.compile(source);
   return template(comments);
 }
@@ -187,7 +192,7 @@ function loadMoreComments(url) {
 
   //if we are towards the bottom of the div, and we haven't gotten all comments, and we don't have a pending request
   if (spaceLeft < 300 && !endOfComments && requestReturned) {
-  
+
     // toggle requestReturned so that we don't send two requests concurrently
     requestReturned = false;
 
@@ -223,7 +228,7 @@ function loadMoreComments(url) {
       if (msg.comments.length > 0) {
         lastLoadedCommentId = msg.comments[msg.comments.length - 1].id;
       }
-      
+
       // compile and append new comments
       var html = compileComments(msg.comments);
       $(".cd-panel-content").append(html);
@@ -240,20 +245,46 @@ function loadMoreComments(url) {
 
 // EVENT LISTENERS
 function registerCommentEventListeners(comment) {
-
+  // or jquery : .off().on('click')
   var replies = document.getElementsByClassName('reply');
   for (var i = 0; i < replies.length; i++) {
-    replies[i].addEventListener('click', function() {
+    $(replies[i]).off('click').on('click', function() {
       var commentId = this.getAttribute('data-comment-id');
       console.log('Reply to: ', commentId);
       $(this).toggleClass('active');
-      $('#' + commentId + ' .reply-form').toggleClass('hidden');
+      $(this).parents('#' + commentId).children('.reply-form').toggleClass('hidden');
+    })
+  }
+
+  var replyForms = document.getElementsByClassName('reply-form');
+  for (var i = 0; i < replyForms.length; i++) {
+    $(replyForms[i]).find('.reply-button').off('click').on('click', function() {
+
+      // replyForms[i].querySelector('.reply-button').addEventListener('click', function() {
+      console.log('reply clicked...');
+      // repliesToId
+      // postComment(text, repliesToId);
+      // repliesToId
+      // isPrivate
+
     });
+    $(replyForms[i]).find('.reply-input').off('keydown').on('keydown', function(e) {
+      // replyForms[i].querySelector('.reply-input').addEventListener('keydown', function(e) {
+      if (e.keyCode === 13) {
+        console.log('enter pressed .. ');
+        var text = $(replyForms[i]).find('.reply-input').value;
+        var repliesToId = $(this).parents('.reply-form').attr('data-comment-id');
+        postComment(text, repliesToId);
+      }
+    });
+
+    // reply-button
+    // reply-input
   }
 
   var flags = document.getElementsByClassName('flag');
   for (var i = 0; i < flags.length; i++) {
-    flags[i].addEventListener('click', function() {
+    $(flags[i]).off('click').on('click', function() {
       // remove modal from DOM that has been appended / used before.
       $('#confirm-modal').remove();
       var id = this.getAttribute('data-comment-id');
@@ -274,7 +305,7 @@ function registerCommentEventListeners(comment) {
 
   var hearts = document.getElementsByClassName('heart');
   for (var i = 0; i < hearts.length; i++) {
-    hearts[i].addEventListener('click', function() {
+    $(hearts[i]).off('click').on('click', function() {
       console.log('heart clicked');
       var id = this.getAttribute('data-comment-id');
       // var faved = this.getAttribute('data-faved-state');
@@ -335,9 +366,6 @@ function favePost(commentId) {
   });
 }
 
-function unFavePost(id) {
-  // function to unfave a post.
-}
 
 // repliesToId
 // isPrivate
@@ -354,7 +382,7 @@ Handlebars.registerHelper('dateFormat', function(context, block) {
     // TO PARSE WITH A DATE USE MOMENT FORMATTING:
     // var f = block.hash.format || "MMM Do, YYYY";
     // return moment(Date(context)).format(f);
-  }else{
-    return context;   //  moment plugin not available. return data as is.
+  } else {
+    return context; //  moment plugin not available. return data as is.
   }
 });

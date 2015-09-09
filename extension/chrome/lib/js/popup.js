@@ -1,27 +1,38 @@
-// CONFIG
-var config = '';
+// settings
+var settings = {};
 
-var getConfig = function() {
-  var xhr = new XMLHttpRequest();
-  xhr.onreadystatechange = function() {
-    config = JSON.parse(xhr.responseText);
-  };
-  xhr.open("GET", chrome.extension.getURL('config.json'), true);
-  xhr.send();
-};
+chrome.storage.sync.get(['server', 'keepprivate', 'autoshow', 'showtrigger'],
+  function(store) {
+    settings.server = store.server;
+    settings.keepprivate = store.keepprivate;
+    settings.autoshow = store.keepprivate;
+    settings.showtrigger = store.showtrigger;
+    console.log(store.server);
+    console.log(settings.server);
 
-getConfig();
+  });
+
+// update settings as they are changed in the chrome storage
+// chrome.storage.onChanged.addListener(function(changes, namespace) {
+//   for (key in changes) {
+//     if (settings.hasOwnProperty(key)) {
+//       var storageChange = changes[key];
+//       settings[key] = storageChange.newValue;
+//     }
+//   }
+// });
+
 
 // LOGIN STRATEGIES
 var googleLogin = function() {
   chrome.tabs.create({
-    url: config.server + '/api/auth/chrome/google'
+    url: settings.server + '/api/auth/chrome/google'
   });
 }
 
 var facebookLogin = function() {
   chrome.tabs.create({
-    url: config.server + '/api/auth/chrome/facebook'
+    url: settings.server + '/api/auth/chrome/facebook'
   });
 }
 
@@ -67,17 +78,3 @@ document.querySelector('#google-login').addEventListener('click', googleLogin);
 document.querySelector('#logout').addEventListener('click', logout);
 document.querySelector('#options').addEventListener('click', options);
 document.querySelector('#popup').addEventListener('click', popup);
-
-
-
-// nope..
-// $(document).ready(function() {
-//   $('body').on('click', 'a', function() {
-//     if ($(this).attr('href') === '') {
-//       chrome.tabs.create({
-//         url: $(this).attr('href')
-//       });
-//       return false;
-//     }
-//   });
-// });
