@@ -54,7 +54,7 @@ sequelize.sync().then(function() {
 
   http.createServer(app, function(req, res) {
     console.log('http running..');
-  }).listen(80);
+  }).listen(3000);
 
   if (process.env.NODE_ENV === 'production') {
     var options = {
