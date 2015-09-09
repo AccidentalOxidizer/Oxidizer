@@ -34,10 +34,10 @@ var copyObject = function(obj) {
 
 
 var getId = function(url){
-  var parsedUrl = parseUrl(url).url;
-  return Url.findOne({where: {url: parsedUrl}})
-    .then(function(url){
-      return url.get('id');
+  var parsedUrl = parseUrl(url);
+  return Url.findOrCreate({where: {url: parsedUrl.url, host: parsedUrl.host}})
+    .then(function(url,b,c){
+      return url[0].get('id');
     })
 };
 

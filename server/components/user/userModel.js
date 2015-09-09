@@ -45,9 +45,18 @@ module.exports = function(sequelize, dataTypes) {
     status: dataTypes.INTEGER,
 
     // user notifications
-    repliesToCheck: dataTypes.INTEGER,
-    heartsToCheck: dataTypes.INTEGER,
-    flagsToCheck: dataTypes.INTEGER,
+    repliesToCheck: {
+      type: dataTypes.INTEGER,
+      defaultValue: 0
+    },
+    heartsToCheck: {
+      type: dataTypes.INTEGER,
+      defaultValue: 0
+    },
+    flagsToCheck: {
+      type: dataTypes.INTEGER,
+      defaultValue: 0
+    },
     lastCheckedUpdates: dataTypes.DATE
 
     // additional profile info here
