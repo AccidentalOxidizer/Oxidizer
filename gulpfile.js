@@ -63,7 +63,7 @@ gulp.task('webpack', function(done) {
 });
 
 gulp.task('build-client', function() {
-  gulp.watch(['client/**/*'], ['webpack']);
+  gulp.watch(['client/**/*',  "!client/dist/*.js"], ['webpack']);
 });
 
 // DEFAULT TASKS
