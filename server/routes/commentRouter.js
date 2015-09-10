@@ -80,11 +80,15 @@ module.exports = function(app) {
       searchObject.UserId = req.user.id;
     }
 
-    // translate public/private from string ('true' or 'false') to number (1 or 0)
-    if (req.query.isPrivate === 'true' || req.query.isPrivate === '1'){
-      searchObject.isPrivate = 1
+    // Ensure that we have a boolean value for requesting a private feed;
+    // defaults to false. In addition, if requesting a private feed,
+    // we need to filter the comments to be for this user only.
+    if (req.query.isPrivate === 'true' || req.query.isPrivate === true){
+      searchObject.isPrivate = true;
+      searchObject.UserId = req.user.id;
+      console.log("Comments get: private comments requested.");
     } else {
-      searchObject.isPrivate = 0;
+      searchObject.isPrivate = false;
     }
 
     if (req.query.repliesToId){
@@ -169,7 +173,10 @@ module.exports = function(app) {
 
         // sanitize against XSS etc
         var text = xssFilters.inHTMLData(req.body.text);
-        var isPrivate = typeof req.body.isPrivate === 'boolean' ? req.body.isPrivate : false;
+
+        // Defaults to false
+        var isPrivate = (req.body.isPrivate === true || req.body.isPrivate === 'true') ? true : false;
+        console.log('Comments add: isPrivate is ' + isPrivate);
 
         return Comment.post({
           text: text,

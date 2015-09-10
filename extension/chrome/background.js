@@ -73,7 +73,7 @@ chrome.storage.sync.get(['server', 'keepprivate', 'autoshow', 'showtrigger'],
   function(store) {
     settings.server = store.server;
     settings.keepprivate = store.keepprivate;
-    settings.autoshow = store.keepprivate;
+    settings.autoshow = store.autoshow;
     settings.showtrigger = store.showtrigger;
   });
 
