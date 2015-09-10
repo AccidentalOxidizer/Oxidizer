@@ -19,12 +19,11 @@ var Admin = React.createClass({
 
   getInitialState: function() {
     return {
-      displayName: '',
       comments: [],
       numComments: 0,
       // API expects string 'undefined' on first load
-      oldestLoadedCommentId: 'undefined',
-      currentTime: undefined
+      //oldestLoadedCommentId: 'undefined',
+      //currentTime: undefined
     };
   },
 
@@ -47,29 +46,11 @@ var Admin = React.createClass({
 
   // XXX EE: does this get called early enough to initialize state???
   componentDidMount: function() {
-    this.initLoadState();
+    //this.initLoadState();
     this.loadComments();
   },
 
   deleteComment: function(data_id) {
-    var comments = this.state.comments;
-    var newComments = comments.filter(function(elem) {
-        return elem.id != data_id;
-    });
-
-    this.setState({comments: newComments});
-
-    $.ajax({
-          url: window.location.origin + '/api/comments/remove/' + data_id,
-          method: 'DELETE',
-          dataType: 'json',
-          success: function() {
-            console.log('Successfully removed comment');
-          }.bind(this),
-          error: function(xhr, status, err) {
-            console.error(xhr, status, err.message);
-          }
-        });
   },
 
   // Query fields:
@@ -140,6 +121,7 @@ var Admin = React.createClass({
 
         // Only update the numComments total if not null, i.e. on first load
         var updatedNumComments = this.state.numComments || data.numComments;
+        console.log('NUMBER OF COMMENTS: ', updatedNumComments);
 
         this.setState({
           displayName: data.userInfo.username,
