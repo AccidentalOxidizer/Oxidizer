@@ -18,8 +18,6 @@ var userStatus = 1;
 var CommentActions = React.createClass({
   removeComment: function() {
     console.log('CLICK DETECTED IN COMMENTACTIONS.JS!');
-    this.setState({ checked: 'randommmmm' });
-    this.props.callbackParent(newState);
 
     // $.ajax({
     //   url: window.location.origin + '/api/comments/remove/' + this.props.commentid,

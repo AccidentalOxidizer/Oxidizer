@@ -18,18 +18,12 @@ var Comment = React.createClass({
     comment: React.PropTypes.object.isRequired
   },
 
-  onChildChanged: function(newState) {
-    console.log('COMMENT.JS STATE CHANGE!', newState);
-    this.setState({ checked: 'Raaaannndom' });
-    this.props.callbackParent(newState);
-  },
-
   render: function() {
     return (
       <div>
         <p><strong>{this.props.comment.User.name}</strong> | {this.props.comment.Url.url} | {this.props.comment.createdAt}</p>
         <p>{this.props.comment.text}</p>
-        <CommentActions commentid={this.props.comment.id} callbackParent={this.onChildChanged}/>
+        <CommentActions commentid={this.props.comment.id} />
       </div>
     );
   }
