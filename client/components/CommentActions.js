@@ -33,6 +33,9 @@ var CommentActions = React.createClass({
     // });
   },
 
+  // TODO: Move all this stuff into the above the comment.js component above this. Then we can get real about changing all our states.
+  // 
+
   handleClick: function() {
     console.log('HANDLE CLICK DELETE: ', this.props.commentid);
     console.log('props', this.props);
