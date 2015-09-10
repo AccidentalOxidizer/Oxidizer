@@ -1,6 +1,17 @@
 var settings = {};
 var url = '';
 
+// Boolean: true if commenting privately; false if public.
+// Initialized to the value set in options; updated according to
+// privacy select option.
+//
+// TODO:
+// - add an option to view private (to logged in user) vs public/all comments
+// - use this option for isPrivate for loading comments
+// - if there are private comments, they should only be returned to the user
+//    who made them.
+var commentPrivately;
+
 // requestReturned tracks if we have a pending http request so that we don't receive back the same comments twice
 // tracking.mainLastComment - id tracks last comments we've retrieved for main thread, endOfComments tracks if we've returned all of the comments there are. When we get replies, we will set a key with the comments id and a value of the last loaded reply
 var tracking = {
@@ -24,6 +35,14 @@ document.addEventListener("DOMContentLoaded", function(e) {
     if (e.data.type === 'open') {
       url = e.data.url;
       settings = e.data.settings;
+      console.log(settings.server);
+
+      // Set default value for comment privacy and dropup selection.
+      commentPrivately = settings.keepprivate;
+
+      var privacyText = commentPrivately ? 'Private' : 'Public';
+      $('#comment-privacy-select').parents('.dropup').find('.btn').html(privacyText + ' <span class="caret"></span>');
+
       // show the panel with animation
       $('.cd-panel').addClass('is-visible');
       // do what needs to be done. load content, etc..
@@ -54,6 +73,19 @@ document.addEventListener("DOMContentLoaded", function(e) {
       postComment(document.getElementById('comment-input-field').value);
       document.getElementById('comment-input-field').value = '';
     }
+  });
+
+  // Update the privacy setting if the user changes it in the dropup menu.
+  $('#comment-privacy-select li a').click(function() {
+    var selectedText = $(this).text();
+
+    if (selectedText === 'Private') {
+      commentPrivately = true;
+    } else {
+      commentPrivately = false;
+    }
+    console.log('comment privacy set to ' + selectedText + ' commentPrivately ' + commentPrivately);
+    $(this).parents(".dropup").find('.btn').html(selectedText + ' <span class="caret"></span>');
   });
 
   document.getElementById('comment-submit-button').addEventListener('click', function() {
@@ -152,7 +184,7 @@ function postComment(text, repliesToId) {
     url: url,
     text: text,
     repliesToId: repliesToId || undefined,
-    isPrivate: false
+    isPrivate: commentPrivately
   });
 
   var request = $.ajax({
