@@ -2,15 +2,13 @@ var settings = {};
 var url = '';
 
 // Boolean: true if commenting privately; false if public.
-// Initialized to the value set in options; updated according to
+// Initialized to 'keepprivate' value set in options; updated according to
 // privacy select option.
-//
-// TODO:
-// - add an option to view private (to logged in user) vs public/all comments
-// - use this option for isPrivate for loading comments
-// - if there are private comments, they should only be returned to the user
-//    who made them.
 var commentPrivately;
+
+// Boolean: true to see private comment feed; false to see public.
+// Also initialized to 'keepprivate' options value.
+var privateFeed;
 
 // requestReturned tracks if we have a pending http request so that we don't receive back the same comments twice
 // tracking.mainLastComment - id tracks last comments we've retrieved for main thread, endOfComments tracks if we've returned all of the comments there are. When we get replies, we will set a key with the comments id and a value of the last loaded reply
@@ -37,11 +35,14 @@ document.addEventListener("DOMContentLoaded", function(e) {
       settings = e.data.settings;
       console.log(settings.server);
 
-      // Set default value for comment privacy and dropup selection.
+      // Set default value for comment privacy, public vs private feed,
+      // and dropdown selections.
       commentPrivately = settings.keepprivate;
+      privateFeed = settings.keepprivate;
 
       var privacyText = commentPrivately ? 'Private' : 'Public';
       $('#comment-privacy-select').parents('.dropup').find('.btn').html(privacyText + ' <span class="caret"></span>');
+      $('#feed-privacy-select').parents('.dropdown').find('.dropdown-toggle').html(privacyText + ' Feed <span class="caret"></span>');
 
       // show the panel with animation
       $('.cd-panel').addClass('is-visible');
@@ -66,6 +67,21 @@ document.addEventListener("DOMContentLoaded", function(e) {
     }, function() {});
   });
 
+  // Update the feed privacy setting if the user changes it in the dropdown menu.
+  $('#feed-privacy-select li a').click(function() {
+    var selectedText = $(this).text();
+
+    if (selectedText === 'Private Feed') {
+      privateFeed = true;
+    } else {
+      privateFeed = false;
+    }
+    console.log('feed privacy set to ' + selectedText + ' privateFeed ' + privateFeed);
+    $(this).parents(".dropdown").find('.dropdown-toggle').html(selectedText + ' <span class="caret"></span>');
+
+    // reload the feed with the updated setting.
+    loadContent(url);
+  });
 
   // Post new comment
   document.getElementById('comment-input-field').addEventListener('keydown', function(e) {
@@ -135,7 +151,7 @@ function loadContent(url) {
 
   var params = {
     url: encodeURIComponent(url),
-    isPrivate: false
+    isPrivate: privateFeed
   };
 
   var paramString = [];
@@ -159,9 +175,16 @@ function loadContent(url) {
     tracking.requestReturned = true;
     if (msg.comments.length > 0) {
       tracking.mainLastComment.id = msg.comments[msg.comments.length - 1].id;
-    } else {
-      tracking.mainLastComment.endOfComments
     }
+
+    // We load 25 comments per request, so if we loaded less than
+    // this amount (including 0), we've finished loading all the comments.
+    if (msg.comments.length < 25) {
+      tracking.mainLastComment.endOfComments = true;
+    } else {
+      tracking.mainLastComment.endOfComments = false;
+    }
+
     // clean the DOM
     $(".cd-panel-content").html('');
     // compile and append new comments
@@ -235,7 +258,7 @@ function loadMoreComments(destination, url, repliesToId) {
   
   var params = {
     url: encodeURIComponent(url),
-    isPrivate: false
+    isPrivate: privateFeed
   };
   
   if (repliesToId !== undefined) {
@@ -276,14 +299,25 @@ function loadMoreComments(destination, url, repliesToId) {
     if (repliesToId === undefined){
       if (msg.comments.length > 0) {
         tracking.mainLastComment.id = msg.comments[msg.comments.length - 1].id;
+      }
+
+      // We load 25 comments per request, so if we loaded less than
+      // this amount (including 0), we've finished loading all the comments.
+      if (msg.comments.length < 25) {
+        tracking.mainLastComment.endOfComments = true;
       } else {
-        tracking.mainLastComment.endOfComments = true
+        tracking.mainLastComment.endOfComments = false;
       }
     } else {
       if (msg.comments.length > 0) {
         tracking[repliesToId].id = msg.comments[msg.comments.length - 1].id;
+      }
+
+      // Same logic regarding comment loads, but for the reply tracking.
+      if (msg.comments.length < 25) {
+        tracking[repliesToId].endOfComments = true;
       } else {
-        tracking[repliesToId].endOfComments = true
+        tracking[repliesToId].endOfComments = false;
       }
     }
 
