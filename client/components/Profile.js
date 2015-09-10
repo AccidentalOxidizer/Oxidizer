@@ -204,7 +204,7 @@ var Profile = React.createClass({
               <input type="text" className="form-control" placeholder="Search for Comment Text" ref="searchText" />
             </div>
             <div className="form-group col-sm-5">
-              <button type="button" className="btn btn-block btn-primary">Search</button>
+              <button type="submit" className="btn btn-block btn-primary">Search</button>
             </div>
           </form>
           <InfiniteScroll pageStart="0" loadMore={this.loadMoreComments} hasMore={this.hasMoreComments} 
