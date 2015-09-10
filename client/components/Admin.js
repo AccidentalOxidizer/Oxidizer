@@ -136,9 +136,18 @@ var Admin = React.createClass({
 
 
   render: function() {
+
+    var context = this;
+
+    var setLastClicked = function(commentId) {
+      console.log('WE BE CLICKING FOOLS IN COMMENT.JS!');
+      console.log(context.state);
+      context.setState({lastClickedComment: commentId});
+    };
+
     console.log('STATE: ', this.state);
     var comments = this.state.comments.map(function(comment) {
-      return <Comment key={comment.id} comment={comment} />;
+      return <Comment key={comment.id} comment={comment} setLastClicked={setLastClicked} />;
     });
 
     return (

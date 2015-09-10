@@ -25,22 +25,39 @@ var Comment = React.createClass({
     };
   },
 
+  handleClick: function() {
+    // console.log('HANDLE CLICK DELETE: ', this.props.comment.id);
+    // console.log('before state', this.state);
+    //this.props.setLastClicked(this.props.commentid);
+  },
+
+  removeComment: function() {
+    $.ajax({
+      url: window.location.origin + '/api/comments/remove/' + this.props.comment.id,
+      method: 'DELETE',
+      //dataType: 'json',
+      success: function(data) {
+        console.log('Removing comment: ', this.props.comment.id);
+        this.setState({commentId: this.props.comment.id});
+        var getDivId = 'div[data-commentid="' + this.props.comment.id +'"]';
+        $(getDivId).hide();
+      }.bind(this),
+      error: function(xhr, status, err) {
+        console.error(xhr, status, err.message);
+      }
+    });
+  },  
+
   render: function() {
 
-    var context = this;
+    // TODO: Add comment actions buttons here.
 
-
-    var setLastClicked = function(commentId) {
-      console.log('WE BE CLICKING FOOLS IN COMMENT.JS!');
-      console.log(context.state);
-      context.setState({lastClickedComment: commentId});
-    };
-
+        // <CommentActions commentid={this.props.comment.id} setLastClicked={setLastClicked} />
     return (
-      <div>
+      <div data-commentid={this.props.comment.id}>
         <p><strong>{this.props.comment.User.name}</strong> | {this.props.comment.Url.url} | {this.props.comment.createdAt}</p>
         <p>{this.props.comment.text}</p>
-        <CommentActions commentid={this.props.comment.id} setLastClicked={setLastClicked} />
+        <p><a onClick={this.removeComment}>DELETE COMMENT</a></p>
       </div>
     );
   }
