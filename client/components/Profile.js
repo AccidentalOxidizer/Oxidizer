@@ -162,14 +162,17 @@ var Profile = React.createClass({
     this.loadUserComments();
   },
 
-  handleUrlSearch: function() {
+  handleUrlSearch: function(e) {
+    e.preventDefault();
+
     var url = this.refs.searchUrl.getDOMNode().value;
     this.refs.searchUrl.getDOMNode().value = '';
 
     this.loadUserCommentsForUrl(url);
   },
 
-  handleTextSearch: function() {
+  handleTextSearch: function(e) {
+    e.preventDefault();
     var text = this.refs.searchText.getDOMNode().value;
     this.refs.searchText.getDOMNode().value = '';
 
@@ -201,7 +204,7 @@ var Profile = React.createClass({
               <input type="text" className="form-control" placeholder="Search for Comment Text" ref="searchText" />
             </div>
             <div className="form-group col-sm-5">
-              <button type="submit" className="btn btn-block btn-primary">Search</button>
+              <button type="button" className="btn btn-block btn-primary">Search</button>
             </div>
           </form>
           <InfiniteScroll pageStart="0" loadMore={this.loadMoreComments} hasMore={this.hasMoreComments} 
