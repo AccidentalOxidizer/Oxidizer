@@ -28,6 +28,11 @@ var Admin = React.createClass({
     };
   },
 
+  onChildChanged: function(newState) {
+    console.log('ADMIN.JS STATE CHANGE!', newState);
+    this.setState({ checked: newState });
+  },
+
   initLoadState: function() {
     this.oldestLoadedCommentId = 'undefined';
     this.currentTime = undefined;
@@ -156,7 +161,7 @@ var Admin = React.createClass({
 
   render: function() {
     var comments = this.state.comments.map(function(comment) {
-      return <Comment key={comment.id} comment={comment} />;
+      return <Comment key={comment.id} comment={comment} callbackParent={this.onChildChanged} />;
     });
 
     return (

@@ -17,18 +17,22 @@ var userStatus = 1;
 
 var CommentActions = React.createClass({
   removeComment: function() {
-    $.ajax({
-      url: window.location.origin + '/api/comments/remove/' + this.props.commentid,
-      method: 'DELETE',
-      dataType: 'json',
-      success: function(data) {
-        console.log('DELETED COMMENT OH SHIT OH SHIT')
-        //React.render(<Admin/>);
-      }.bind(this),
-      error: function(xhr, status, err) {
-        console.error(xhr, status, err.message);
-      }
-    });
+    console.log('CLICK DETECTED IN COMMENTACTIONS.JS!');
+    this.setState({ checked: 'randommmmm' });
+    this.props.callbackParent(newState);
+
+    // $.ajax({
+    //   url: window.location.origin + '/api/comments/remove/' + this.props.commentid,
+    //   method: 'DELETE',
+    //   dataType: 'json',
+    //   success: function(data) {
+    //     console.log('DELETED COMMENT OH SHIT OH SHIT')
+    //     //React.render(<Admin/>);
+    //   }.bind(this),
+    //   error: function(xhr, status, err) {
+    //     console.error(xhr, status, err.message);
+    //   }
+    // });
   },
 
   render: function() {
