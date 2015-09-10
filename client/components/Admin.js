@@ -51,6 +51,27 @@ var Admin = React.createClass({
     this.loadComments();
   },
 
+  deleteComment: function(data_id) {
+    var comments = this.state.comments;
+    var newComments = comments.filter(function(elem) {
+        return elem.id != data_id;
+    });
+
+    this.setState({comments: newComments});
+
+    $.ajax({
+          url: window.location.origin + '/api/comments/remove/' + data_id,
+          method: 'DELETE',
+          dataType: 'json',
+          success: function() {
+            console.log('Successfully removed comment');
+          }.bind(this),
+          error: function(xhr, status, err) {
+            console.error(xhr, status, err.message);
+          }
+        });
+  },
+
   // Query fields:
   //  * filterByUser: set to true to indicate to load
   //      comments for the logged in user

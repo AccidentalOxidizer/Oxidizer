@@ -22,8 +22,8 @@ var CommentActions = React.createClass({
       method: 'DELETE',
       dataType: 'json',
       success: function(data) {
-        //console.log('DELETED COMMENT OH SHIT OH SHIT')
-        React.render(<Admin/>);
+        console.log('DELETED COMMENT OH SHIT OH SHIT')
+        //React.render(<Admin/>);
       }.bind(this),
       error: function(xhr, status, err) {
         console.error(xhr, status, err.message);
