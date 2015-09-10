@@ -33,11 +33,18 @@ var CommentActions = React.createClass({
     // });
   },
 
+  handleClick: function() {
+    console.log('HANDLE CLICK DELETE: ', this.props.commentid);
+    console.log('props', this.props);
+    this.setState({lastClickedComment: this.props.commentid});
+    //this.props.setLastClicked(this.props.commentid);
+  },
+
   render: function() {
-    console.log('COMMENT ID: ', this.props.commentid);
+    console.log('RENDER COMMENT ID: ', this.props.commentid);
     if (userStatus === 1) {
       return (
-          <p><a onClick={this.removeComment}>DELETE COMMENT</a> | REMOVE FLAG</p>
+          <p><a onClick={this.handleClick}>DELETE COMMENT</a> | REMOVE FLAG</p>
       );    
     } else {
       return null;  

@@ -18,12 +18,29 @@ var Comment = React.createClass({
     comment: React.PropTypes.object.isRequired
   },
 
+  getInitialState: function() {
+    return {
+      commentId: null,
+      lastClickedComment: 'none'
+    };
+  },
+
   render: function() {
+
+    var context = this;
+
+
+    var setLastClicked = function(commentId) {
+      console.log('WE BE CLICKING FOOLS IN COMMENT.JS!');
+      console.log(context.state);
+      context.setState({lastClickedComment: commentId});
+    };
+
     return (
       <div>
         <p><strong>{this.props.comment.User.name}</strong> | {this.props.comment.Url.url} | {this.props.comment.createdAt}</p>
         <p>{this.props.comment.text}</p>
-        <CommentActions commentid={this.props.comment.id} />
+        <CommentActions commentid={this.props.comment.id} setLastClicked={setLastClicked} />
       </div>
     );
   }

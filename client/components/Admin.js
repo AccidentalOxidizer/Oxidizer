@@ -121,7 +121,6 @@ var Admin = React.createClass({
 
         // Only update the numComments total if not null, i.e. on first load
         var updatedNumComments = this.state.numComments || data.numComments;
-        console.log('NUMBER OF COMMENTS: ', updatedNumComments);
 
         this.setState({
           displayName: data.userInfo.username,
@@ -137,6 +136,7 @@ var Admin = React.createClass({
 
 
   render: function() {
+    console.log('STATE: ', this.state);
     var comments = this.state.comments.map(function(comment) {
       return <Comment key={comment.id} comment={comment} />;
     });
