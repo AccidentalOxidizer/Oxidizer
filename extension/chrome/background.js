@@ -62,7 +62,8 @@ chrome.runtime.onInstalled.addListener(function(details) {
       server: settings.server,
       keepprivate: settings.keepprivate,
       autoshow: settings.autoshow,
-      showtrigger: settings.showtrigger
+      showtrigger: settings.showtrigger,
+      triggerposition: settings.triggerposition
     }, function() {});
   };
   xhr.open("GET", chrome.extension.getURL('config.json'), true);
@@ -75,6 +76,7 @@ chrome.storage.sync.get(['server', 'keepprivate', 'autoshow', 'showtrigger'],
     settings.keepprivate = store.keepprivate;
     settings.autoshow = store.autoshow;
     settings.showtrigger = store.showtrigger;
+    settings.triggerposition = store.triggerposition;
   });
 
 // update settings as they are changed in the chrome storage

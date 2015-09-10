@@ -3,11 +3,15 @@ function saveOptions() {
   var keepprivate = document.getElementById('keepprivate').checked;
   var autoshow = document.getElementById('autoshow').checked;
   var showtrigger = document.getElementById('showtrigger').checked;
+  var triggerposition = document.getElementById("triggerposition");
+  triggerposition = Number(triggerposition.options[triggerposition.selectedIndex].value);
+
   // save values with chrome storage sync
   chrome.storage.sync.set({
     keepprivate: keepprivate,
     autoshow: autoshow,
-    showtrigger: showtrigger
+    showtrigger: showtrigger,
+    triggerposition: triggerposition
   }, function() {
     // Update status to indicate successful saved options
     var status = document.getElementById('status');
@@ -31,11 +35,14 @@ function restoreOptions() {
   chrome.storage.sync.get({
     keepprivate: false,
     autoshow: true,
-    showtrigger: true
+    showtrigger: true,
+    triggerposition: 0
   }, function(items) {
     document.getElementById('keepprivate').checked = items.keepprivate;
     document.getElementById('autoshow').checked = items.autoshow;
     document.getElementById('showtrigger').checked = items.showtrigger;
+    var triggerposition = document.getElementById("triggerposition");
+    triggerposition.selectedIndex = items.triggerposition;
   });
 }
 

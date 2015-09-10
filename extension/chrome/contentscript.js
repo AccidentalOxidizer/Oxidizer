@@ -34,16 +34,36 @@ function createIframe() {
 }
 
 function createAndShowTrigger() {
-  // Create trigger
-  var section = document.createElement('div');
-  section.setAttribute('data-oxidizer-identity', 'trigger');
-  section.className = 'oxidizer cleanslate';
-  section.style.cssText = 'position:fixed !important; bottom:0 !important; right:0 !important; background: red;';
-  // console.log(document.querySelector('[data-oxidizer-identity="trigger"'));
-  section.style.cssText = 'position:fixed !important; bottom:0 !important; right:0 !important; background: red;';
-  section.innerHTML = 'TRIGGER'; // this should be a nice SVG element
-  // console.log(section.style.cssText);
-  document.body.appendChild(section);
+
+  switch (settings.triggerposition) {
+    case 0:
+      var triggerClass = 'bottom-right';
+      break;
+    case 1:
+      var triggerClass = 'bottom-left';
+      break;
+    case 2:
+      var triggerClass = 'top-right';
+      break;
+    case 3:
+      var triggerClass = 'top-left';
+      break;
+    default:
+      var triggerClass = 'bottom-right';
+  }
+
+  var svgns = "http://www.w3.org/2000/svg";
+
+  var svgDocument = document.createElementNS(svgns, "svg");
+  svgDocument.setAttributeNS(null, 'data-oxidizer-identity', 'trigger');
+  svgDocument.setAttributeNS(null, 'data-oxidizer-trigger', triggerClass);
+  var shape = document.createElementNS(svgns, "polygon");
+  shape.setAttributeNS(null, "points", "45,0 0,45 45,45");
+  var line = document.createElementNS(svgns, "polyline");
+  line.setAttributeNS(null, "points", "45,0 0,45");
+  svgDocument.appendChild(line);
+  svgDocument.appendChild(shape);
+  document.body.parentNode.insertBefore(svgDocument, null); // make sure to append AFTER body
 
   // Create listener to fire trigger to open iframe
   document.querySelector('[data-oxidizer-identity="trigger"]').addEventListener('mouseover', function(evt) {
