@@ -24,12 +24,10 @@ document.addEventListener("DOMContentLoaded", function(e) {
     if (e.data.type === 'open') {
       url = e.data.url;
       settings = e.data.settings;
-      console.log(settings.server);
       // show the panel with animation
       $('.cd-panel').addClass('is-visible');
       // do what needs to be done. load content, etc..
       loadContent(url);
-
     }
   }, false);
 
@@ -72,10 +70,9 @@ document.addEventListener("DOMContentLoaded", function(e) {
     var spaceLeft = commentContainer.scrollHeight - (commentContainer.clientHeight + commentContainer.scrollTop);
 
     //if we are towards the bottom of the div, and we haven't gotten all comments, and we don't have a pending request
-    if (spaceLeft < 300 && !tracking.mainLastComment.endOfComments && tracking.requestReturned) {
+    if (spaceLeft < 300) {
 
       // toggle requestReturned so that we don't send two requests concurrently
-      tracking.requestReturned = false;
       loadMoreComments($(".cd-panel-content"), url);
     }
   });
@@ -101,14 +98,11 @@ document.addEventListener("DOMContentLoaded", function(e) {
     });
 });
 
-
-
 function loadContent(url) {
   console.log('getting content from API');
 
   var params = {
     url: encodeURIComponent(url),
-    lastUpdateId: 'undefined',
     isPrivate: false
   };
 
@@ -122,7 +116,6 @@ function loadContent(url) {
   paramString = paramString.join('&');
   var apiURL = settings.server + "/api/comments/get?" + paramString;
 
-
   var request = $.ajax({
     url: apiURL,
     method: "GET",
@@ -130,6 +123,8 @@ function loadContent(url) {
   });
 
   request.success(function(msg) {
+    console.log(msg);
+    tracking.requestReturned = true;
     if (msg.comments.length > 0) {
       tracking.mainLastComment.id = msg.comments[msg.comments.length - 1].id;
     } else {
@@ -195,14 +190,24 @@ function compileComments(comments) {
 
 // destination is a jquery object that you want to append to
 function loadMoreComments(destination, url, repliesToId) {
-  console.log('))))))))))))))))))))))', destination, url, repliesToId);
+  // if not a reply, don't execute if we are at end of comments, or waiting for a request to return
+  if (repliesToId === undefined && (tracking.mainLastComment.endOfComments || !tracking.requestReturned)) {
+    console.log(tracking.mainLastComment.endOfComments, tracking.requestReturned);
+    return;
+  }
+
+  if (repliesToId && tracking[repliesToId])
+    if(tracking[repliesToId].endOfComments || !tracking.requestReturned) {
+    return;
+  }
+  
   var params = {
     url: encodeURIComponent(url),
     isPrivate: false
   };
-
+  
   if (repliesToId !== undefined) {
-    // check if we've received comments, and add to params if we have
+    // check if we've received comments, and add to params if we have a lastCommentId to send
     if (tracking[repliesToId] !== undefined){
       params.lastCommentId = tracking[repliesToId].id;
     } else {   
@@ -210,10 +215,11 @@ function loadMoreComments(destination, url, repliesToId) {
         endOfComments: false
       }
     }
-    
     params.repliesToId = repliesToId;
   } else {
-    params.lastCommentId = tracking.mainLastComment.id;
+    if (tracking.mainLastComment.id){
+      params.lastCommentId = tracking.mainLastComment.id;
+    }
   }
 
   var paramString = [];
@@ -226,7 +232,7 @@ function loadMoreComments(destination, url, repliesToId) {
   paramString = paramString.join('&');
   var apiURL = settings.server + "/api/comments/get?" + paramString;
 
-
+  tracking.requestReturned = false;
   var request = $.ajax({
     url: apiURL,
     method: "GET",
@@ -234,11 +240,6 @@ function loadMoreComments(destination, url, repliesToId) {
   });
 
   request.done(function(msg) {
-
-    if (msg.comments.length === 0) {
-      endOfComments = true;
-    }
-
     // set lastLoadedCommentId
     if (repliesToId === undefined){
       if (msg.comments.length > 0) {
@@ -250,10 +251,12 @@ function loadMoreComments(destination, url, repliesToId) {
       if (msg.comments.length > 0) {
         tracking[repliesToId].id = msg.comments[msg.comments.length - 1].id;
       } else {
-        tracking.mainLastComment.endOfComments = true
+        tracking[repliesToId].endOfComments = true
       }
     }
 
+    $('.reply-count').innerHtml(msg.userInfo.repliesToCheck);
+    $('.like-count').innerHtml(msg.userInfo.heartsToCheck);
     // compile and append new comments
     var html = compileComments(msg.comments);
     destination.append(html);
@@ -316,11 +319,27 @@ function registerCommentEventListeners(comment) {
 
   // get elements 
   var showReplies = document.getElementsByClassName('replies');
+  
   for (var i = 0; i < showReplies.length; i++){
     $(showReplies[i]).off('click').on('click', function() {
+
       var target = $(this).parents('.comment');
       var repliesToId = $($(this)[0]).attr('data-comment-id');
-      loadMoreComments(target, url, repliesToId);
+      
+      var thisComment = $(this).parents('.comment');
+      var replies = thisComment.find('.comment');
+      
+      // toggle whether
+      if (replies.length > 0){ 
+        if(!$(replies[0]).hasClass('hidden')) {
+          $(replies).addClass('hidden')
+        } else {
+          $(replies).removeClass('hidden')
+          loadMoreComments(target, url, repliesToId);
+        }
+      } else {
+        loadMoreComments(target, url, repliesToId);
+      }
     });
   }
 

@@ -73,7 +73,6 @@ module.exports = function(app) {
   // valid req.user.
   app.get('/api/comments/get', jsonParser, auth.isLoggedIn, function(req, res, next) {
     var searchObject = {};
-
     console.log("Comments get: req.query: ");
     console.log(req.query);
     
@@ -99,7 +98,6 @@ module.exports = function(app) {
     if (req.query.textSearch) {
       searchObject.text = {$like: '%' + req.query.textSearch + '%'};
       console.log("Comments: get - updated searchObj: ");
-      console.log(searchObject);
     }
 
     return new Promise(function(resolve, reject){
@@ -115,7 +113,11 @@ module.exports = function(app) {
         }
       })
       .then(function(searchObj){
-        return Comment.get(searchObj, req.query.lastCommentId, req.query.urlSearch);
+        if (req.user) {
+          return Promise.all([Comment.get(searchObj, req.user.id, req.query.lastCommentId, req.query.urlSearch), User.getUpdates(req.user.id)]);
+        } else {
+          return Comment.get(searchObj, req.user.id, req.query.lastCommentId, req.query.urlSearch);
+        }
       })
       .then(function(result) {
         // TODO: Handle case where URL exists but no comments??
@@ -128,13 +130,19 @@ module.exports = function(app) {
         }
 
         if (req.user !== undefined){
-          userInfo.userId = req.user.id;
-          userInfo.username = req.user.name;
+          userInfo = {
+            userId: req.user.id,
+            username: req.user.name,
+            repliesToCheck: result[1].repliesToCheck,
+            heartsToCheck: result[1].heartsToCheck,
+          }
+
         }
 
+
         res.send({
-          comments: result.rows,
-          numComments: result.count,
+          comments: result[0].rows,
+          numComments: result[0].count,
           currentTime: new Date(), // TODO: Fill this out!
           userInfo: userInfo
         });

@@ -19,8 +19,8 @@
             <header class="cd-panel-header">
                 <h1>Oxidizer</h1>
                 <ul class="nav nav-pills" role="tablist">
-                    <li role="presentation" class="active"><a href="#">Replies <span class="badge">0</span></a></li>
-                    <li role="presentation" class=""><a href="#">Likes <span class="badge">0</span></a></li>
+                    <li role="presentation" class="active"><a href="#">Replies <span class="badge reply-count">0</span></a></li>
+                    <li role="presentation" class=""><a href="#">Likes <span class="badge like-count">0</span></a></li>
                     <li role="presentation" class=""><a href="#">Dismiss</a></li>
                 </ul>
             </header>
@@ -57,7 +57,7 @@
             <div class="row " style="margin-top:5px; margin-bottom:5px;">
                 <div class="col-xs-12 comment-engage">
                     <div id="reply" data-comment-id="{{id}}" class="reply" style="float:left;"><i class="fa fa-reply"></i></div>
-                    <div id="replies" data-comment-id="{{id}}" class="replies" style="float:left;"><i class="fa fa-commenting-o"></i>0</div>
+                    <div id="replies" data-comment-id="{{id}}" class="replies" style="float:left;"><i class="fa fa-commenting-o"></i>{{ replies }}</div>
                     <div id="heart" data-comment-id="{{id}}" class="heart" style="float:left;">
                         <i class="fa fa-heart-o"></i>&nbsp;{{Hearts}}&nbsp;</div>
                     <div id="flag" data-comment-id="{{id}}" class="flag" style="float:right; text-align:right;">
