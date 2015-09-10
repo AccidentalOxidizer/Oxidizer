@@ -171,7 +171,6 @@ function loadContent(url) {
   });
 
   request.success(function(msg) {
-    console.log(msg);
     tracking.requestReturned = true;
     if (msg.comments.length > 0) {
       tracking.mainLastComment.id = msg.comments[msg.comments.length - 1].id;
@@ -295,6 +294,8 @@ function loadMoreComments(destination, url, repliesToId) {
   });
 
   request.done(function(msg) {
+    tracking.requestReturned = true;
+    
     // set lastLoadedCommentId
     if (repliesToId === undefined){
       if (msg.comments.length > 0) {
@@ -319,10 +320,11 @@ function loadMoreComments(destination, url, repliesToId) {
       } else {
         tracking[repliesToId].endOfComments = false;
       }
-    }
+    } 
 
-    $('.reply-count').innerHtml(msg.userInfo.repliesToCheck);
-    $('.like-count').innerHtml(msg.userInfo.heartsToCheck);
+    $('.reply-count').text(msg.userInfo.repliesToCheck);
+    $('.like-count').text(msg.userInfo.heartsToCheck);
+    
     // compile and append new comments
     var html = compileComments(msg.comments);
     destination.append(html);

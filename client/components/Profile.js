@@ -162,14 +162,17 @@ var Profile = React.createClass({
     this.loadUserComments();
   },
 
-  handleUrlSearch: function() {
+  handleUrlSearch: function(e) {
+    e.preventDefault();
+
     var url = this.refs.searchUrl.getDOMNode().value;
     this.refs.searchUrl.getDOMNode().value = '';
 
     this.loadUserCommentsForUrl(url);
   },
 
-  handleTextSearch: function() {
+  handleTextSearch: function(e) {
+    e.preventDefault();
     var text = this.refs.searchText.getDOMNode().value;
     this.refs.searchText.getDOMNode().value = '';
 
