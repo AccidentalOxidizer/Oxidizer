@@ -17,10 +17,13 @@ var favicon = require('serve-favicon');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var session = require('express-session');
+var RedisStore = require('connect-redis')(session);
+
 var middleware = require('./middleware');
 var morgan = require('morgan');
 var passport = require('passport');
 var sequelize = require('./components').sequelize;
+
 
 // UTILITIES
 var fs = require('fs');
@@ -38,20 +41,41 @@ require('./components/dbconfig');
 
 // ROUTES
 var routes = require('./routes');
+
 sequelize.sync().then(function() {
   app.use(morgan('dev'));
   app.use(cookieParser());
 
-  // using sessions for auth for now
-  // need to switch to tokens 
-  app.use(session({
-    secret: config.secret,
-    resave: false,
-    saveUninitialized: true
-  }));
+  if (process.env.NODE_ENV === 'production') {
+    app.use(session({
+      store: new RedisStore({
+        port: config.redis.port,
+        host: config.redis.host,
+        pass: config.redis.pass
+      }),
+      secret: config.secret,
+      resave: false,
+      saveUninitialized: true
+    }));
+    app.use(passport.initialize());
+    app.use(passport.session({
+      store: new RedisStore({
+        port: config.redis.port,
+        host: config.redis.host,
+        pass: config.redis.pass
+      }),
+      secret: config.secret
+    }));
+  } else {
+    app.use(session({
+      secret: config.secret,
+      resave: false,
+      saveUninitialized: true
+    }));
+    app.use(passport.initialize());
+    app.use(passport.session());
+  }
 
-  app.use(passport.initialize());
-  app.use(passport.session());
 
   routes(express, app, passport);
   http.createServer(app).listen(port);
@@ -63,12 +87,5 @@ sequelize.sync().then(function() {
     }
     https.createServer(options, app).listen(443);
   }
+
 });
-
-/*
-
-Warning: connect.session() MemoryStore is not
-designed for a production environment, as it will leak
-memory, and will not scale past a single process.
-// Maybe redis store or mongostore..
-*/
