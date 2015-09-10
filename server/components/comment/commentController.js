@@ -163,9 +163,9 @@ var remove = function(commentId) {
     })
     .then(function(affectedRows) {
       if (affectedRows === 0) {
-        throw new Error('Comment not found - delete failed');
+        throw new Error('User not found - delete failed');
       } else if (affectedRows > 1) {
-        throw new Error('deleted multiple comments');
+        throw new Error('deleted multiple users');
       } else {
         return true;
       }
