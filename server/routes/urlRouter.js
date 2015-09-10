@@ -94,6 +94,6 @@ module.exports = function(app) {
     urlHelper.remove(urlToDelete)
       .then(function(url) {
         res.send(200, "Deleted: " + urlToDelete.path);
-      })
+      });
   });
-}
+};

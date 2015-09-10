@@ -233,11 +233,16 @@ module.exports = function(app) {
       });
   });
 
+  app.delete('/api/comments/remove/:id', jsonParser, auth.isAuthorized, function(req, res, next) {
+    // Delete a comment!
+    return Comment.remove(req.params.id)
+            .then(function(url) {
+              res.send(200, "Deleted comment!");
+            });   
+  });
+
   // app.put('/api/comments/:id', jsonParser, auth.isAuthorized, function(req, res, next) {
   //   // Updates a comment!
   // });
 
-  // app.delete('/api/comments/:id', jsonParser, auth.isAuthorized, function(req, res, next) {
-  //   // Delete a comment!
-  // });
 };
