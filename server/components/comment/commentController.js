@@ -7,10 +7,11 @@ var Flag = require('../').Flag;
 var flagController = require('../flag');
 var Url = require('../').Url;
 
-var get = function(searchObject, lastCommentId, urlSearch) {
+var get = function(searchObject, requesterId, lastCommentId, urlSearch) {
 
   var userHearts;
   var userFlags;
+  var replyCount = {};
   var attributes = ['text', 'User.name', 'RepliesTo'];
 
   var queryObject = {
@@ -52,24 +53,34 @@ var get = function(searchObject, lastCommentId, urlSearch) {
   return Comment.findAndCountAll(queryObject)
     .then(function(results) {
       var comments = results.rows;
-
       // if there is a userId to filter by, see if they have hearted/flagged
-      if (searchObject.userId){
+
+      if (requesterId && comments.length > 0){
         searchObject = {
           CommentId: {
             $lte: comments[0].id,
             $gte: comments[comments.length - 1].id
           },
+
         };
         // get all hearts and flags for a user within the CommentId range
-        return Promise.all([heartController.get(searchObject, searchObject.userId), flagController.get(searchObject, searchObject.userId)])
-          .spread(function(hearts, flags){
+        return Promise.all([heartController.get(searchObject, requesterId), flagController.get(searchObject, requesterId), Comment.findAll({where: {repliesToId: searchObject.CommentId}})])
+          .spread(function(hearts, flags, replies){
             userHearts = hearts.map(function(heart){
               return heart.CommentId;
             });          
             userFlags = flags.map(function(flag){
               return flag.CommentId;
             });
+
+            replies.forEach(function(reply) {
+
+              if (replyCount[reply.repliesToId]) {
+                replyCount[reply.repliesToId]++;
+              } else {
+                replyCount[reply.repliesToId] = 1;
+              }
+            })
             return results; 
           });
       } else {
@@ -77,6 +88,7 @@ var get = function(searchObject, lastCommentId, urlSearch) {
       }
     })
     .then(function(results){
+
       var comments = results.rows;
       
       comments.forEach(function(comment, index, array) {
@@ -93,12 +105,18 @@ var get = function(searchObject, lastCommentId, urlSearch) {
             comment.dataValues.flaggedByUser = true;
           }
         }
+
+        console.log(comment);
+        if (replyCount[comment.dataValues.id]){
+          comment.dataValues.replies = replyCount[comment.dataValues.id];
+        } else {
+          comment.dataValues.replies = 0;
+        }
         // Iterate over our results array and update the number of hearts and favorites so
         // we don't return the ENTIRE array.
         comment.dataValues.Hearts = comment.dataValues.Hearts.length;
         comment.dataValues.Flags = comment.dataValues.Flags.length;
       });
-
       return results; 
     })
     .catch(function(err) {
