@@ -28,8 +28,6 @@ var routes = (
     <DefaultRoute handler={Home} />
     <Route name="profile" path="/profile" handler={Profile} />
     <Route name="website" path="/website/:website?" handler={Website} />
-    <Route name="signup" path="/signup" handler={Signup} />
-    <Route name="login" path="/login" handler={Login} />
   </Route>
 );
 

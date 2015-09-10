@@ -10,7 +10,7 @@ module.exports = function(req, res, next) {
         type: 'not authenticated'
       });
     } else {
-      res.redirect('/login');
+      res.redirect('/');
     }
   }
 };

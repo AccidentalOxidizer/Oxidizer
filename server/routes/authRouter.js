@@ -3,6 +3,7 @@ var jsonParser = bodyParser.json();
 var urlEncodedParser = bodyParser.urlencoded({
   extended: true
 });
+var auth = require('../middleware').auth;
 
 
 module.exports = function(app, passport) {
@@ -46,21 +47,6 @@ module.exports = function(app, passport) {
     }
   });
 
-  // route to logout user from chrome extension
-  app.get('/api/auth/chrome/logout', function(req, res, next) {
-    console.log(req.session, req.user);
-    req.logOut();
-    req.logout();
-    req.session.destroy();
-    console.log('Session & User after logout: ', req.session, req.user);
-
-    // what's our cookie name?
-    // res.clearCookie('cookiename')
-    res.status(200).send({
-      auth: 'terminated'
-    });
-  });
-
   // Facebook Auth Routes
   app.get('/api/auth/facebook', jsonParser, passport.authenticate('facebook', {
     scope: 'email'
@@ -79,4 +65,29 @@ module.exports = function(app, passport) {
   app.get('/api/auth/chrome/facebook', jsonParser, passport.authenticate('facebook', {
     scope: 'email'
   }));
+
+
+  // Logout Routes
+  app.get('/api/auth/logout', auth.isLoggedIn, function(req, res, next) {
+    req.logout();
+    req.session.destroy();
+    console.log('Session & User after logout: ', req.session, req.user);
+
+    res.redirect('/');
+  });
+
+  app.get('/api/auth/chrome/logout', function(req, res, next) {
+    console.log(req.session, req.user);
+    req.logOut();
+    req.logout();
+    req.session.destroy();
+    console.log('Session & User after logout: ', req.session, req.user);
+
+    // what's our cookie name?
+    // res.clearCookie('cookiename')
+    res.status(200).send({
+      auth: 'terminated'
+    });
+  });
+
 };
