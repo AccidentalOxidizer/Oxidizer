@@ -4,7 +4,7 @@ function saveOptions() {
   var autoshow = document.getElementById('autoshow').checked;
   var showtrigger = document.getElementById('showtrigger').checked;
   var triggerposition = document.getElementById("triggerposition");
-  triggerposition = triggerposition.options[triggerposition.selectedIndex].value;
+  triggerposition = Number(triggerposition.options[triggerposition.selectedIndex].value);
 
   // save values with chrome storage sync
   chrome.storage.sync.set({
