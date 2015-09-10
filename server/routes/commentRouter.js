@@ -72,6 +72,19 @@ module.exports = function(app) {
     };
   });
 
+  // Remove all flags for a specific comment.
+  app.delete('/api/flags/remove/:id', jsonParser, auth.isAuthorized, function(req, res, next) {
+    // Delete all flags!
+    return Flag.removeAll(req.params.id)
+            .then(function(flag) {
+              res.send(200, "Deleted all flags!");
+            })
+            .catch(function(err) {
+              console.log("Err: ", err);
+              res.send(200);
+            });
+  });
+
   // Get all comments with search parameters in query string
   // With auth.isLoggedIn middleware, we should always have a 
   // valid req.user.

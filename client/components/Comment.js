@@ -46,6 +46,23 @@ var Comment = React.createClass({
         console.error(xhr, status, err.message);
       }
     });
+  },
+
+  removeFlags: function() {
+    $.ajax({
+      url: window.location.origin + '/api/flags/remove/' + this.props.comment.id,
+      method: 'DELETE',
+      //dataType: 'json',
+      success: function(data) {
+        console.log('Removing flags: ', this.props.comment.id);
+        this.setState({commentId: this.props.comment.id});
+        var getDivId = 'div[data-commentid="' + this.props.comment.id +'"]';
+//        $(getDivId).hide();
+      }.bind(this),
+      error: function(xhr, status, err) {
+        console.error(xhr, status, err.message);
+      }
+    });
   },  
 
   render: function() {
@@ -57,7 +74,7 @@ var Comment = React.createClass({
       <div data-commentid={this.props.comment.id}>
         <p><strong>{this.props.comment.User.name}</strong> | {this.props.comment.Url.url} | {this.props.comment.createdAt}</p>
         <p>{this.props.comment.text}</p>
-        <p><a onClick={this.removeComment}>DELETE COMMENT</a></p>
+        <p>TOTAL FLAGS: {this.props.comment.Flags} <a onClick={this.removeComment}>DELETE COMMENT</a> | <a onClick={this.removeFlags}>REMOVE FLAGS</a> </p>
       </div>
     );
   }

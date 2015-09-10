@@ -19,6 +19,20 @@ var get = function(searchObject, userId) {
     });
 };
 
+// Remove all flags
+// This is an admin only function that should check number of flags and then remove them.
+var removeAll = function(commentId) {
+  return Flag.destroy({where:
+    {CommentId: commentId}
+  })
+  .then(function(result) {
+    return "Success!";
+  })
+  .catch(function(err) {
+    return err;
+  });
+};
+
 var flag = function(searchObject) {
 
   //First: Search
@@ -84,3 +98,4 @@ var flag = function(searchObject) {
 
 exports.get = get;
 exports.flag = flag;
+exports.removeAll = removeAll;
