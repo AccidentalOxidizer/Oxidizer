@@ -40,7 +40,7 @@ require('./components/user/passport')(passport, config);
 
 // ROUTES
 var routes = require('./routes');
-
+// add all our models to the app so they are always on the request
 var models = require('./components');
 app.models = models;
 
@@ -85,9 +85,6 @@ sequelize.sync().then(function() {
     app.use(passport.initialize());
     app.use(passport.session());
   }
-
-  // add all our models to the app so they are always on the request
-  app.set('models', models);
 
   routes(express, app, passport);
   http.createServer(app).listen(port);
