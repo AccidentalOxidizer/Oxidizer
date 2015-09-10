@@ -73,8 +73,7 @@ module.exports = function(app) {
   // valid req.user.
   app.get('/api/comments/get', jsonParser, auth.isLoggedIn, function(req, res, next) {
     var searchObject = {};
-    console.log("Comments get: req.query: ");
-    console.log(req.query);
+    console.log("Comments get: req.query: ", req.query);
     
     // Are we requesting comments for the logged in user?
     if (req.query.filterByUser) {
@@ -157,7 +156,6 @@ module.exports = function(app) {
   // add isAuth
   app.post('/api/comments/add', jsonParser, auth.isLoggedIn, function(req, res, next) {
     // Add a new comment!
-    console.log(req.body.repliesToId);
     Url.save({
         url: req.body.url
       })

@@ -12,7 +12,7 @@ var Website = React.createClass({
   getInitialState: function() {
     return {
       comments: [],
-      maxCommentId: -1
+      lastCommentId: -1
     };
   },
 
@@ -43,6 +43,12 @@ var Website = React.createClass({
     this.init();
   },
 
+  loadComments: function(){
+    var query = {};
+
+
+  },
+
   render: function() {
     var comments = this.state.comments.map(function(comment) {
       return <Comment key={comment.id} comment={comment} />;
@@ -50,7 +56,32 @@ var Website = React.createClass({
 
     return (
       <div className="row">
-        {comments}
+        <div className="col-md-4">
+          <h2>{this.state.displayName}</h2>
+          <p>Total Comments: {this.state.numComments}</p>
+        </div>
+        <div className="col-md-8">
+          <form onSubmit={this.handleUrlSearch}>
+            <div className="form-group col-sm-7">
+              <input type="text" className="form-control" placeholder="Search for URL" ref="searchUrl" />
+            </div>
+            <div className="form-group col-sm-5">
+              <button type="submit" className="btn btn-block btn-primary">Search</button>
+            </div>
+          </form>
+          <form onSubmit={this.handleTextSearch}>
+            <div className="form-group col-sm-7">
+              <input type="text" className="form-control" placeholder="Search for Comment Text" ref="searchText" />
+            </div>
+            <div className="form-group col-sm-5">
+              <button type="submit" className="btn btn-block btn-primary">Search</button>
+            </div>
+          </form>
+          <InfiniteScroll pageStart="0" loadMore={this.loadMoreComments} hasMore={this.hasMoreComments} 
+              loader={<div className="loader">Loading ...</div>}>
+            {comments}
+          </InfiniteScroll>
+        </div>
       </div>
     );
   }

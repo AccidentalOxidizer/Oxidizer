@@ -31,7 +31,7 @@ var get = function(searchObject, requesterId, lastCommentId, urlSearch) {
     }]
   };
 
-  if (lastCommentId !== undefined) {
+  if (lastCommentId !== undefined && lastCommentId !== 'undefined') {
     queryObject.where.id = {};
     queryObject.where.id.$lt = lastCommentId;
   }
@@ -106,7 +106,6 @@ var get = function(searchObject, requesterId, lastCommentId, urlSearch) {
           }
         }
 
-        console.log(comment);
         if (replyCount[comment.dataValues.id]){
           comment.dataValues.replies = replyCount[comment.dataValues.id];
         } else {
