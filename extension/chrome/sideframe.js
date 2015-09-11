@@ -58,7 +58,7 @@ document.addEventListener("DOMContentLoaded", function(e) {
           privateFeed = settings.keepprivate;
 
           var privacyText = commentPrivately ? 'Private' : 'Public';
-          $('#comment-privacy-select').parents('.dropup').find('.btn').html(privacyText + ' <span class="caret"></span>');
+          $('#comment-privacy-select').parents('.dropup').find('.btn-privacy').html(privacyText + ' <span class="caret"></span>');
           $('#feed-privacy-select').parents('.dropdown').find('.dropdown-toggle').html(privacyText + ' Feed <span class="caret"></span>');
 
           // show the panel with animation
@@ -119,7 +119,7 @@ document.addEventListener("DOMContentLoaded", function(e) {
       commentPrivately = false;
     }
     console.log('comment privacy set to ' + selectedText + ' commentPrivately ' + commentPrivately);
-    $(this).parents(".dropup").find('.btn').html(selectedText + ' <span class="caret"></span>');
+    $(this).parents(".dropup").find('.btn-privacy').html(selectedText + ' <span class="caret"></span>');
   });
 
   document.getElementById('comment-submit-button').addEventListener('click', function() {
