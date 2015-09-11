@@ -9,8 +9,8 @@ var Url = require('../').Url;
 
 var get = function(searchObject, requesterId, lastCommentId, urlSearch, orderBy) {
 
-  console.log('test class instance');
-  Comment.sortFlags();
+  // console.log('test class instance');
+  // Comment.sortFlags();
 
   var userHearts;
   var userFlags;

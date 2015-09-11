@@ -65,7 +65,6 @@ var Admin = React.createClass({
     var query = {
       filterByUser: false,
       isPrivate: false,
-      orderBy: 'flags'
     };
 
     // Don't send this query value on first load.
@@ -81,7 +80,7 @@ var Admin = React.createClass({
       query.textSearch = this.textSearch;
     }
 
-    console.log("Profile loadComments: query ", query);
+    console.log("Admin Load Comments ", query);
 
     $.ajax({
       url: window.location.origin + '/api/comments/get',
@@ -89,17 +88,6 @@ var Admin = React.createClass({
       method: 'GET',
       dataType: 'json',
       success: function(data) {
-        console.log('Profile init: successfully loaded user comments');
-
-        // XXX EE: what's the right thing to store here?
-        // For now, if no comments returned, keep it the same as it was.
-        // What if you have comments, but then you run a query -> 0 comments returned?
-        this.oldestLoadedCommentId = data.comments.length > 0 ?
-          data.comments[data.comments.length - 1].id : this.oldestLoadedCommentId;
-        console.log('Profile init: oldestLoadedCommentId ' + this.oldestLoadedCommentId);
-
-        // Update the time ...
-        this.currentTime = data.currentTime;
 
         // If the number of loaded comments is less than 25 (XXX - should have a 
         // constant for this), we've loaded all the comments of this type.
@@ -134,6 +122,9 @@ var Admin = React.createClass({
     });
   },
 
+  sortFlags: function() {
+    console.log('Sort by Flags');
+  },
 
   render: function() {
 
@@ -170,7 +161,7 @@ var Admin = React.createClass({
               <button type="submit" className="btn btn-block btn-primary">Search</button>
             </div>
           </form>
-          <p>Sort By: <a>FLAGS</a> | <a>RECENT</a></p>
+          <p>Sort By: <a onClick={this.sortFlags}>FLAGS</a> | <a onClick={this.loadComments}>RECENT</a></p>
           {comments}
         </div>
       </div>

@@ -18,7 +18,6 @@ var get = function(searchObject, userId) {
       where: searchObject
     })
     .then(function(result) {
-      console.log('grwreqfsfdsfdsa', result, searchObject);
       return result;
     })
     .catch(function(err) {
