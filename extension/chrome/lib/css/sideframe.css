@@ -83,21 +83,24 @@ body {
     -moz-transition: top 0.3s 0s;
     transition: top 0.3s 0s;
     padding-top: 5px;
-    padding: 5px 5%;
+    padding: 0px 5%;
+}
+
+.cd-panel-header .navbar {
+    border: none;
+    background: transparent;
+    margin-bottom: 0;
 }
 
 .cd-panel-header h1 {
-    /*font-weight: bold;
-  color: #89ba2c;
-  padding-left: 5%;*/
     font-weight: 300;
     color: #2372CC;
-    margin-top: 0;
+    padding: 7px 0;
     float: left;
 }
 
 .cd-panel-header h2 {
-    /*font-weight: bold;*/
+    padding: 7px 0;
     font-weight: 300;
     color: #2372CC;
     margin-top: 0;
@@ -105,9 +108,13 @@ body {
 }
 
 .cd-panel-header li {
-    font-size: 11px;
+    /*font-size: 11px;*/
 }
 
+
+.cd-panel-header .navbar-nav>li {
+    float: left;
+}
 .from-right .cd-panel-header,
 .from-left .cd-panel-header {
     top: -50px;
@@ -308,6 +315,11 @@ body {
     padding: 15px;
     background: rgba(255, 255, 255, 0.96);
     box-shadow: rgba(0, 0, 0, .10) 2px 0px 1px, rgba(0, 0, 0, .10) 0px 0px 1px;
+}
+
+.public-private {
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
 }
 
 .cd-panel-footer > div,
