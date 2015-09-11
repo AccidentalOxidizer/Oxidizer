@@ -13,7 +13,7 @@ chrome.runtime.sendMessage({
   });
 
 // Base Iframe Style
-var iframeStyle = 'position:fixed !important;top:0;right:0;display:block;height:100%;z-index:2147483648!important;bottom: auto !important; border: none !important;  overflow: hidden !important; '
+var iframeStyle = 'padding:0px !important; position:fixed !important;top:0;right:0;display:block;height:100%;z-index:2147483648!important;bottom: auto !important; border: none !important;  overflow: hidden !important; '
 var iframeStyleClosed = iframeStyle + 'width:0px; !important; visibility: hidden;';
 var iframeStyleOpened = iframeStyle + 'width:100% !important; visibility: visible;';
 

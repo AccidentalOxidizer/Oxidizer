@@ -88,8 +88,10 @@ document.addEventListener("DOMContentLoaded", function(e) {
   document.getElementById('dismiss-notifications').addEventListener('click', function() {
     dismissNotifications();
     // SEND MESSAGE TO SERVER TO SET TO ZERO
-
-  })
+  });
+  // Register Events on DOM
+  document.querySelector('#facebook-login').addEventListener('click', facebookLogin);
+  document.querySelector('#google-login').addEventListener('click', googleLogin);
 
   // Update the feed privacy setting if the user changes it in the dropdown menu.
   $('#feed-privacy-select li a').click(function() {
@@ -197,13 +199,11 @@ function loadContent(url) {
 
   request.success(function(msg) {
     console.log('GET ALL:', msg);
-
     if (msg.userInfo.heartsToCheck > 0 ||
       msg.userInfo.repliesToCheck > 0) {
       console.log('fave of replies!');
       setNotifications(msg.userInfo.heartsToCheck, msg.userInfo.repliesToCheck);
     } else {
-      console.log('no notifications..');
       setNotifications(null, null);
     }
 
@@ -231,7 +231,15 @@ function loadContent(url) {
   });
 
   request.fail(function(jqXHR, textStatus) {
-    console.log("Request failed: " + textStatus);
+    console.log("Request failed: ", jqXHR.status, textStatus);
+  });
+
+  request.complete(function(jqXHR, textStatus) {
+    if (jqXHR.status === 401) {
+      loginButtons(true);
+    } else {
+      loginButtons(false);
+    }
   });
 
 }
@@ -564,6 +572,27 @@ function favePost(commentId) {
   });
 }
 
+function loginButtons(showLogin) {
+  if (showLogin) {
+    document.getElementById('notification-area').classList.remove('hidden');
+  } else {
+    document.getElementById('notification-area').classList.add('hidden');
+    // document.getElementById('panel-content').innerHTML = '';
+  }
+}
+
+// LOGIN STRATEGIES
+var googleLogin = function() {
+  // chrome.tabs.create({
+  //   url: settings.server + '/api/auth/chrome/google'
+  // });
+}
+
+var facebookLogin = function() {
+  // chrome.tabs.create({
+  //   url: settings.server + '/api/auth/chrome/facebook'
+  // });
+}
 
 //  format an ISO date using Moment.js
 //  http://momentjs.com/

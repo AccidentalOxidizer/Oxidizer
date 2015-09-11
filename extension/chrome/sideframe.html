@@ -47,8 +47,21 @@
                 </nav>
             </header>
             <div id="comment-container" class="comment-container cd-panel-container">
-                <div class="cd-panel-content">
+                
+                <div class="panel-content-wrapper">
+                <div id="notification-area" class='hidden'>
+                <h3>Login or Sign-up</h3>
+                    <a target="_blank" href="https://api.oxidizer.io/api/auth/chrome/facebook" id="facebook-login" class="btn btn-social btn-facebook">
+                        <i class="fa fa-facebook"></i> Login
+                    </a>
+                    <a target="_blank" href="https://api.oxidizer.io/api/auth/chrome/google" id="google-login" class="btn btn-social btn-google">
+                        <i class="fa fa-google"></i> Login
+                    </a>
+                    <p>then reload :)</p>
+                </div>
+                <div id="panel-content" class="cd-panel-content">
                     <!-- Handlebars will append comments here-->
+                </div>
                 </div>
                 <!-- cd-panel-content -->
                 <footer class="cd-panel-footer submit-footer">
@@ -56,7 +69,6 @@
                         <div class="input-group">
                             <input type="text" id="comment-input-field" class="form-control" aria-label="Add your comment" placeholder="Add your comment">
                             <div class="input-group-btn dropup">
-
                                 <button type="button" class="btn btn-privacy btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                     Privacy<span class="caret"></span>
                                     <span class="sr-only">Toggle Dropdown</span>
@@ -65,7 +77,6 @@
                                     <li><a href="#"><i class="fa fa-globe"></i> Public</a></li>
                                     <li><a href="#"><i class="fa fa-lock"></i> Private</a></li>
                                 </ul>
-
                                 <button id="comment-submit-button" type="" class="btn btn-default">Post</button>
                             </div>
                         </div>
@@ -79,7 +90,7 @@
     </div>
     <script id="comment-entry-template" type="text/x-handlebars-template">
         {{#each this}}
-        <div class="col-xs-12 comment" id="{{id}}">
+        <div class="col-xs-12 comment {{repliesToId}}" id="{{id}}">
             <div class="row">
                 <div class="col-xs-6 comment-username">{{User.name}}</div>
                 <div class="col-xs-6 comment-timestamp">{{dateFormat createdAt format="MMMM YYYY"}}</div>
@@ -89,7 +100,7 @@
             </div>
             <div class="row " style="margin-top:5px; margin-bottom:5px;">
                 <div class="col-xs-12 comment-engage">
-                    <div id="reply" data-comment-id="{{id}}" class="reply" style="float:left;"><i class="fa fa-reply"></i></div>
+                    <div id="reply" data-comment-id="{{id}}" class="reply" style="float:left;"><i class="fa fa-reply"></i>&nbsp;</div>
                     <div id="replies" data-comment-id="{{id}}" class="replies" style="float:left;"><i class="fa fa-commenting-o"></i>&nbsp;{{replies}}</div>
                     <div id="heart" data-comment-id="{{id}}" class="heart" style="float:left;">
                         <i class="fa fa-heart-o"></i>&nbsp;{{Hearts}}</div>
