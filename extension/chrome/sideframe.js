@@ -21,8 +21,18 @@ var tracking = {
 };
 
 
-
 document.addEventListener("DOMContentLoaded", function(e) {
+
+  chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
+    // DEBUG
+    if (request.from === 'contentscript' && request.message === 'debug') {
+      console.log('message events intercepted in iframe:', request);
+      sendResponse({
+        from: 'iframe',
+        message: 'debug'
+      });
+    }
+  });
 
   // when ever we have a trigger event from the parent window 
   // it will tell the iframe to reload and redo what is needed
@@ -33,34 +43,42 @@ document.addEventListener("DOMContentLoaded", function(e) {
     if (e.data.type === 'open') {
       url = e.data.url;
       settings = e.data.settings;
-      console.log(settings.server);
 
-      // Set default value for comment privacy, public vs private feed,
-      // and dropdown selections.
-      commentPrivately = settings.keepprivate;
-      privateFeed = settings.keepprivate;
+      // if iframe received contentscript open postMessage, route a message back via background script
+      // to tell contenscript it's ok to show iframe & once contenscript finished, start animation and load content
+      chrome.runtime.sendMessage({
+          from: 'iframe',
+          message: 'ok',
+          details: 'successfully received open postMessage from contentscript'
+        },
+        function(response) {
+          // Set default value for comment privacy, public vs private feed,
+          // and dropdown selections.
+          commentPrivately = settings.keepprivate;
+          privateFeed = settings.keepprivate;
 
-      var privacyText = commentPrivately ? 'Private' : 'Public';
-      $('#comment-privacy-select').parents('.dropup').find('.btn').html(privacyText + ' <span class="caret"></span>');
-      $('#feed-privacy-select').parents('.dropdown').find('.dropdown-toggle').html(privacyText + ' Feed <span class="caret"></span>');
+          var privacyText = commentPrivately ? 'Private' : 'Public';
+          $('#comment-privacy-select').parents('.dropup').find('.btn').html(privacyText + ' <span class="caret"></span>');
+          $('#feed-privacy-select').parents('.dropdown').find('.dropdown-toggle').html(privacyText + ' Feed <span class="caret"></span>');
 
-      // show the panel with animation
-      $('.cd-panel').addClass('is-visible');
-      // do what needs to be done. load content, etc..
-      loadContent(url);
+          // show the panel with animation
+          document.getElementById('panel').classList.add('is-visible');
+          // do what needs to be done. load content, etc..
+          loadContent(url);
+        });
     }
   }, false);
 
   window.addEventListener("message", function(e) {
     if (e.data.type === 'close') {
-      $('.cd-panel').removeClass('is-visible');
+      document.getElementById('panel').classList.remove('is-visible');
     }
   }, false);
 
 
   // send message to background script to tell content script to close this iframe
   document.getElementById('close').addEventListener('click', function() {
-    $('.cd-panel').removeClass('is-visible');
+    document.getElementById('panel').classList.remove('is-visible');
     chrome.runtime.sendMessage({
       from: 'iframe',
       message: 'close iframe'
@@ -119,7 +137,6 @@ document.addEventListener("DOMContentLoaded", function(e) {
 
     //if we are towards the bottom of the div, and we haven't gotten all comments, and we don't have a pending request
     if (spaceLeft < 300) {
-
       // toggle requestReturned so that we don't send two requests concurrently
       loadMoreComments($(".cd-panel-content"), url);
     }
@@ -251,27 +268,27 @@ function loadMoreComments(destination, url, repliesToId) {
   }
 
   if (repliesToId && tracking[repliesToId])
-    if(tracking[repliesToId].endOfComments || !tracking.requestReturned) {
-    return;
-  }
-  
+    if (tracking[repliesToId].endOfComments || !tracking.requestReturned) {
+      return;
+    }
+
   var params = {
     url: encodeURIComponent(url),
     isPrivate: privateFeed
   };
-  
+
   if (repliesToId !== undefined) {
     // check if we've received comments, and add to params if we have a lastCommentId to send
-    if (tracking[repliesToId] !== undefined){
+    if (tracking[repliesToId] !== undefined) {
       params.lastCommentId = tracking[repliesToId].id;
-    } else {   
+    } else {
       tracking[repliesToId] = {
         endOfComments: false
       }
     }
     params.repliesToId = repliesToId;
   } else {
-    if (tracking.mainLastComment.id){
+    if (tracking.mainLastComment.id) {
       params.lastCommentId = tracking.mainLastComment.id;
     }
   }
@@ -295,9 +312,9 @@ function loadMoreComments(destination, url, repliesToId) {
 
   request.done(function(msg) {
     tracking.requestReturned = true;
-    
+
     // set lastLoadedCommentId
-    if (repliesToId === undefined){
+    if (repliesToId === undefined) {
       if (msg.comments.length > 0) {
         tracking.mainLastComment.id = msg.comments[msg.comments.length - 1].id;
       }
@@ -320,11 +337,11 @@ function loadMoreComments(destination, url, repliesToId) {
       } else {
         tracking[repliesToId].endOfComments = false;
       }
-    } 
+    }
 
     $('.reply-count').text(msg.userInfo.repliesToCheck);
     $('.like-count').text(msg.userInfo.heartsToCheck);
-    
+
     // compile and append new comments
     var html = compileComments(msg.comments);
     destination.append(html);
@@ -387,19 +404,19 @@ function registerCommentEventListeners(comment) {
 
   // get elements 
   var showReplies = document.getElementsByClassName('replies');
-  
-  for (var i = 0; i < showReplies.length; i++){
+
+  for (var i = 0; i < showReplies.length; i++) {
     $(showReplies[i]).off('click').on('click', function() {
 
       var target = $(this).parents('.comment');
       var repliesToId = $($(this)[0]).attr('data-comment-id');
-      
+
       var thisComment = $(this).parents('.comment');
       var replies = thisComment.find('.comment');
-      
+
       // toggle whether
-      if (replies.length > 0){ 
-        if(!$(replies[0]).hasClass('hidden')) {
+      if (replies.length > 0) {
+        if (!$(replies[0]).hasClass('hidden')) {
           $(replies).addClass('hidden')
         } else {
           $(replies).removeClass('hidden')
