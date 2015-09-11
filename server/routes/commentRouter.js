@@ -138,12 +138,13 @@ module.exports = function(app) {
       })
       .then(function(searchObj){
         if (req.user) {
-          return Promise.all([Comment.get(searchObj, req.user.id, req.query.lastCommentId, req.query.urlSearch), User.getUpdates(req.user.id)]);
+          return Promise.all([Comment.get(searchObj, req.user.id, req.query.lastCommentId, req.query.urlSearch, req.query.orderBy), User.getUpdates(req.user.id)]);
         } else {
           return Comment.get(searchObj, req.user.id, req.query.lastCommentId, req.query.urlSearch);
         }
       })
       .then(function(result) {
+        console.log('RESULTS!!! ', result);
         // TODO: Handle case where URL exists but no comments??
         // TODO: Make this look like contract!
 
@@ -160,7 +161,6 @@ module.exports = function(app) {
             repliesToCheck: result[1].repliesToCheck,
             heartsToCheck: result[1].heartsToCheck,
           };
-
         }
 
 

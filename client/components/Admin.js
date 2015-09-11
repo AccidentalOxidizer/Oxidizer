@@ -65,7 +65,8 @@ var Admin = React.createClass({
   loadComments: function() {
     var query = {
       filterByUser: false,
-      isPrivate: false
+      isPrivate: false,
+      orderBy: 'flags'
     };
 
     // Don't send this query value on first load.
