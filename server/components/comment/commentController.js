@@ -19,7 +19,7 @@ var get = function(searchObject, requesterId, lastCommentId, urlSearch, hostSear
     where: searchObject,
     include: [{
       model: User,
-      attributes: ['name']
+      attributes: ['id','name', 'avatar']
     }, {
       model: Heart,
       attributes: ['id']

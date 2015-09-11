@@ -3,6 +3,18 @@ var GoogleStrategy = require('passport-google-oauth').OAuth2Strategy;
 var FacebookStrategy = require('passport-facebook').Strategy;
 var config = require('../../config.js').get(process.env.NODE_ENV);
 var User = require('../index')['User'];
+var md5 = require('md5');
+
+var gravatarCheck = function(email) {
+  email = email || 'nothing@nothing.com';
+  // Gravatar requires all emails to be converted to lower case for
+  // consistent results.
+  var emailCheck = email.toLowerCase();
+  var emailToMD5 = md5(emailCheck);
+
+  //Generate Gravatar Link
+  return 'http://www.gravatar.com/avatar/' + emailToMD5 + '.jpg?d=mm';
+ };
 
 module.exports = function(passport, config) {
   // Using sessions for now -> req serialization support
@@ -42,6 +54,7 @@ module.exports = function(passport, config) {
             console.log('DEVELOPMENT: Creating new user!');
             var newUser = User.build({
               name: req.body.name || 'Testy McTesterson',
+              avatar: gravatarCheck(email),
               email: email,
               password: password || 'aaaaaaa'
             });
@@ -115,6 +128,7 @@ module.exports = function(passport, config) {
             console.log("GoogleStrategy: creating new user " + email);
             var newUser = User.build({
               name: profile.displayName,
+              avatar: gravatarCheck(email),
               email: email,
               googleId: profile.id,
               googleToken: accessToken,
@@ -174,6 +188,7 @@ module.exports = function(passport, config) {
             console.log("FacebookStrategy: creating new user " + email);
             var newUser = User.build({
               name: profile.displayName,
+              avatar: gravatarCheck(email),
               email: email,
               fbId: profile.id,
               fbToken: accessToken,

@@ -7,6 +7,7 @@ var InfiniteScroll = require('react-infinite-scroll')(React);
 var Profile = React.createClass({
   getInitialState: function() {
     return {
+      userAvatar: '',
       displayName: '',
       comments: [],
       numComments: null,
@@ -72,6 +73,9 @@ var Profile = React.createClass({
       success: function(data) {
         console.log('Profile init: successfully loaded user comments');
 
+        // Print user data in the console.
+        console.log('USER DATA: ', data);
+
         // XXX EE: what's the right thing to store here?
         // For now, if no comments returned, keep it the same as it was.
         // What if you have comments, but then you run a query -> 0 comments returned?
@@ -103,8 +107,11 @@ var Profile = React.createClass({
         // Only update the numComments total if not null, i.e. on first load
         var updatedNumComments = this.state.numComments || data.numComments;
 
+        console.log('Ava', data.userInfo);
+
         this.setState({
           displayName: data.userInfo.username,
+          userAvatar: data.userInfo.userAvatar,
           comments: updatedComments,
           numComments: updatedNumComments,
         });
@@ -219,6 +226,7 @@ var Profile = React.createClass({
     return (
       <div className="row">
         <div className="col-md-4">
+          <p><img src={this.state.userAvatar} width="200px" /></p>
           <h2>{this.state.displayName}</h2>
           <p>Total Comments: {this.state.numComments}</p>
         </div>
