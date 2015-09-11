@@ -1,6 +1,5 @@
-var Comment = require('../').Comment;
-
 module.exports = function(sequelize, dataTypes) {
+  var Comment = sequelize.import(__dirname + '/' + '../comment/commentModel')
   return sequelize.define('Url', {
     url: {
       type: dataTypes.STRING,
@@ -20,7 +19,7 @@ module.exports = function(sequelize, dataTypes) {
           },
           attributes: ['id', 'url', [sequelize.fn('count', '*'), 'count']],
           include: [{
-            model: sequelize.import(__dirname + '/' + '../comment/commentModel'),
+            model: Comment,
             attributes: [[sequelize.fn('count', sequelize.col('UrlId')), 'count']]
           }],
           group: ['id']
