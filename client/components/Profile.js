@@ -28,6 +28,10 @@ var Profile = React.createClass({
     // Otherwise search on one should clear the other.
     this.urlSearch = '';
     this.textSearch =  '';
+
+    // Default to loading public comments initially.
+    // TODO? Persist a default setting for the user?
+    this.privateFeed = false;
   },
 
   // Query fields:
@@ -42,7 +46,7 @@ var Profile = React.createClass({
   loadComments: function() {
     var query = {
       filterByUser: true,
-      isPrivate: false
+      isPrivate: this.privateFeed
     }
 
     // Don't send this query value on first load.
@@ -156,7 +160,6 @@ var Profile = React.createClass({
     this.loadComments();
   },
 
-  // XXX EE: does this get called early enough to initialize state??? Seems to.
   componentDidMount: function() {
     this.initLoadState();
     this.loadUserComments();
@@ -179,11 +182,40 @@ var Profile = React.createClass({
     this.loadUserCommentsForText(text);
   },
 
+  // After the private/public comment feed option is selected, simply
+  // load all of the user's comments again with the new setting. If
+  // the user was currently in the middle of a url or text search, it
+  // will need to be repeated after the setting change.
+  selectPrivateComments: function(e) {
+    e.preventDefault();
+
+    console.log("Profile: selecting private comments");
+    this.privateFeed = true;
+
+    this.loadUserComments();
+  },
+
+  selectPublicComments: function(e) {
+    e.preventDefault();
+
+    console.log("Profile: selecting public comments");
+    this.privateFeed = false;
+
+    this.loadUserComments();
+  },
+
+  resetComments: function(e) {
+    e.preventDefault();
+    this.loadUserComments();
+  },
+
   render: function() {
     var comments = this.state.comments.map(function(comment) {
       return <Comment key={comment.id} comment={comment} />;
     });
 
+          // <div className="col-sm-offset-3 col-sm-6">
+            // <p><a href="#">Clear Search</a> | <a href="#">Public</a></p>
     return (
       <div className="row">
         <div className="col-md-4">
@@ -191,6 +223,20 @@ var Profile = React.createClass({
           <p>Total Comments: {this.state.numComments}</p>
         </div>
         <div className="col-md-8">
+          <div className="row">
+            <div className="dropdown">
+              <button className="btn btn-default dropdown-toggle" type="button" id="privacy-select"
+                data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                Comment Options <span className="caret"></span>
+              </button>
+              <ul className="dropdown-menu" aria-labelledby="privacy-select">
+                <li><a onClick={this.selectPrivateComments} href="#">Show Private Comments</a></li>
+                <li><a onClick={this.selectPublicComments} href="#">Show Public Comments</a></li>
+              </ul>
+                | <a onClick={this.resetComments} href="#">Clear Search</a>
+            </div>
+            <hr />
+          </div>
           <form onSubmit={this.handleUrlSearch}>
             <div className="form-group col-sm-7">
               <input type="text" className="form-control" placeholder="Search for URL" ref="searchUrl" />
