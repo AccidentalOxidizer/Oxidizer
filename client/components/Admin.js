@@ -1,5 +1,5 @@
 var React = require('react');
-var Comment = require('./Comment');
+var AdminComment = require('./AdminComments');
 
 // Create Mixin to check that user has the correct credentials to access this page.
 var AuthenticatedUser = {
@@ -12,8 +12,7 @@ var AuthenticatedUser = {
   }
 };
 
-// At the moment, Profile will only be used to display your personal
-// profile, not that of others.
+// Admin Page!
 var Admin = React.createClass({
   mixins: [AuthenticatedUser], // Use the mixin
 
@@ -148,7 +147,7 @@ var Admin = React.createClass({
 
     console.log('STATE: ', this.state);
     var comments = this.state.comments.map(function(comment) {
-      return <Comment key={comment.id} comment={comment} setLastClicked={setLastClicked} />;
+      return <AdminComment key={comment.id} comment={comment} setLastClicked={setLastClicked} />;
     });
 
     return (
@@ -171,6 +170,7 @@ var Admin = React.createClass({
               <button type="submit" className="btn btn-block btn-primary">Search</button>
             </div>
           </form>
+          <p>Sort By: <a>FLAGS</a> | <a>RECENT</a></p>
           {comments}
         </div>
       </div>

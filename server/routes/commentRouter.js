@@ -138,7 +138,7 @@ module.exports = function(app) {
       })
       .then(function(searchObj){
         if (req.user) {
-          return Promise.all([Comment.get(searchObj, req.user.id, req.query.lastCommentId, req.query.urlSearch, req.query.orderBy), User.getUpdates(req.user.id)]);
+          return Promise.all([Comment.get(searchObj, req.user.id, req.query.lastCommentId, req.query.urlSearch), User.getUpdates(req.user.id)]);
         } else {
           return Comment.get(searchObj, req.user.id, req.query.lastCommentId, req.query.urlSearch);
         }
