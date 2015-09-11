@@ -212,7 +212,8 @@ var getUserId = function(commentId){
     .catch(function(err){
       console.log(err);
     });
-}
+};
+
 exports.get = get;
 exports.post = post;
 exports.put = put;
