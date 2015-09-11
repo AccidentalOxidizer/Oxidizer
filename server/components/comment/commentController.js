@@ -7,7 +7,7 @@ var Flag = require('../').Flag;
 var flagController = require('../flag');
 var Url = require('../').Url;
 
-var get = function(searchObject, requesterId, lastCommentId, urlSearch, orderBy, hostSearch) {
+var get = function(searchObject, requesterId, lastCommentId, urlSearch, hostSearch, orderBy) {
 
   var userHearts;
   var userFlags;
@@ -60,7 +60,7 @@ var get = function(searchObject, requesterId, lastCommentId, urlSearch, orderBy,
       ['id', 'DESC']
     ];
   }
-  
+
   // return in ascending order of commentid
   return Comment.findAndCountAll(queryObject)
     .then(function(results) {

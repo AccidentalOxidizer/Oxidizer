@@ -136,11 +136,7 @@ module.exports = function(app) {
         }
       })
       .then(function(searchObj){
-        if (req.user) {
-          return Promise.all([Comment.get(searchObj, req.user.id, req.query.lastCommentId, req.query.urlSearch, req.query.host)]);
-        } else {
           return Comment.get(searchObj, req.user.id, req.query.lastCommentId, req.query.urlSearch, req.query.host);
-        }
       })
       .then(function(result) {
         console.log('RESULTS!!! ', result);
