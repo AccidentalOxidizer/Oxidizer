@@ -34,11 +34,10 @@ var copyObject = function(obj) {
 
 
 var getId = function(url){
-  var parsedUrl = parseUrl(url).url;
-
-  return Url.findOne({where: {url: parsedUrl}})
-    .then(function(url){
-      return url.get('id');
+  var parsedUrl = parseUrl(url);
+  return Url.findOrCreate({where: {url: parsedUrl.url, host: parsedUrl.host}})
+    .then(function(url,b,c){
+      return url[0].get('id');
     })
 };
 
@@ -73,6 +72,7 @@ var get = function(searchObject, userid) {
 var save = function(urlObject) {
 
   var parsedObject = copyObject(urlObject);
+
   return Url.findOrCreate({
       where: parsedObject
     })
@@ -110,7 +110,20 @@ var remove = function(url) {
     });
 };
 
+var getPaths = function(host, callback){
+  return Url.getUrls(host)
+    .then(function(data){
+      callback(data);
+    })
+    .catch(function(err){
+      console.log(err);
+    });
+};
+
+
+
 exports.get = get;
 exports.save = save;
 exports.remove = remove;
 exports.getId = getId;
+exports.getPaths = getPaths;

@@ -9,6 +9,12 @@ module.exports = function(sequelize, dataTypes) {
       allowNull: false
     },
 
+    // URL for user avatar
+    avatar: {
+      type: dataTypes.STRING,
+      defaultValue : "https://raw.githubusercontent.com/daveschumaker/twittler/master/images/avatar_125px.png"
+    },  
+
     // Use the email address as the common factor to identify
     // a given account across different types of logins
     email: {
@@ -45,12 +51,33 @@ module.exports = function(sequelize, dataTypes) {
     status: dataTypes.INTEGER,
 
     // user notifications
-    repliesToCheck: dataTypes.INTEGER,
-    heartsToCheck: dataTypes.INTEGER,
-    flagsToCheck: dataTypes.INTEGER,
+    repliesToCheck: {
+      type: dataTypes.INTEGER,
+      defaultValue: 0
+    },
+    heartsToCheck: {
+      type: dataTypes.INTEGER,
+      defaultValue: 0
+    },
+    flagsToCheck: {
+      type: dataTypes.INTEGER,
+      defaultValue: 0
+    },
     lastCheckedUpdates: dataTypes.DATE
 
     // additional profile info here
+  }, {
+    classMethods: {
+      getAvatar: function(id) {
+        sequelize.query('SELECT avatar FROM Users WHERE id=' + id)
+          .then(function(result) {
+            return result;
+          })
+          .catch(function(err) {
+            console.log(err);
+          });
+      }
+    }
   }, {
     instanceMethods: {
       generateHash: function(password) {

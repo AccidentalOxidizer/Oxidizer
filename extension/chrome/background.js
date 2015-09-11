@@ -1,5 +1,25 @@
 // CHROME EVENT LISTENERS
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
+
+  console.log('EVENT INTERCEPT from background:', request);
+
+  // if iframe received open postMessage from contentscript tell contentscript to show iframe
+  if (request.from === 'iframe' && request.message === 'ok') {
+    chrome.tabs.query({
+      active: true,
+      currentWindow: true
+    }, function(tabs) {
+      chrome.tabs.sendMessage(tabs[0].id, {
+        from: 'background',
+        message: 'iframe ok',
+        details: request.details
+      }, function(response) {
+        sendResponse(response.data);
+      });
+    });
+    return true;
+  }
+
   /* Generic callback passing along an inital round trip message */
   if (request.from === 'iframe' && request.message === 'callback') {
     chrome.tabs.query({
@@ -8,13 +28,15 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
     }, function(tabs) {
       chrome.tabs.sendMessage(tabs[0].id, {
         from: 'background',
-        message: 'callback'
+        message: 'callback',
+        tab: tabs[0].id
       }, function(response) {
         sendResponse(response.data);
       });
     });
     return true;
   }
+
 
   // on initialization from the content script, sent back the settings
   if (request.from === 'content script' && request.message === 'get settings') {
@@ -38,6 +60,7 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
     });
     return true;
   }
+
 });
 
 chrome.commands.onCommand.addListener(function(command) {
@@ -61,12 +84,22 @@ chrome.runtime.onInstalled.addListener(function(details) {
       server: settings.server,
       keepprivate: settings.keepprivate,
       autoshow: settings.autoshow,
-      showtrigger: settings.showtrigger
+      showtrigger: settings.showtrigger,
+      triggerposition: settings.triggerposition
     }, function() {});
   };
   xhr.open("GET", chrome.extension.getURL('config.json'), true);
   xhr.send();
 });
+
+chrome.storage.sync.get(['server', 'keepprivate', 'autoshow', 'showtrigger'],
+  function(store) {
+    settings.server = store.server;
+    settings.keepprivate = store.keepprivate;
+    settings.autoshow = store.autoshow;
+    settings.showtrigger = store.showtrigger;
+    settings.triggerposition = store.triggerposition;
+  });
 
 // update settings as they are changed in the chrome storage
 chrome.storage.onChanged.addListener(function(changes, namespace) {

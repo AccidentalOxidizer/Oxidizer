@@ -1,13 +1,14 @@
 // *********** COMMENTS *************
 
-// POST request to api/comments*path
-// extension sends in parameter the url (and later group/ maybe isPrivate)
-var requestAllCommentsForPath = {
-  url: 'string unparsed url',
-  lastCommentId: 'number',
+// GET request to api/comments/get
+var requestComments = {
+  url: 'string unparsed url', // Set if loading all comments for a URL
+  filterByUser: 'boolean', // True if loading all comments for logged in user; should be undefined otherwise
+  lastCommentId: 'number', // Don't send in initial query, otherwise oldest comment loaded so far
   isPrivate: 'boolean'
-  urlString: 'url search term',
-  textString: 'text search term'
+  urlSearch: 'url search term', // Set if filtering on url; must not be in query otherwise
+  textSearch: 'text search term' // Set if filtering on comment text
+  repliesToId: 'whether or not to return replies (?)'
 };
 
 // server responds 

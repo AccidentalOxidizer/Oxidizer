@@ -18,7 +18,6 @@ var get = function(searchObject, userId) {
       where: searchObject
     })
     .then(function(result) {
-      console.log('grwreqfsfdsfdsa', result, searchObject);
       return result;
     })
     .catch(function(err) {
@@ -30,7 +29,8 @@ var get = function(searchObject, userId) {
 var fave = function(searchObject) {
   //First: Search
   // if a fave for this particular user and comment combination already exists.
-  
+  var faved = true;
+
   return Heart.findOne({
       where: searchObject
     })
@@ -43,8 +43,6 @@ var fave = function(searchObject) {
         return newHeart.save()
           // tell the author that their post was faved
           .then(function(heart){
-            
-
             return Comment.findOne({
               where: {
                 id: heart.CommentId 
@@ -56,18 +54,22 @@ var fave = function(searchObject) {
             })       
           })
           .then(function(comment){
-            return userController.updateNotification(comment.User.id, 'hearts');
+            return userController.incrementNotification(comment.UserId, 'hearts');
           });
       } else {
+        faved = false;
+        userId = result.get('UserId');
         // User has already faved this item before. Let's remove the fave!
         console.log('Faved result already found. Removing existing result.');
         return Heart.destroy({
-          where: searchObject
-        });
+            where: searchObject
+          })
+          .then(function(){
+            userController.decrementNotification(userId, 'hearts');
+          });
       }
     })
     .then(function() {
-      //console.log(searchObject.CommentId);
       return Heart.findAndCountAll({
         where: {
           CommentId: searchObject.CommentId
@@ -77,7 +79,10 @@ var fave = function(searchObject) {
     .then(function(result) {
       // Return total number of faves found for this comment.
       console.log('GET TOTAL FAVE COUNT!!!!: ', result.count);
-      return result.count;
+      return {
+        count: result.count, 
+        faved: faved
+      };
     })
     .catch(function(err) {
       console.log("Fave error: ", err);

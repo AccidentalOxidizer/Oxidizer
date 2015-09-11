@@ -1,40 +1,86 @@
-<html>
+<html lang="en">
 
 <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" media="screen" href="lib/css/bootstrap.min.css">
-    <link rel="stylesheet" media="screen" href="lib/css/font-awesome.min.css">
     <link rel="stylesheet" media="screen" href="lib/css/bootstrap-social.css">
     <link rel="stylesheet" media="screen" href="lib/css/sideframe.css">
+    <link rel="stylesheet" media="screen" href="lib/css/font-awesome.min.css">
     <style>
 
     </style>
 </head>
 
 <body>
-    <div class="iframe-container container-fluid">
-        <div class="cd-panel from-right">
+    <div class="iframe-container container-fluid" style="">
+        <div id="panel" class="cd-panel from-right">
             <div class="nav">
                 <div id="close" class="cd-panel-close">Close</div>
             </div>
             <header class="cd-panel-header">
-                <h1>Oxidizer</h1>
-                <ul class="nav nav-pills" role="tablist">
-                    <li role="presentation" class="active"><a href="#">Replies <span class="badge">0</span></a></li>
-                </ul>
+                <nav class="navbar navbar-default">
+                    <div class="container-fluid">
+                        <h2>Oxidizer</h2>
+                        <ul class="nav navbar-nav navbar-right">
+                            <li role="presentation" class="dropdown">
+                                <a class="dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">
+                            Feed Type<span class="caret"></span>
+                        </a>
+                                <ul class="dropdown-menu" id="feed-privacy-select">
+                                    <li><a href="#"><i class="fa fa-globe"></i> Public Feed</a></li>
+                                    <li><a href="#"><i class="fa fa-lock"></i> Private Feed</a></li>
+                                </ul>
+                            </li>
+                            <li class="dropdown">
+                                <a href="#" id="notifications" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"><i class="fa fa-bell-o"></i>&nbsp;</a>
+                                <ul class="dropdown-menu" style="text-align:right;">
+                                    <li><a href="#" class="replies hidden"><i class="fa fa-commenting-o"></i> You have comment replies</a></li>
+                                    <li><a href="#" class="favs hidden"><i class="fa fa-heart-o"></i> You have comment likes</a></li>
+                                    <li role="separator" class="divider"></li>
+                                    <li><a href="#" id="dismiss-notifications"><i class="fa fa-check-square-o"></i> Dismiss all</a></li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </div>
+                </nav>
             </header>
             <div id="comment-container" class="comment-container cd-panel-container">
-                <div class="cd-panel-content">
+                
+                <div class="panel-content-wrapper">
+                <div id="notification-area" class='hidden'>
+                <h3>Login or Sign-up</h3>
+                    <a target="_blank" href="https://api.oxidizer.io/api/auth/chrome/facebook" id="facebook-login" class="btn btn-social btn-facebook">
+                        <i class="fa fa-facebook"></i> Login
+                    </a>
+                    <a target="_blank" href="https://api.oxidizer.io/api/auth/chrome/google" id="google-login" class="btn btn-social btn-google">
+                        <i class="fa fa-google"></i> Login
+                    </a>
+                    <p>then reload :)</p>
+                </div>
+                <div id="panel-content" class="cd-panel-content">
                     <!-- Handlebars will append comments here-->
+                </div>
                 </div>
                 <!-- cd-panel-content -->
                 <footer class="cd-panel-footer submit-footer">
-                    <div class="form-horizontal col-xs-12" style="margin:0px;">
-                        <div class="form-group" style="margin-bottom:0px;">
-                            <div class="col-xs-10">
-                                <input class="form-control" id="comment-input-field" placeholder="Add your comment">
+                    <div class="col-xs-12">
+                        <div class="input-group">
+                            <input type="text" id="comment-input-field" class="form-control" aria-label="Add your comment" placeholder="Add your comment">
+                            <div class="input-group-btn dropup">
+                                <button type="button" class="btn btn-privacy btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                    Privacy<span class="caret"></span>
+                                    <span class="sr-only">Toggle Dropdown</span>
+                                </button>
+                                <ul id="comment-privacy-select" class="dropdown-menu dropdown-menu-right">
+                                    <li><a href="#"><i class="fa fa-globe"></i> Public</a></li>
+                                    <li><a href="#"><i class="fa fa-lock"></i> Private</a></li>
+                                </ul>
+                                <button id="comment-submit-button" type="" class="btn btn-default">Post</button>
                             </div>
-                            <button id="comment-submit-button" type="" class="col-xs-2 btn btn-primary">Post</button>
                         </div>
+                        <!-- /.input-group -->
                     </div>
                 </footer>
             </div>
@@ -44,7 +90,7 @@
     </div>
     <script id="comment-entry-template" type="text/x-handlebars-template">
         {{#each this}}
-        <div class="col-xs-12 comment" id="{{id}}">
+        <div class="col-xs-12 comment {{repliesToId}}" id="{{id}}">
             <div class="row">
                 <div class="col-xs-6 comment-username">{{User.name}}</div>
                 <div class="col-xs-6 comment-timestamp">{{dateFormat createdAt format="MMMM YYYY"}}</div>
@@ -54,23 +100,23 @@
             </div>
             <div class="row " style="margin-top:5px; margin-bottom:5px;">
                 <div class="col-xs-12 comment-engage">
-                    <div id="reply" data-comment-id="{{id}}" class="reply" style="float:left;"><i class="fa fa-reply"></i></div>
-                    <div id="replies" data-comment-id="{{id}}" class="replies" style="float:left;"><i class="fa fa-commenting-o"></i>0</div>
+                    <div id="reply" data-comment-id="{{id}}" class="reply" style="float:left;"><i class="fa fa-reply"></i>&nbsp;</div>
+                    <div id="replies" data-comment-id="{{id}}" class="replies" style="float:left;"><i class="fa fa-commenting-o"></i>&nbsp;{{replies}}</div>
                     <div id="heart" data-comment-id="{{id}}" class="heart" style="float:left;">
-                        <i class="fa fa-heart-o"></i>&nbsp;{{Hearts}}&nbsp;</div>
+                        <i class="fa fa-heart-o"></i>&nbsp;{{Hearts}}</div>
                     <div id="flag" data-comment-id="{{id}}" class="flag" style="float:right; text-align:right;">
                         <i class="fa fa-flag-o"></i>&nbsp; </div>
                 </div>
             </div>
             <div class="reply-form hidden" data-comment-id="{{id}}">
-            <div class="form-horizontal col-xs-12" style="margin:10px 0;">
-            <div class="form-group" style="margin-bottom:0px;">
-                <div class="col-xs-10" style="padding-left:0px;">
-                    <input class="form-control reply-input" placeholder="Add your reply">
+                <div class="form-horizontal col-xs-12" style="margin:10px 0;">
+                    <div class="form-group" style="margin-bottom:0px;">
+                        <div class="col-xs-10" style="padding-left:0px;">
+                            <input class="form-control reply-input" placeholder="Add your reply">
+                        </div>
+                        <button class="col-xs-2 btn btn-default reply-button">Reply</button>
+                    </div>
                 </div>
-                <button class="col-xs-2 btn btn-default reply-button">Reply</button>
-            </div>
-        </div>
             </div>
         </div>
         {{/each}}
@@ -95,7 +141,6 @@
             </div>
         </div>
     </script>
-
     <script src="lib/js/jquery-2.1.4.min.js"></script>
     <script src="lib/js/handlebars-v4.0.2.js"></script>
     <script src="lib/js/bootstrap.min.js"></script>

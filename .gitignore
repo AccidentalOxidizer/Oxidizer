@@ -29,7 +29,7 @@ node_modules/
 bower_components/
 server/config.js
 client/dist
-
+newrelic.js
 
 # Elastic Beanstalk Files
 .elasticbeanstalk/*

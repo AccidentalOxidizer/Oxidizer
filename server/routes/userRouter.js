@@ -28,6 +28,18 @@ module.exports = function(app) {
       });
   });
 
+  app.get('/api/users/markread', jsonParser, function(req, res, next) {
+    var userId = req.user.id;
+    User.markRead({id: userId})
+      .then(function(user){
+        res.json(user);
+      })
+      .catch(function(){
+        res.send(404);
+      });
+  });
+
+
   // TODO: add isAuthorized
   app.put('/api/users/:userid', jsonParser, function(req, res, next) {
     // Updates user!
@@ -46,4 +58,6 @@ module.exports = function(app) {
   app.delete('/api/users/:id', jsonParser, auth.isAuthorized, function(req, res, next) {
       var userId = req.params.userid;
   });
+
+
 };

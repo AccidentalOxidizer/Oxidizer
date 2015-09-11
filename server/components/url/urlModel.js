@@ -1,4 +1,5 @@
 module.exports = function(sequelize, dataTypes) {
+  var Comment = sequelize.import(__dirname + '/' + '../comment/commentModel')
   return sequelize.define('Url', {
     url: {
       type: dataTypes.STRING,
@@ -9,5 +10,24 @@ module.exports = function(sequelize, dataTypes) {
       type: dataTypes.STRING,
       allowNull: false
     }
+  }, {
+    classMethods: {
+      getUrls: function(host){
+        var result = this.findAll({
+          where: {
+            host: host
+          },
+          attributes: ['id', 'url', [sequelize.fn('count', '*'), 'count']],
+          include: [{
+            model: Comment,
+            attributes: [[sequelize.fn('count', sequelize.col('UrlId')), 'count']]
+          }],
+          group: ['id']
+        });
+        return result;
+      }
+    }
   });
 };
+
+          // attributes: [[sequelize.fn('count', sequelize.col('Comment.id')), 'NumberOfComments']],

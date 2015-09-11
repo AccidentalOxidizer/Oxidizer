@@ -51,6 +51,12 @@ module.exports = function(app) {
   //     })
   // });
 
+  app.get('/api/url/path', jsonParser, function(req, res, next) {
+    var host = encodeURIComponent(req.query.host);
+    Url.getPaths(host, function(paths){
+      res.send(200, paths);
+    })
+  });
 
   //app.post('/api/urls', jsonParser, auth.isAdmin, function(req, res, next) {
   app.post('/api/urls', jsonParser, function(req, res, next) {

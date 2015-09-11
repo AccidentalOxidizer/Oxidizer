@@ -1,6 +1,40 @@
-[data-oxidizer-identity="trigger"]{
-  position: fixed !important;
-  bottom: 0px !important; 
-  right: 0px !important;
-  background: red !important;
+[data-oxidizer-identity="trigger"] {
+  position: fixed;
+  margin: 0 auto;
+  transform-origin: 50% 50%;
+  width:45px;
+  height:45px;
+  z-index: 2147483646;
+}
+
+[data-oxidizer-trigger="bottom-right"] {
+  transform: rotate(0deg);
+  bottom: 0px;
+  right: 0px;
+}
+
+[data-oxidizer-trigger="top-right"] {
+  transform: rotate(270deg);
+  top: 0px;
+  right: 0px;
+}
+[data-oxidizer-trigger="top-left"] {
+  transform: rotate(180deg);
+  top: 0px;
+  left: 0px;
+}
+[data-oxidizer-trigger="bottom-left"] {
+  transform: rotate(90deg);
+  bottom: 0px;
+  left: 0px;
+}
+
+[data-oxidizer-identity="trigger"] polygon {
+  fill:#337ab7;
+  stroke: #337ab7;
+  stroke-width: 0;
+}
+[data-oxidizer-identity="trigger"] polyline {
+  stroke: #fff;
+  stroke-width:2;
 }

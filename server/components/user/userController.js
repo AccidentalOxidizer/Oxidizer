@@ -51,8 +51,9 @@ var remove = function(userId){
 };
 
 // add one to the new notifications fiels - second argument should be 'replies', 'hearts', or 'flags'
-var updateNotification = function(userId, stringAttribute){
+var incrementNotification = function(userId, stringAttribute){
   var field = stringAttribute + 'ToCheck';
+  console.log(userId);
   return User.findOne({where: {id: userId}})
     .then(function(user){
       user.increment(field);
@@ -63,10 +64,30 @@ var updateNotification = function(userId, stringAttribute){
     });
 };
 
-var getUpdates = function(userId){
+var decrementNotification = function(userId, stringAttribute){
+  var field = stringAttribute + 'ToCheck';
   return User.findOne({where: {id: userId}})
     .then(function(user){
-      user.updateAttributes({lastCheckedUpdates: Sequelize.fn('NOW')});
+      if (user.get(field) > 0){
+        user.decrement(field);
+      }
+      return true;
+    })
+    .catch(function(err){
+      throw new Error(err);
+    });
+};
+
+var markRead = function(userId){
+  return User.findOne({where: {id: userId}})
+    .then(function(user){
+      user.updateAttributes({
+        lastCheckedUpdates: Sequelize.fn('NOW'),
+        repliesToCheck: 0,
+        heartsToCheck: 0,
+        flagsToCheck: 0,
+      });
+
       user.save();
       return {
         repliesToCheck: user.repliesToCheck,
@@ -75,13 +96,17 @@ var getUpdates = function(userId){
     });
 };
 
+var getAvatar = function(id) {
+  console.log('get user id for avatar: ', id);
+  return User.getAvatar(id);
+};
+
 exports.get = get;
 exports.getAll = getAll;
+exports.getAvatar = getAvatar;
 exports.post = post;
 exports.put = put;
 exports.remove = remove;
-exports.updateNotification = updateNotification;
-exports.getUpdates = getUpdates;
-
-
-
+exports.incrementNotification = incrementNotification;
+exports.decrementNotification = decrementNotification;
+exports.markRead = markRead;

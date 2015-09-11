@@ -5,7 +5,7 @@ chrome.storage.sync.get(['server', 'keepprivate', 'autoshow', 'showtrigger'],
   function(store) {
     settings.server = store.server;
     settings.keepprivate = store.keepprivate;
-    settings.autoshow = store.keepprivate;
+    settings.autoshow = store.autoshow;
     settings.showtrigger = store.showtrigger;
     console.log(store.server);
     console.log(settings.server);
@@ -38,19 +38,23 @@ var facebookLogin = function() {
 
 // LOGOUT STRATEGIES 
 var logout = function() {
-  chrome.runtime.sendMessage({
-    type: 'logout'
-  }, function(response) {
-    console.log(response);
+  var request = $.ajax({
+    url: settings.server + '/api/auth/chrome/logout',
+    method: "GET",
+    contentType: "application/json"
+  });
 
+  request.done(function(msg) {
     var status = document.getElementById('status');
     status.textContent = 'Logout.. done.';
     setTimeout(function() {
-      // reset the status message after 2 seconds
       status.textContent = '';
     }, 2000);
+  });
 
-  })
+  request.fail(function(err) {
+    console.log("Something stranged happened, couldn't log you out .. ", err);
+  });
 }
 
 // open the options page
