@@ -121,7 +121,6 @@ module.exports = function(app) {
 
     if (req.query.textSearch) {
       searchObject.text = {$like: '%' + req.query.textSearch + '%'};
-      console.log("Comments: get - updated searchObj: ");
     }
 
     return new Promise(function(resolve, reject){
@@ -137,11 +136,7 @@ module.exports = function(app) {
         }
       })
       .then(function(searchObj){
-        if (req.user) {
-          return Promise.all([Comment.get(searchObj, req.user.id, req.query.lastCommentId, req.query.urlSearch), User.getUpdates(req.user.id)]);
-        } else {
-          return Comment.get(searchObj, req.user.id, req.query.lastCommentId, req.query.urlSearch);
-        }
+          return Comment.get(searchObj, req.user.id, req.query.lastCommentId, req.query.urlSearch, req.query.host);
       })
       .then(function(result) {
         console.log('RESULTS!!! ', result);
@@ -158,11 +153,12 @@ module.exports = function(app) {
           userInfo = {
             userId: req.user.id,
             username: req.user.name,
-            repliesToCheck: result[1].repliesToCheck,
-            heartsToCheck: result[1].heartsToCheck,
-          };
+            repliesToCheck: result[0].userObj.get('repliesToCheck'),
+            heartsToCheck: result[0].userObj.get('heartsToCheck'),
+          }
         }
 
+        console.log(userInfo);
 
         res.send({
           comments: result[0].rows,

@@ -7,13 +7,11 @@ var Flag = require('../').Flag;
 var flagController = require('../flag');
 var Url = require('../').Url;
 
-var get = function(searchObject, requesterId, lastCommentId, urlSearch, orderBy) {
-
-  // console.log('test class instance');
-  // Comment.sortFlags();
+var get = function(searchObject, requesterId, lastCommentId, urlSearch, hostSearch, orderBy) {
 
   var userHearts;
   var userFlags;
+  var userObj;
   var replyCount = {};
   var attributes = ['text', 'User.name', 'RepliesTo'];
 
@@ -39,10 +37,16 @@ var get = function(searchObject, requesterId, lastCommentId, urlSearch, orderBy)
     queryObject.where.id.$lt = lastCommentId;
   }
 
+  queryObject.include[3].where = {};
+
   if (urlSearch !== undefined) {
     console.log("Comments get: filtering on url " + urlSearch);
-    var urlQuery = {url: {$like: '%' + urlSearch + '%'}};
-    queryObject.include[3].where = urlQuery;
+    queryObject.include[3].where.url = {$like: '%' + urlSearch + '%'};
+  }
+
+  if (hostSearch !== undefined) {
+    console.log("Comments get: filtering on host " + hostSearch);
+    queryObject.include[3].where.host = hostSearch;
   }
 
   // limit the number of comments we send to the user
@@ -57,6 +61,7 @@ var get = function(searchObject, requesterId, lastCommentId, urlSearch, orderBy)
     ];
   }
 
+  // return in ascending order of commentid
   return Comment.findAndCountAll(queryObject)
     .then(function(results) {
       var comments = results.rows;
@@ -71,15 +76,15 @@ var get = function(searchObject, requesterId, lastCommentId, urlSearch, orderBy)
 
         };
         // get all hearts and flags for a user within the CommentId range
-        return Promise.all([heartController.get(searchObject, requesterId), flagController.get(searchObject, requesterId), Comment.findAll({where: {repliesToId: searchObject.CommentId}})])
-          .spread(function(hearts, flags, replies){
+        return Promise.all([heartController.get(searchObject, requesterId), flagController.get(searchObject, requesterId), Comment.findAll({where: {repliesToId: searchObject.CommentId}}), User.findOne({where: {id: requesterId}})])
+          .spread(function(hearts, flags, replies, user){
             userHearts = hearts.map(function(heart){
               return heart.CommentId;
             });          
             userFlags = flags.map(function(flag){
               return flag.CommentId;
             });
-
+            userObj = user;
             replies.forEach(function(reply) {
 
               if (replyCount[reply.repliesToId]) {
@@ -97,6 +102,8 @@ var get = function(searchObject, requesterId, lastCommentId, urlSearch, orderBy)
     .then(function(results){
 
       var comments = results.rows;
+
+      results.userObj = userObj;
       
       comments.forEach(function(comment, index, array) {
         if (userHearts !== undefined ) {

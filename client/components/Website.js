@@ -13,20 +13,23 @@ var InfiniteScroll = require('react-infinite-scroll')(React);
 var Website = React.createClass({
   getInitialState: function() {
     return {
-      host: '',
-      path: '',
       comments: [],
+      paths: []
     };
   },
 
   // TODO: refactor to use to load additional comments too.
   initLoadState: function() {
-    this.lastCommentId = undefined;
+    this.lastCommentId = -1;
     
+    this.host = undefined;
+    this.path = undefined;
+    this.textSearch = undefined;
+
     // for infinite scroll
     this.hasMoreComments = true;
 
-    this.currentQuery = {};
+    this.query = {};
   },
 
   componentDidMount: function() {
@@ -34,24 +37,37 @@ var Website = React.createClass({
     // TODO: what do we want to show when we first land on this page?
   },
 
-  loadComments: function(searchObject){
-    var query = searchObject;
+  getPaths: function(host){
+    $.ajax({
+      url: window.location.origin + '/api/url/path',
+      data: {host: host},
+      method: 'GET',
+      dataType: 'json',
+      success: function(data){
+        console.log('received paths:', data);
+        // this.setState({paths: data});
+      }.bind(this),
 
-    // always search by host
-    query.host = searchObject.host || this.state.host
-
-    // track our current search for infinite scroll
-    for (var key in searchObject) {
-      if (searchObject.hasOwnProperty(key)) {
-        this.currentQuery[key] = searchObject[key];
+      error: function(xhr, status, err) {
+        console.error(xhr, status, err.message);
       }
-    }
-    console.log(this.state.las)
-    if (this.state.lastCommentId){
-      query.lastCommentId = this.state.lastCommentId
+    });
+  },
+
+  loadComments: function(searchObject){
+
+    var query = {};
+    // always search by host
+    query.host = searchObject.host || this.host;
+    query.urlSearch = searchObject.urlSearch || this.path;
+    query.textSearch = searchObject.textSearch || this.textSearch;
+    
+    if (this.lastCommentId > -1) {
+      query.lastCommentId = this.lastCommentId
     }
 
     console.log('websiteProfile loading comments:', query);
+    
     $.ajax({
       url: window.location.origin + '/api/comments/get',
       data: query,
@@ -60,7 +76,14 @@ var Website = React.createClass({
       success: function(data){
         console.log('received comments:', data.comments);
         
-        // check if we got the last batch of comments for this call
+        var updatedComments; 
+        if (this.lastCommentId === -1) {  
+          updatedComments = data.comments;
+        } else {
+          updatedComments = this.state.comments.concat(data.comments);
+        }
+
+        // add new comments so we render the page
         if (data.comments.length < 25) {
           // TODO: when do we need to reset this to true?
           this.hasMoreComments = false;
@@ -68,50 +91,55 @@ var Website = React.createClass({
         } else {
           this.lastCommentId = data.comments[data.comments.length - 1].id;
         }
-        // add new comments so we render the page
-        this.setState({comments: this.state.comments.concat(data.comments)});
+        this.setState({comments: updatedComments});
       }.bind(this),
 
       error: function(xhr, status, err) {
         console.error(xhr, status, err.message);
       }
-    })
-  },
-
-  // handle infinite scroll
-  loadMoreComments: function () {
-    this.loadComments(this.currentQuery);
+    });
   },
   
   // this is triggered when user searches by host 
-  handleHostSearch: function(e){
+  urlTextSearch: function(e){
     e.preventDefault();
-    var host = this.refs.searchHost.getDOMNode().value;
-    this.refs.searchHost.getDOMNode().value = '';
-
-    this.loadComments({host: host});  
-  },
-
-  handlePathSearch: function(e){
-    e.preventDefault();
-    // var host = this.refs.searchHost;
-    // this.refs.searchHost.getDOMNode().value;
-
-    // this.loadComments({host: host});  
-  },
-
-  handleTextSearch: function(e){
-    e.preventDefault();
-    // var host = this.refs.searchHost;
-    // this.refs.searchHost.getDOMNode().value;
-
-    // this.loadComments({host: host});  
-  },
-
-  loadComments: function(){
+    
     var query = {};
+    var urlSearch = this.refs.searchPath.getDOMNode().value;
+    var textSearch = this.refs.textSearch.getDOMNode().value;
 
+    this.lastCommentId = -1;
 
+    query.host = this.host;
+    
+    if (urlSearch !== '') {
+      query.urlSearch = urlSearch;
+    }    
+    if (textSearch !== '') {
+      query.textSearch = textSearch;
+    }
+    
+    this.query = query;
+
+    this.loadComments(query);  
+  },
+
+  hostSearch: function(e){
+    e.preventDefault();
+    console.log('hostSearch');
+    var query = {};
+    
+    this.lastCommentId = -1;
+
+    query.host = this.refs.searchHost.getDOMNode().value;
+
+    this.refs.searchHost.getDOMNode().value = '';
+    
+    this.query = query;
+    this.host = query.host;
+
+    this.getPaths(this.host);
+    this.loadComments(query);  
   },
 
   render: function() {
@@ -120,91 +148,56 @@ var Website = React.createClass({
     });
 
     return (
-      <div className="row">
+      <div>
         <div className="col-md-4">
-          <h2>{this.state.host}</h2>
-          <p>Total Comments: {this.state.numComments}</p>
-        </div>
-        <div className="col-md-8">
+          <h2>{this.host}</h2>
+          <p>Total Comments:</p>
+          <div> { this.state.paths}</div>
+        </div>  
+        <form onSubmit={this.hostSearch}>
           <div className="row">  
-            <form onSubmit={this.handleHostSearch}>
-              <div className="form-group col-sm-7">
-                <input type="text" className="form-control" placeholder="Search for host" ref="searchHost" />
-              </div>
-              <div className="form-group col-sm-5">
-                <button type="submit" className="btn btn-block btn-primary">Search</button>
-              </div>
-            </form>
+            <div className="form-group col-sm-7">
+              <input type="text" className="form-control" placeholder="Search for host" ref="searchHost" />
+            </div>
+            <div className="row">
+              <button type="submit" className="btn btn-block btn-primary">Search</button>
+            </div>
           </div>
-          <div className="row">
-            <form onSubmit={this.handlePathSearch}>
-              <div className="form-group col-sm-7">
-                <input type="text" className="form-control" placeholder="Search by path" ref="searchPath" />
-              </div>
-              <div className="form-group col-sm-5">
-                <button type="submit" className="btn btn-block btn-primary">Search</button>
-              </div>
-            </form>
-          </div>          
-          <div className="row">
-            <form onSubmit={this.handleTextSearch}>
-              <div className="form-group col-sm-7">
-                <input type="text" className="form-control" placeholder="Search for Comment Text" ref="searchText" />
-              </div>
-              <div className="form-group col-sm-5">
-                <button type="submit" className="btn btn-block btn-primary">Search</button>
-              </div>
-            </form>
-          </div>
-          <InfiniteScroll pageStart="0" loadMore={this.loadMoreComments} hasMore={this.hasMoreComments} 
-              loader={<div className="loader">Loading ...</div>}>
-            {comments}
-          </InfiniteScroll>
-        </div>
+        </form>
+
+        {(() => {
+          if (this.host){
+            return (
+              <div>
+                <div className="row">Searching by: {this.path} {this.textSearch}</div>   
+                <div className="col-md-8">
+                  <form onSubmit={this.urlTextSearch}>
+                    <div className="row">
+                      <div className="form-group col-sm-7">
+                        <input type="text" className="form-control" placeholder="Search by path" ref="searchPath" />
+                      </div>
+                    </div>
+                    <div className="row">
+                      <div className="form-group col-sm-7">
+                        <input type="text" className="form-control" placeholder="Search for Comment Text" ref="textSearch" />
+                      </div>
+                    </div>
+                    <div className="row">
+                      <button type="submit" className="btn btn-block btn-primary">Search</button>
+                    </div>
+                  </form>
+                  <InfiniteScroll pageStart="0" loadMore={this.loadComments} hasMore={this.hasMoreComments}
+                      loader={<div className="loader">Loading ...</div>}>
+                    {comments}
+                  </InfiniteScroll>
+                </div>
+              </div>)
+            }
+          })()}  
       </div>
+
     );
   }
 });
 
 module.exports = Website;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-        //   <div className="row">
-        //     <form onSubmit={this.handlePathSearch}>
-        //       <div className="form-group col-sm-7">
-        //         <input type="text" className="form-control" placeholder="Search by path" ref="searchPath" />
-        //       </div>
-        //       <div className="form-group col-sm-5">
-        //         <button type="submit" className="btn btn-block btn-primary">Search</button>
-        //       </div>
-        //     </form>
-        //   </div>          
-        //   <div className="row">
-        //     <form onSubmit={this.handleTextSearch}>
-        //       <div className="form-group col-sm-7">
-        //         <input type="text" className="form-control" placeholder="Search for Comment Text" ref="searchText" />
-        //       </div>
-        //       <div className="form-group col-sm-5">
-        //         <button type="submit" className="btn btn-block btn-primary">Search</button>
-        //       </div>
-        //     </form>
-        //   </div>
-        //   <InfiniteScroll pageStart="0" loadMore={this.loadMoreComments} hasMore={this.hasMoreComments} 
-        //       loader={<div className="loader">Loading ...</div>}>
-        //     {comments}
-        //   </InfiniteScroll>
-        // </div>
