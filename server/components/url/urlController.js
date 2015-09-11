@@ -110,7 +110,21 @@ var remove = function(url) {
     });
 };
 
+var getPaths = function(host, callback){
+  return Url.getUrls(host)
+    .then(function(data){
+      console.log('---------------',data);
+      callback(data);
+    })
+    .catch(function(err){
+      console.log(err);
+    });
+};
+
+
+
 exports.get = get;
 exports.save = save;
 exports.remove = remove;
 exports.getId = getId;
+exports.getPaths = getPaths;
