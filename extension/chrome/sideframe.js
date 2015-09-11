@@ -87,6 +87,8 @@ document.addEventListener("DOMContentLoaded", function(e) {
 
   document.getElementById('dismiss-notifications').addEventListener('click', function() {
     dismissNotifications();
+    // SEND MESSAGE TO SERVER TO SET TO ZERO
+
   })
 
   // Update the feed privacy setting if the user changes it in the dropdown menu.
@@ -482,12 +484,19 @@ function setNotifications(favs, replies) {
   //testing:
   favs = 1, replies = 1;
   if (!favs && !replies) {
-    document.getElementById('notifications').classList.add('disabled');
-    document.querySelector('a.favs').classList.add('hidden');
-    document.querySelector('a.replies').classList.add('hidden');
+    dismissNotifications();
+    // document.getElementById('notifications').classList.add('disabled');
+    // document.querySelector('#notifications > i').classList.remove('fa-bell notifications');
+    // document.querySelector('#notifications > i').classList.add('fa-bell-o');
+    // document.querySelector('a.favs').classList.add('hidden');
+    // document.querySelector('a.replies').classList.add('hidden');
 
   } else {
     document.getElementById('notifications').classList.remove('disabled');
+    document.querySelector('#notifications > i').classList.add('fa-bell')
+    document.querySelector('#notifications > i').classList.add('notifications');
+    document.querySelector('#notifications > i').classList.remove('fa-bell-o');
+
     if (favs > 0) {
       document.querySelector('a.favs').classList.remove('hidden');
     }
@@ -502,6 +511,9 @@ function dismissNotifications() {
   document.getElementById('notifications').classList.add('disabled');
   document.querySelector('a.favs').classList.add('hidden');
   document.querySelector('a.replies').classList.add('hidden');
+  document.querySelector('#notifications > i').classList.remove('fa-bell')
+  document.querySelector('#notifications > i').classList.remove('notifications');
+  document.querySelector('#notifications > i').classList.add('fa-bell-o');
   // SEND MESSAGE TO SERVER TO SET TO ZERO
 
 }
