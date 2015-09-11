@@ -9,6 +9,9 @@ module.exports = function(sequelize, dataTypes) {
       allowNull: false
     },
 
+    // URL for user avatar
+    avatar: dataTypes.STRING,  
+
     // Use the email address as the common factor to identify
     // a given account across different types of logins
     email: {
