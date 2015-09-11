@@ -57,7 +57,7 @@ document.addEventListener("DOMContentLoaded", function(e) {
           commentPrivately = settings.keepprivate;
           privateFeed = settings.keepprivate;
 
-          var privacyText = commentPrivately ? 'Private' : 'Public';
+          var privacyText = commentPrivately ? '<i class="fa fa-lock"></i> Private' : '<i class="fa fa-globe"></i> Public';
           $('#comment-privacy-select').parents('.dropup').find('.btn-privacy').html(privacyText + ' <span class="caret"></span>');
           $('#feed-privacy-select').parents('.dropdown').find('.dropdown-toggle').html(privacyText + ' Feed <span class="caret"></span>');
 
@@ -93,9 +93,10 @@ document.addEventListener("DOMContentLoaded", function(e) {
 
   // Update the feed privacy setting if the user changes it in the dropdown menu.
   $('#feed-privacy-select li a').click(function() {
-    var selectedText = $(this).text();
+    var selectedText = $(this).html();
+    console.log(selectedText);
 
-    if (selectedText === 'Private Feed') {
+    if (selectedText.endsWith('Private Feed')) {
       privateFeed = true;
     } else {
       privateFeed = false;
@@ -117,9 +118,8 @@ document.addEventListener("DOMContentLoaded", function(e) {
 
   // Update the privacy setting if the user changes it in the dropup menu.
   $('#comment-privacy-select li a').click(function() {
-    var selectedText = $(this).text();
-
-    if (selectedText === 'Private') {
+    var selectedText = $(this).html();
+    if (selectedText.endsWith('Private')) {
       commentPrivately = true;
     } else {
       commentPrivately = false;
@@ -176,6 +176,8 @@ function loadContent(url) {
     url: encodeURIComponent(url),
     isPrivate: privateFeed
   };
+
+  console.log('param isPrivate', privateFeed);
 
   var paramString = [];
   for (var key in params) {
@@ -482,15 +484,9 @@ function registerCommentEventListeners(comment) {
 
 function setNotifications(favs, replies) {
   //testing:
-  favs = 1, replies = 1;
+  // favs = 1, replies = 1;
   if (!favs && !replies) {
     dismissNotifications();
-    // document.getElementById('notifications').classList.add('disabled');
-    // document.querySelector('#notifications > i').classList.remove('fa-bell notifications');
-    // document.querySelector('#notifications > i').classList.add('fa-bell-o');
-    // document.querySelector('a.favs').classList.add('hidden');
-    // document.querySelector('a.replies').classList.add('hidden');
-
   } else {
     document.getElementById('notifications').classList.remove('disabled');
     document.querySelector('#notifications > i').classList.add('fa-bell')
@@ -568,9 +564,6 @@ function favePost(commentId) {
   });
 }
 
-
-// repliesToId
-// isPrivate
 
 //  format an ISO date using Moment.js
 //  http://momentjs.com/

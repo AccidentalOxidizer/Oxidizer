@@ -4,10 +4,12 @@
     box-sizing: border-box;
 }
 
-*::after,
-*::before {
+
+#panel::after, #panel::before, 
+#close::after, #close::before {
     content: '';
 }
+
 
 html,
 body {
@@ -114,6 +116,7 @@ body {
 
 .cd-panel-header .navbar-nav>li {
     float: left;
+    /*min-height:50px;*/
 }
 .from-right .cd-panel-header,
 .from-left .cd-panel-header {
@@ -358,7 +361,9 @@ body {
 }
 
 .comment-engage div {
-    min-width: 60px;
+    /*min-width: 60px;*/
+    maring-right:5px;
+    padding-left:5px;
     color: grey;
 }
 
