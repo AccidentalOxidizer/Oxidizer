@@ -113,7 +113,6 @@ var remove = function(url) {
 var getPaths = function(host, callback){
   return Url.getUrls(host)
     .then(function(data){
-      console.log('---------------',data);
       callback(data);
     })
     .catch(function(err){

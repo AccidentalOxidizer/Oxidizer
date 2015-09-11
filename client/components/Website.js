@@ -1,5 +1,6 @@
 var React = require('react');
 var Comment = require('./Comment');
+var Path = require('./Path');
 var InfiniteScroll = require('react-infinite-scroll')(React);
 
 
@@ -44,8 +45,16 @@ var Website = React.createClass({
       method: 'GET',
       dataType: 'json',
       success: function(data){
-        console.log('received paths:', data);
-        // this.setState({paths: data});
+
+        data = data.map(function(url){
+          console.log(url);
+          return {
+            url: url.url,
+            commentCount: url.Comments[0].count
+          }
+        });
+
+        this.setState({paths: data});
       }.bind(this),
 
       error: function(xhr, status, err) {
@@ -75,6 +84,8 @@ var Website = React.createClass({
       dataType: 'json',
       success: function(data){
         console.log('received comments:', data.comments);
+        console.log('received userInfo:', data.userInfo);
+
         
         var updatedComments; 
         if (this.lastCommentId === -1) {  
@@ -147,28 +158,29 @@ var Website = React.createClass({
       return <Comment key={comment.id} comment={comment} />;
     });
 
+    var paths = this.state.paths.map(function(path) {
+      return <Path key={path.url} path={path} />;
+    });
+    console.log(paths);
     return (
       <div>
+        <div className="row">  
+          <form onSubmit={this.hostSearch}>
+            <input type="text" className="col-md-8 form-control" placeholder="Search for host" ref="searchHost" />
+            <button type="submit" className="col-md-4 btn btn-block btn-primary">Search</button>
+          </form>
+        </div>
+
         <div className="col-md-4">
           <h2>{this.host}</h2>
           <p>Total Comments:</p>
-          <div> { this.state.paths}</div>
+          <div> {paths}</div>
         </div>  
-        <form onSubmit={this.hostSearch}>
-          <div className="row">  
-            <div className="form-group col-sm-7">
-              <input type="text" className="form-control" placeholder="Search for host" ref="searchHost" />
-            </div>
-            <div className="row">
-              <button type="submit" className="btn btn-block btn-primary">Search</button>
-            </div>
-          </div>
-        </form>
 
         {(() => {
           if (this.host){
             return (
-              <div>
+              <div className="col-md-8">
                 <div className="row">Searching by: {this.path} {this.textSearch}</div>   
                 <div className="col-md-8">
                   <form onSubmit={this.urlTextSearch}>

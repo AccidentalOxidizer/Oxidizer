@@ -115,10 +115,6 @@ module.exports = function(app) {
       searchObject.repliesToId = null;
     }
 
-    if (req.query.lastCommentId) {
-      searchObject.lastCommentId = req.query.lastCommentId;
-    }
-
     if (req.query.textSearch) {
       searchObject.text = {$like: '%' + req.query.textSearch + '%'};
     }
@@ -154,15 +150,18 @@ module.exports = function(app) {
           userInfo = {
             userAvatar: req.user.avatar,
             userId: req.user.id,
-            username: req.user.name,
-            repliesToCheck: result[0].userObj.get('repliesToCheck'),
-            heartsToCheck: result[0].userObj.get('heartsToCheck'),
-          };
+            username: req.user.name
+          }
+        }
+
+        if (result.userObj) { 
+          userInfo.repliesToCheck = result.userObj.get('repliesToCheck');
+          userInfo.heartsToCheck = result.userObj.get('heartsToCheck');
         }
 
         res.send({
-          comments: result[0].rows,
-          numComments: result[0].count,
+          comments: result.rows,
+          numComments: result.count,
           currentTime: new Date(), // TODO: Fill this out!
           userInfo: userInfo
         });
