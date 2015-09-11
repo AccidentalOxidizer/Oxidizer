@@ -33,6 +33,9 @@ var Profile = React.createClass({
     // Default to loading public comments initially.
     // TODO? Persist a default setting for the user?
     this.privateFeed = false;
+
+    // Are we loading the user's favorited comments?
+    this.loadFavorites = false;
   },
 
   // Query fields:
@@ -45,33 +48,46 @@ var Profile = React.createClass({
   //  * urlSearch 
   //  * textSearch
   loadComments: function() {
-    var query = {
-      filterByUser: true,
-      isPrivate: this.privateFeed
+    // Adjust loading API and parameters according to whether we
+    // are loading user comments or user favorited comments.
+    var url;
+    var query;
+
+    if (this.loadFavorites) {
+      url = window.location.origin + '/api/comments/faves/getForUser',
+      query = {};
+    } else {
+      url = window.location.origin + '/api/comments/get',
+
+      query = {
+        filterByUser: true,
+        isPrivate: this.privateFeed
+      }
+
+      // Don't send this query value on first load.
+      if (this.numLoads !== 0) {
+        query.lastCommentId = this.oldestLoadedCommentId;
+      }
+
+      if (this.urlSearch !== '') {
+        query.urlSearch = this.urlSearch;
+      }
+
+      if (this.textSearch !== '') {
+        query.textSearch = this.textSearch;
+      }
     }
 
-    // Don't send this query value on first load.
-    if (this.numLoads !== 0) {
-      query.lastCommentId = this.oldestLoadedCommentId;
-    }
-
-    if (this.urlSearch !== '') {
-      query.urlSearch = this.urlSearch;
-    }
-
-    if (this.textSearch !== '') {
-      query.textSearch = this.textSearch;
-    }
-
+    console.log("Profile loadComments: url ", url);
     console.log("Profile loadComments: query ", query);
 
     $.ajax({
-      url: window.location.origin + '/api/comments/get',
+      url: url,
       data: query,
       method: 'GET',
       dataType: 'json',
       success: function(data) {
-        console.log('Profile init: successfully loaded user comments');
+        console.log('Profile: successfully loaded comments');
 
         // Print user data in the console.
         console.log('USER DATA: ', data);
@@ -81,7 +97,7 @@ var Profile = React.createClass({
         // What if you have comments, but then you run a query -> 0 comments returned?
         this.oldestLoadedCommentId = data.comments.length > 0 ?
           data.comments[data.comments.length - 1].id : this.oldestLoadedCommentId;
-        console.log('Profile init: oldestLoadedCommentId ' + this.oldestLoadedCommentId);
+        console.log('Profile loadComments: oldestLoadedCommentId ' + this.oldestLoadedCommentId);
 
         // Update the time ...
         this.currentTime = data.currentTime;
@@ -125,6 +141,7 @@ var Profile = React.createClass({
   loadUserComments: function() {
     console.log("Profile: loadUserComments, oldestLoadedCommentId " + this.oldestLoadedCommentId);
 
+    this.loadFavorites = false;
     this.oldestLoadedCommentId = 'undefined';
     this.numLoads = 0;
 
@@ -138,6 +155,7 @@ var Profile = React.createClass({
   loadUserCommentsForUrl: function(url) {
     console.log("Profile: loadUserCommentsForUrl, " + url);
 
+    this.loadFavorites = false;
     this.oldestLoadedCommentId = 'undefined';
     this.numLoads = 0;
 
@@ -151,6 +169,7 @@ var Profile = React.createClass({
   loadUserCommentsForText: function(text) {
     console.log("Profile: loadUserCommentsForText, " + text);
 
+    this.loadFavorites = false;
     this.oldestLoadedCommentId = 'undefined';
     this.numLoads = 0;
 
@@ -216,6 +235,20 @@ var Profile = React.createClass({
     this.loadUserComments();
   },
 
+  loadUserFavorites: function() {
+    console.log('Profile: requested loadUserFavorites');
+
+    this.loadFavorites = true;
+    this.oldestLoadedCommentId = 'undefined';
+    this.numLoads = 0;
+
+    // Clear out state for Url and Text search for load of favorites
+    this.urlSearch = '';
+    this.textSearch = '';
+
+    this.loadComments();
+  },
+
   render: function() {
     var comments = this.state.comments.map(function(comment) {
       return <Comment key={comment.id} comment={comment} />;
@@ -242,6 +275,7 @@ var Profile = React.createClass({
                 <li><a onClick={this.selectPublicComments} href="#">Show Public Comments</a></li>
               </ul>
                 | <a onClick={this.resetComments} href="#">Clear Search</a>
+                | <a onClick={this.loadUserFavorites}>Load Favorites</a>
             </div>
             <hr />
           </div>
