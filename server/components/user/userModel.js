@@ -64,6 +64,18 @@ module.exports = function(sequelize, dataTypes) {
 
     // additional profile info here
   }, {
+    classMethods: {
+      getAvatar: function(id) {
+        sequelize.query('SELECT avatar FROM Users WHERE id=' + id)
+          .then(function(result) {
+            return result;
+          })
+          .catch(function(err) {
+            console.log(err);
+          });
+      }
+    }
+  }, {
     instanceMethods: {
       generateHash: function(password) {
         var cipher = Promise.promisify(bcrypt.hash);

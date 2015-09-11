@@ -139,7 +139,6 @@ module.exports = function(app) {
           return Comment.get(searchObj, req.user.id, req.query.lastCommentId, req.query.urlSearch, req.query.host);
       })
       .then(function(result) {
-        console.log('RESULTS!!! ', result);
         // TODO: Handle case where URL exists but no comments??
         // TODO: Make this look like contract!
 
@@ -150,15 +149,16 @@ module.exports = function(app) {
         };
 
         if (req.user !== undefined){
+
+          // Get user avatar from database then set stuff up.
           userInfo = {
+            userAvatar: req.user.avatar,
             userId: req.user.id,
             username: req.user.name,
             repliesToCheck: result[0].userObj.get('repliesToCheck'),
             heartsToCheck: result[0].userObj.get('heartsToCheck'),
-          }
+          };
         }
-
-        console.log(userInfo);
 
         res.send({
           comments: result[0].rows,
@@ -168,9 +168,9 @@ module.exports = function(app) {
         });
       })
       .catch(function(err) {
-        throw err;
         console.log("User not logged in", err);
         res.send(200);
+        throw err;
       });
   });
 

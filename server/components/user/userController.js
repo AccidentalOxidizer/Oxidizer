@@ -53,7 +53,7 @@ var remove = function(userId){
 // add one to the new notifications fiels - second argument should be 'replies', 'hearts', or 'flags'
 var incrementNotification = function(userId, stringAttribute){
   var field = stringAttribute + 'ToCheck';
-  console.log('dfsafdafdafsafdsa', field);
+  console.log(userId);
   return User.findOne({where: {id: userId}})
     .then(function(user){
       user.increment(field);
@@ -96,14 +96,17 @@ var markRead = function(userId){
     });
 };
 
+var getAvatar = function(id) {
+  console.log('get user id for avatar: ', id);
+  return User.getAvatar(id);
+};
+
 exports.get = get;
 exports.getAll = getAll;
+exports.getAvatar = getAvatar;
 exports.post = post;
 exports.put = put;
 exports.remove = remove;
 exports.incrementNotification = incrementNotification;
 exports.decrementNotification = decrementNotification;
 exports.markRead = markRead;
-
-
-
