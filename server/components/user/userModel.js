@@ -10,7 +10,10 @@ module.exports = function(sequelize, dataTypes) {
     },
 
     // URL for user avatar
-    avatar: dataTypes.STRING,  
+    avatar: {
+      type: dataTypes.STRING,
+      defaultValue : "https://raw.githubusercontent.com/daveschumaker/twittler/master/images/avatar_125px.png"
+    },  
 
     // Use the email address as the common factor to identify
     // a given account across different types of logins
