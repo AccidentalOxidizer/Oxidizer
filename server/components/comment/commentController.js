@@ -53,6 +53,15 @@ var get = function(searchObject, requesterId, lastCommentId, urlSearch, orderBy,
   queryObject.limit = 25;
 
   // return in ascending order of commentid
+  if (orderBy) {
+    queryObject.order = orderBy + ' DESC';
+  } else {
+    queryObject.order = [
+      ['id', 'DESC']
+    ];
+  }
+  
+  // return in ascending order of commentid
   return Comment.findAndCountAll(queryObject)
     .then(function(results) {
       var comments = results.rows;
