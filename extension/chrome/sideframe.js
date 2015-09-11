@@ -85,6 +85,10 @@ document.addEventListener("DOMContentLoaded", function(e) {
     }, function() {});
   });
 
+  document.getElementById('dismiss-notifications').addEventListener('click', function() {
+    dismissNotifications();
+  })
+
   // Update the feed privacy setting if the user changes it in the dropdown menu.
   $('#feed-privacy-select li a').click(function() {
     var selectedText = $(this).text();
@@ -188,6 +192,17 @@ function loadContent(url) {
   });
 
   request.success(function(msg) {
+    console.log('GET ALL:', msg);
+
+    if (msg.userInfo.heartsToCheck > 0 ||
+      msg.userInfo.repliesToCheck > 0) {
+      console.log('fave of replies!');
+      setNotifications(msg.userInfo.heartsToCheck, msg.userInfo.repliesToCheck);
+    } else {
+      console.log('no notifications..');
+      setNotifications(null, null);
+    }
+
     tracking.requestReturned = true;
     if (msg.comments.length > 0) {
       tracking.mainLastComment.id = msg.comments[msg.comments.length - 1].id;
@@ -462,6 +477,34 @@ function registerCommentEventListeners(comment) {
 }
 
 // FUNCTIONS
+
+function setNotifications(favs, replies) {
+  //testing:
+  favs = 1, replies = 1;
+  if (!favs && !replies) {
+    document.getElementById('notifications').classList.add('disabled');
+    document.querySelector('a.favs').classList.add('hidden');
+    document.querySelector('a.replies').classList.add('hidden');
+
+  } else {
+    document.getElementById('notifications').classList.remove('disabled');
+    if (favs > 0) {
+      document.querySelector('a.favs').classList.remove('hidden');
+    }
+    if (replies > 0) {
+      document.querySelector('a.replies').classList.remove('hidden');
+    }
+
+  }
+}
+
+function dismissNotifications() {
+  document.getElementById('notifications').classList.add('disabled');
+  document.querySelector('a.favs').classList.add('hidden');
+  document.querySelector('a.replies').classList.add('hidden');
+  // SEND MESSAGE TO SERVER TO SET TO ZERO
+
+}
 
 function flagPost(commentId) {
   // this function is called when user confirms flagging a comment
