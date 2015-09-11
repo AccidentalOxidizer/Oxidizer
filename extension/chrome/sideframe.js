@@ -57,7 +57,7 @@ document.addEventListener("DOMContentLoaded", function(e) {
           commentPrivately = settings.keepprivate;
           privateFeed = settings.keepprivate;
 
-          var privacyText = commentPrivately ? 'Private' : 'Public';
+          var privacyText = commentPrivately ? '<i class="fa fa-lock"></i> Private' : '<i class="fa fa-globe"></i> Public';
           $('#comment-privacy-select').parents('.dropup').find('.btn-privacy').html(privacyText + ' <span class="caret"></span>');
           $('#feed-privacy-select').parents('.dropdown').find('.dropdown-toggle').html(privacyText + ' Feed <span class="caret"></span>');
 
@@ -85,11 +85,18 @@ document.addEventListener("DOMContentLoaded", function(e) {
     }, function() {});
   });
 
+  document.getElementById('dismiss-notifications').addEventListener('click', function() {
+    dismissNotifications();
+    // SEND MESSAGE TO SERVER TO SET TO ZERO
+
+  })
+
   // Update the feed privacy setting if the user changes it in the dropdown menu.
   $('#feed-privacy-select li a').click(function() {
-    var selectedText = $(this).text();
+    var selectedText = $(this).html();
+    console.log(selectedText);
 
-    if (selectedText === 'Private Feed') {
+    if (selectedText.endsWith('Private Feed')) {
       privateFeed = true;
     } else {
       privateFeed = false;
@@ -111,9 +118,8 @@ document.addEventListener("DOMContentLoaded", function(e) {
 
   // Update the privacy setting if the user changes it in the dropup menu.
   $('#comment-privacy-select li a').click(function() {
-    var selectedText = $(this).text();
-
-    if (selectedText === 'Private') {
+    var selectedText = $(this).html();
+    if (selectedText.endsWith('Private')) {
       commentPrivately = true;
     } else {
       commentPrivately = false;
@@ -171,6 +177,8 @@ function loadContent(url) {
     isPrivate: privateFeed
   };
 
+  console.log('param isPrivate', privateFeed);
+
   var paramString = [];
   for (var key in params) {
     if (params.hasOwnProperty(key)) {
@@ -188,6 +196,17 @@ function loadContent(url) {
   });
 
   request.success(function(msg) {
+    console.log('GET ALL:', msg);
+
+    if (msg.userInfo.heartsToCheck > 0 ||
+      msg.userInfo.repliesToCheck > 0) {
+      console.log('fave of replies!');
+      setNotifications(msg.userInfo.heartsToCheck, msg.userInfo.repliesToCheck);
+    } else {
+      console.log('no notifications..');
+      setNotifications(null, null);
+    }
+
     tracking.requestReturned = true;
     if (msg.comments.length > 0) {
       tracking.mainLastComment.id = msg.comments[msg.comments.length - 1].id;
@@ -463,6 +482,38 @@ function registerCommentEventListeners(comment) {
 
 // FUNCTIONS
 
+function setNotifications(favs, replies) {
+  //testing:
+  // favs = 1, replies = 1;
+  if (!favs && !replies) {
+    dismissNotifications();
+  } else {
+    document.getElementById('notifications').classList.remove('disabled');
+    document.querySelector('#notifications > i').classList.add('fa-bell')
+    document.querySelector('#notifications > i').classList.add('notifications');
+    document.querySelector('#notifications > i').classList.remove('fa-bell-o');
+
+    if (favs > 0) {
+      document.querySelector('a.favs').classList.remove('hidden');
+    }
+    if (replies > 0) {
+      document.querySelector('a.replies').classList.remove('hidden');
+    }
+
+  }
+}
+
+function dismissNotifications() {
+  document.getElementById('notifications').classList.add('disabled');
+  document.querySelector('a.favs').classList.add('hidden');
+  document.querySelector('a.replies').classList.add('hidden');
+  document.querySelector('#notifications > i').classList.remove('fa-bell')
+  document.querySelector('#notifications > i').classList.remove('notifications');
+  document.querySelector('#notifications > i').classList.add('fa-bell-o');
+  // SEND MESSAGE TO SERVER TO SET TO ZERO
+
+}
+
 function flagPost(commentId) {
   // this function is called when user confirms flagging a comment
   console.log('Comment to flag:', commentId);
@@ -513,9 +564,6 @@ function favePost(commentId) {
   });
 }
 
-
-// repliesToId
-// isPrivate
 
 //  format an ISO date using Moment.js
 //  http://momentjs.com/
