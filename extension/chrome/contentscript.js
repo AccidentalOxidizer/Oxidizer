@@ -1,6 +1,5 @@
 // Initialize & get extension settings or defaults.
 var settings = {};
-
 chrome.runtime.sendMessage({
     from: 'content script',
     message: 'get settings'
@@ -8,11 +7,10 @@ chrome.runtime.sendMessage({
   function(response) {
     settings = response.settings;
     if (settings.showtrigger === true) {
-      createIframe(); //  we might need to create that anyways for popup trigger?
+      createIframe();
       createAndShowTrigger();
     }
   });
-
 
 // Base Iframe Style
 var iframeStyle = 'position:fixed !important;top:0;right:0;display:block;height:100%;z-index:2147483648!important;bottom: auto !important; border: none !important;  overflow: hidden !important; '
@@ -34,7 +32,6 @@ function createIframe() {
 }
 
 function createAndShowTrigger() {
-
   switch (settings.triggerposition) {
     case 0:
       var triggerClass = 'bottom-right';
@@ -53,7 +50,6 @@ function createAndShowTrigger() {
   }
 
   var svgns = "http://www.w3.org/2000/svg";
-
   var svgDocument = document.createElementNS(svgns, "svg");
   svgDocument.setAttributeNS(null, 'data-oxidizer-identity', 'trigger');
   svgDocument.setAttributeNS(null, 'data-oxidizer-trigger', triggerClass);
@@ -64,9 +60,11 @@ function createAndShowTrigger() {
   svgDocument.appendChild(line);
   svgDocument.appendChild(shape);
   document.body.parentNode.insertBefore(svgDocument, null); // make sure to append AFTER body
-
   // Create listener to fire trigger to open iframe
   document.querySelector('[data-oxidizer-identity="trigger"]').addEventListener('mouseover', function(evt) {
+    openIframe();
+  });
+  document.querySelector('[data-oxidizer-identity="trigger"]').addEventListener('click', function(evt) {
     openIframe();
   });
 }
@@ -75,9 +73,6 @@ function createAndShowTrigger() {
 
 // Event listener for incoming messages
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
-  if (request.from === 'background' && request.message === 'test') {
-    console.log('TEST');
-  }
 
   if (request.from === 'background' && request.message === 'close iframe') {
     closeIframe();
@@ -97,7 +92,6 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
 
   /* Generic callback passing along an inital round trip message */
   if (request.from === 'background' && request.message === 'callback') {
-    // console.log('REQUEST', request);
     sendResponse({
       data: 'callback'
     });
@@ -106,14 +100,33 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
 
 function openIframe() {
   var iframe = document.querySelector('[data-oxidizer-identity="iframe"');
-  iframe.setAttribute('data-oxidizer-state', 'opened');
-  iframe.style.cssText = iframeStyleOpened;
+
+
+  // tell iframe to trigger open animation
   iframe.contentWindow.postMessage({
     type: 'open',
     url: document.location.href,
     settings: settings
   }, iframe.src);
+
+  // display iframe if iframe acknowledged to have received postMessage with 'open' command. 
+  chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
+    if (request.from === 'background' && request.message === 'iframe ok') {
+      // console.log(request.details);
+      iframe.setAttribute('data-oxidizer-state', 'opened');
+      iframe.style.cssText = iframeStyleOpened;
+      sendResponse({
+        data: {
+          from: 'content script',
+          message: 'iframe opened',
+          details: request.details
+        }
+      });
+    }
+  });
 }
+
+
 
 function closeIframe() {
   var iframe = document.querySelector('[data-oxidizer-identity="iframe"');
