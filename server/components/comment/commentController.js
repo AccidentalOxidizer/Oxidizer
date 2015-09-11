@@ -7,7 +7,10 @@ var Flag = require('../').Flag;
 var flagController = require('../flag');
 var Url = require('../').Url;
 
-var get = function(searchObject, requesterId, lastCommentId, urlSearch) {
+var get = function(searchObject, requesterId, lastCommentId, urlSearch, orderBy) {
+
+  // console.log('test class instance');
+  // Comment.sortFlags();
 
   var userHearts;
   var userFlags;
@@ -46,9 +49,13 @@ var get = function(searchObject, requesterId, lastCommentId, urlSearch) {
   queryObject.limit = 25;
 
   // return in ascending order of commentid
-  queryObject.order = [
-    ['id', 'DESC']
-  ];
+  if (orderBy) {
+    queryObject.order = orderBy + ' DESC';
+  } else {
+    queryObject.order = [
+      ['id', 'DESC']
+    ];
+  }
 
   return Comment.findAndCountAll(queryObject)
     .then(function(results) {
@@ -205,7 +212,8 @@ var getUserId = function(commentId){
     .catch(function(err){
       console.log(err);
     });
-}
+};
+
 exports.get = get;
 exports.post = post;
 exports.put = put;

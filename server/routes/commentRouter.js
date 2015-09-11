@@ -1,4 +1,3 @@
-
 var auth = require('../middleware').auth;
 var Promise = require('bluebird');
 var xssFilters = require('xss-filters');
@@ -27,6 +26,11 @@ module.exports = function(app) {
           faved: result.faved
         };
         res.send(faveCount);
+
+        return Comment.getUserId(req.body.CommentId)
+          .then(function(userId){
+            return User.updateNotification(userId, 'hearts');
+          });
       })
       .catch(function(err) {
         console.log("Error: Comment not faved...", err);
@@ -68,6 +72,19 @@ module.exports = function(app) {
     };
   });
 
+  // Remove all flags for a specific comment.
+  app.delete('/api/flags/remove/:id', jsonParser, auth.isAuthorized, function(req, res, next) {
+    // Delete all flags!
+    return Flag.removeAll(req.params.id)
+            .then(function(flag) {
+              res.send(200, "Deleted all flags!");
+            })
+            .catch(function(err) {
+              console.log("Err: ", err);
+              res.send(200);
+            });
+  });
+
   // Get all comments with search parameters in query string
   // With auth.isLoggedIn middleware, we should always have a 
   // valid req.user.
@@ -98,6 +115,10 @@ module.exports = function(app) {
       searchObject.repliesToId = null;
     }
 
+    if (req.query.lastCommentId) {
+      searchObject.lastCommentId = req.query.lastCommentId;
+    }
+
     if (req.query.textSearch) {
       searchObject.text = {$like: '%' + req.query.textSearch + '%'};
       console.log("Comments: get - updated searchObj: ");
@@ -123,6 +144,7 @@ module.exports = function(app) {
         }
       })
       .then(function(result) {
+        console.log('RESULTS!!! ', result);
         // TODO: Handle case where URL exists but no comments??
         // TODO: Make this look like contract!
 
@@ -130,7 +152,7 @@ module.exports = function(app) {
         var userInfo = {
           userId: undefined,
           username: undefined
-        }
+        };
 
         if (req.user !== undefined){
           userInfo = {
@@ -138,8 +160,7 @@ module.exports = function(app) {
             username: req.user.name,
             repliesToCheck: result[1].repliesToCheck,
             heartsToCheck: result[1].heartsToCheck,
-          }
-
+          };
         }
 
 
@@ -225,11 +246,19 @@ module.exports = function(app) {
       });
   });
 
+  app.delete('/api/comments/remove/:id', jsonParser, auth.isAuthorized, function(req, res, next) {
+    // Delete a comment!
+    return Comment.remove(req.params.id)
+            .then(function(url) {
+              res.send(200, "Deleted comment!");
+            })
+            .catch(function(err) {
+              console.log("Err: ", err);
+              res.send(200);
+            });
+  });
+
   // app.put('/api/comments/:id', jsonParser, auth.isAuthorized, function(req, res, next) {
   //   // Updates a comment!
-  // });
-
-  // app.delete('/api/comments/:id', jsonParser, auth.isAuthorized, function(req, res, next) {
-  //   // Delete a comment!
   // });
 };
