@@ -12,7 +12,7 @@ var React = require('react');
 // We're passing the comment.id into the CommentActions component
 // as a property, that way we can carry out actions on a specific comment.
 
-var Comment = React.createClass({
+var AdminComment = React.createClass({
   propTypes: {
     comment: React.PropTypes.object.isRequired
   },
@@ -79,4 +79,4 @@ var Comment = React.createClass({
   }
 });
 
-module.exports = Comment;
+module.exports = AdminComment;
