@@ -276,13 +276,23 @@ body {
   }
 }*/
 
-.cd-panel-content {
+.panel-content-wrapper {
     position: absolute;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
     padding: 70px 5%;
+        overflow: auto;
+    /* smooth scrolling on touch devices */
+    -webkit-overflow-scrolling: touch;
+}
+.panel-content-wrapper #notification-area {
+    margin: 25px auto;
+    text-align: center;
+}
+.cd-panel-content {
+    
     overflow: auto;
     /* smooth scrolling on touch devices */
     -webkit-overflow-scrolling: touch;
@@ -335,7 +345,7 @@ body {
     word-wrap: break-word;
     background: #fff;
     font-size: .9em;
-    padding: 10px;
+    padding: 10px 10px 5px 10px;
     margin-bottom: 8px;
     border-radius: 2px;
     box-shadow: rgba(0, 0, 0, .10) 0px 2px 1px, rgba(0, 0, 0, .10) 0px 0px 1px;
@@ -349,6 +359,7 @@ body {
     float: right;
     text-align: right;
     font-style: italic;
+    color:#A7A7A7;
 }
 
 .comment-text {
@@ -362,11 +373,15 @@ body {
 
 .comment-engage div {
     /*min-width: 60px;*/
-    maring-right:5px;
-    padding-left:5px;
+    margin-right:5px;
+    padding-right:5px;
     color: grey;
 }
-
+.comment-engage div.flag {
+    margin-right:0px;
+    padding-right:0px;
+    float:right;
+}
 .comment-engage #reply:hover,
 .comment-engage #flag:hover,
 .comment-engage #heart:hover {
@@ -388,4 +403,16 @@ body {
 .comment-engage .heart i,
 .comment-engage .flag i {
     font-weight: bold;
+}
+
+/* for replies */
+.comment .comment {
+        box-shadow: none;
+    margin-bottom: 2px;
+    margin-top: 5px;
+    padding: 0 5px;
+    border-left: 2px solid #2372CC;
+}
+.comment .comment .comment-engage .reply, .comment .comment .comment-engage #replies {
+    display: none;
 }
