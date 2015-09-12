@@ -9,10 +9,20 @@
 </head>
 <body>
   <h1><img src="http://www.textfiles.com/underconstruction/CaCapitolHill1114Under_Construction.gif"> Low Budget Admin Panel v.1.0 <img src="http://www.textfiles.com/underconstruction/CaCapitolHill1114Under_Construction.gif"></h1>
-  <p>URL: <input type="text" name="url" id="url-search"></p>
-  <p>Sort By: <a href="#" id="sort-flags">FLAGS</a> | <a href="#" id="sort-recent">RECENT</a></p>
+  
+  <p>URL: <input type="text" name="url" id="url-search"><br/>
+     Search comments: <input type="text" name="url" id="comment-search"><br/>
+     Search users: <input type="text" name="url" id="user-search">
+  </p>
+  
+  <p>Tools: <a href="#">Comments</a> | <a href="#">Users</a><br/>
+  Sort By: <a href="#" id="sort-flags">FLAGS</a> | <a href="#" id="sort-recent">RECENT</a></p>
 
+  <p id="sort-type">Showing Comments:</p>
   <div id="comments">
+  </div>
+
+  <div id="users">
   </div>
 
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
