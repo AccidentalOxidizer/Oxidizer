@@ -50,12 +50,13 @@ module.exports = function(app) {
   // Get all favorited comments for the logged in user
   app.get('/api/comments/faves/getForUser', jsonParser, auth.isLoggedIn, function(req, res, next) {
 
-    HeartModel.getUserFaves(req.user.id)
+    console.log("Comments faves for user, query: ", req.query);
+
+    HeartModel.getUserFaves(req.user.id, req.query.lastCommentId)
       .then(function(result) {
         console.log("getUserFaves, result[0]:");
         console.log("Comment text: ", result[0].Comment.text);
         console.log("Comment Url: ", result[0].Comment.Url.url);
-
 
         var comments = _.pluck(result, 'Comment');
 

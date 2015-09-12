@@ -20,25 +20,46 @@ module.exports = function(sequelize, dataTypes) {
       //    to also sort the results here.
       //  x filter on isPrivate? If a user was able to fav a comment, it
       //    should either be a public comment or the user's comment
-      getUserFaves: function(userId) {
-        return Heart.findAll({
+      getUserFaves: function(userId, lastCommentId) {
+
+        var comment = {
+          model: Comment,
+          attributes: ['id', 'text', 'createdAt'],
+          include: [{
+            model: User,
+            attributes: ['name']
+          }, {
+            model: Url,
+            attributes: ['url']
+          }],
+        };
+
+        if (lastCommentId !== undefined && lastCommentId !== 'undefined') {
+          comment.where = {};
+          comment.where.id = {};
+          comment.where.id.$lt = lastCommentId;
+        }
+
+        var query = {
           where: {
             UserId: userId
           },
-          include: [{
-            model: Comment,
-            attributes: ['id', 'text', 'createdAt'],
-            include: [{
-              model: User,
-              attributes: ['name']
-            }, {
-              model: Url,
-              attributes: ['url']
-            }]
-          }]
-        })
+          include: [
+            comment
+          ]
+        };
+
+        // limit the number of comments we send to the user
+        // XXX: should be a constant.
+        query.limit = 25;
+
+        // return in ascending order of heart id
+        query.order = [
+          ['id', 'DESC']
+        ];
+
+        return Heart.findAll(query)
           .then(function(result) {
-            // console.log("Heart: getUserFaves result ", result);
             return result;
           })
           .catch(function(err) {

@@ -64,11 +64,6 @@ var Profile = React.createClass({
         isPrivate: this.privateFeed
       }
 
-      // Don't send this query value on first load.
-      if (this.numLoads !== 0) {
-        query.lastCommentId = this.oldestLoadedCommentId;
-      }
-
       if (this.urlSearch !== '') {
         query.urlSearch = this.urlSearch;
       }
@@ -77,6 +72,13 @@ var Profile = React.createClass({
         query.textSearch = this.textSearch;
       }
     }
+
+    // Don't send this query value on first load.
+    if (this.numLoads !== 0) {
+      query.lastCommentId = this.oldestLoadedCommentId;
+    }
+    console.log("Profile loadComments: numLoads ", this.numLoads);
+
 
     console.log("Profile loadComments: url ", url);
     console.log("Profile loadComments: query ", query);
@@ -105,6 +107,7 @@ var Profile = React.createClass({
         // If the number of loaded comments is less than 25 (XXX - should have a 
         // constant for this), we've loaded all the comments of this type.
         this.hasMoreComments = (data.comments.length < 25) ? false : true;
+        console.log('Profile loadComments: comments.length: ' + data.comments.length + ' hasMoreComments? ' + this.hasMoreComments);
 
         // If reloading for a search query, reset the comments array;
         // otherwise append older comments now loaded to the end.
@@ -183,6 +186,7 @@ var Profile = React.createClass({
   // Used by InfiniteScroll addon
   loadMoreComments: function() {
     console.log("Profile: loadMoreComments");
+    
     this.loadComments();
   },
 
