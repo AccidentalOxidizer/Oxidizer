@@ -283,6 +283,19 @@ function postComment(text, repliesToId) {
 function compileComments(comments) {
   var source = $("#comment-entry-template").html();
   var template = Handlebars.compile(source);
+  console.log('TEMPLATE COMMENTS', comments);
+  
+  comments.forEach(function(element) {
+    var imagePattern = /(https?:\/\/.*\.(?:png|jpg|gif|jpeg))/;
+    var isImageLink = element.text.match(imagePattern);
+
+    console.log('Text Input: ', element.text);
+    if (isImageLink) {
+      console.log('IMAGE URL FOUND');
+      element.text = '<p align="center"><img src="' + element.text + '" style="max-width: 450px;"/></p>';
+    }
+  });
+
   return template(comments);
 }
 
