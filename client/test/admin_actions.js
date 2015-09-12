@@ -69,26 +69,45 @@ $(document).ready(function() {
   // check if anything exists, otherwise it's set to a default.
   getComments();
 
-
-  // Sorting options
+  // SORT COMMENTS BY NUMBER OF FLAGS
   $(document).on('click', '#sort-flags', function(event) {
     // Update Mode:
     adminSettings.currentMode = "flags";
     console.log('Current Sort Mode:', adminSettings.currentMode);
   });
 
+
+  // SORT COMMENTS BY WHEN THEY WERE RECENTLY POSTED
   $(document).on('click', '#sort-recent', function(event) {
     // Update Mode:
     adminSettings.currentMode = "recent";
     console.log('Current Sort Mode:', adminSettings.currentMode);
+
+    // Reset Comments HTML and get comments again.
+    $('#comments').html();
+    getComments();
   });
 
-  // DELETE COMMENT FROM DATABASE
+  // DELETE COMMENT FROM DATABASE!!!!
   $(document).on('click', '.delete', function(event) {
     event.preventDefault();
     console.log('DELETE clicked!');
     console.log('DELETE CLICKED, ID = ', $(this).attr('data-comment-id'));
     var commentId = $(this).attr('data-comment-id');    
+
+    $.ajax({
+      url: window.location.origin + '/api/comments/remove/' + commentId,
+      method: 'DELETE',
+      //dataType: 'json',
+      success: function(data) {
+        console.log('Removing comment: ', commentId);
+        var getDivId = 'div[data-commentid="' + commentId +'"]';
+        $(getDivId).hide();
+      },
+      error: function(xhr, status, err) {
+        console.error(xhr, status, err.message);
+      }
+    });
   });
 
 
