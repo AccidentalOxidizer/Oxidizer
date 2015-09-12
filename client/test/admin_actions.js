@@ -24,6 +24,7 @@ $(document).ready(function() {
   // That way we can update the server if I input a new URL to look at in the
   // input box at the top of the screen.
   var getComments = function(url) {
+    console.log('URL?', url);
     adminSettings.url = url || null;
     // Default website to show comments from on page load.
     // If this is for a POST request, we need to JSON.stringify() data.
@@ -31,6 +32,9 @@ $(document).ready(function() {
     
     // Setting this to nothing (e.g., data = {}) returns ALL comments.
     var data = {};
+    if (url) {
+      data.url = url;
+    }
 
     // AJAX call to server to get comments from a particular URL.
     $.ajax({
@@ -68,6 +72,30 @@ $(document).ready(function() {
   // We don't need to pass in an initial URL since the getComments() function will
   // check if anything exists, otherwise it's set to a default.
   getComments();
+
+  // SEARCH COMMENTS FROM URL
+  $("#url-search").keydown(function(event){
+      if(event.keyCode == 13){
+        var getURL = $("#url-search").val();
+        
+        // Allow posting paths only and not URLs by prepending 'http://'
+        if (getURL === undefined || getURL === '') {
+          // DO NOTHING cause we'll just return all URLs
+          getURL = ''
+          void 0;
+        } else if (getURL.substr(0, 5) === 'http:' || getURL.substr(0, 6) === 'https:') {
+          // ALSO DO NOTHING. WHY IS THIS HERE?
+          // WHO KNOWS. BUT IT WORKS.
+          // ¯\_(ツ)_/¯
+        } else {
+          getURL = 'http://' + getURL;
+        }
+        
+        adminSettings.url = getURL;
+        $('#comments').html();
+        getComments(getURL);        
+      }
+  });
 
   // SORT COMMENTS BY NUMBER OF FLAGS
   $(document).on('click', '#sort-flags', function(event) {
@@ -139,37 +167,5 @@ $(document).ready(function() {
       }
     });
   });
-
-
-  var removeFlags = function(comment) {
-    var getDivId = 'div[data-commentid="' + comment.id +'"]';
-    console.log('DIV ID', getDivId);
-
-//     $.ajax({
-//       url: window.location.origin + '/api/flags/remove/' + this.props.comment.id,
-//       method: 'DELETE',
-//       //dataType: 'json',
-//       success: function(data) {
-//         console.log('Removing flags: ', this.props.comment.id);
-//         this.setState({commentId: this.props.comment.id});
-//         var getDivId = 'div[data-commentid="' + this.props.comment.id +'"]';
-// //        $(getDivId).hide();
-//       },
-//       error: function(xhr, status, err) {
-//         console.error(xhr, status, err.message);
-//       }
-//     });
-  };
-
-
-
-
-
-
-
-
-
-
-
 
 });
