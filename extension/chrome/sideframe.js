@@ -279,10 +279,27 @@ function postComment(text, repliesToId) {
   });
 }
 
-
 function compileComments(comments) {
   var source = $("#comment-entry-template").html();
   var template = Handlebars.compile(source);
+
+  // Iterate over array of comments and search for anything that appears
+  // to be an image link using a regex pattern. If we find a match, replace
+  // the text with an image tag and a link.
+  comments.forEach(function(element) {
+    var imagePattern = /(https?:\/\/.*\.(?:png|jpg|gif|jpeg))/;
+    var isImageLink = element.text.match(imagePattern);
+
+    //console.log('Text Input: ', element.text);
+
+    // If isImageLink is true and matches the RegEx pattern, let's
+    // go ahead and replace it! 
+    if (isImageLink) {
+      console.log('IMAGE URL FOUND');
+      element.text = '<p align="center"><img src="' + element.text + '" style="max-width: 450px;"/></p>';
+    }
+  });
+
   return template(comments);
 }
 

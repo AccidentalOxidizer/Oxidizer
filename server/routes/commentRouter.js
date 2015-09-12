@@ -231,6 +231,8 @@ module.exports = function(app) {
           comments: [formatComment],
           currentTime: new Date(), // TODO: add currentTime
           userInfo: {
+            userAvatar: req.user.avatar,
+            userId: req.user.id,
             username: req.user.name
           }
         });
