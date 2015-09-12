@@ -177,8 +177,6 @@ function loadContent(url) {
     isPrivate: privateFeed
   };
 
-  console.log('param isPrivate', privateFeed);
-
   var paramString = [];
   for (var key in params) {
     if (params.hasOwnProperty(key)) {
@@ -222,7 +220,7 @@ function loadContent(url) {
     $(".cd-panel-content").html('');
     // compile and append new comments
 
-    var html = compileComments(msg.comments);
+    var html = compileComments(msg);
 
     $(".cd-panel-content").append(html);
     registerCommentEventListeners();
@@ -261,7 +259,9 @@ function postComment(text, repliesToId) {
 
   request.done(function(msg) {
     // compile and append successfully saved and returned message to DOM
-    var html = compileComments(msg.comments);
+    var html = compileComments(msg);
+
+    console.log('MESSAGE after POST', msg);
 
     if (!repliesToId) {
       $(".cd-panel-content").prepend(html);
@@ -277,14 +277,14 @@ function postComment(text, repliesToId) {
   });
 }
 
-function compileComments(comments) {
+function compileComments(msg) {
   var source = $("#comment-entry-template").html();
   var template = Handlebars.compile(source);
 
   // Iterate over array of comments and search for anything that appears
   // to be an image link using a regex pattern. If we find a match, replace
   // the text with an image tag and a link.
-  comments.forEach(function(element) {
+  msg.comments.forEach(function(element) {
     var imagePattern = /(https?:\/\/.*\.(?:png|jpg|gif|jpeg))/;
     var isImageLink = element.text.match(imagePattern);
 
@@ -298,7 +298,7 @@ function compileComments(comments) {
     }
   });
 
-  return template(comments);
+  return template(msg);
 }
 
 // destination is a jquery object that you want to append to
@@ -385,7 +385,7 @@ function loadMoreComments(destination, url, repliesToId) {
     $('.like-count').text(msg.userInfo.heartsToCheck);
 
     // compile and append new comments
-    var html = compileComments(msg.comments);
+    var html = compileComments(msg);
     destination.append(html);
     registerCommentEventListeners();
   });
@@ -614,3 +614,13 @@ Handlebars.registerHelper('dateFormat', function(context, block) {
     return context; //  moment plugin not available. return data as is.
   }
 });
+
+
+// if userInfo.userId === comments[i].UserId
+Handlebars.registerHelper('ifSelf', function(v1, v2, options) {
+  if (v1 === v2) {
+    return options.fn(this);
+  }
+  return options.inverse(this);
+});
+// EOF

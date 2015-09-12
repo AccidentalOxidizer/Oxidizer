@@ -88,7 +88,7 @@
         <!-- cd-panel -->
     </div>
     <script id="comment-entry-template" type="text/x-handlebars-template">
-        {{#each this}}
+        {{#each comments}}
         <div class="col-xs-12 comment {{repliesToId}}" id="{{id}}">
             <div class="row">
                 <div class="media col-xs-12">
@@ -112,8 +112,11 @@
                     <div id="replies" data-comment-id="{{id}}" class="replies" style="float:left;"><i class="fa fa-commenting-o"></i>&nbsp;{{replies}}</div>
                     <div id="heart" data-comment-id="{{id}}" class="heart" style="float:left;">
                         <i class="fa fa-heart-o"></i>&nbsp;{{Hearts}}</div>
-                    <div id="flag" data-comment-id="{{id}}" class="flag" style="float:right; text-align:right;">
-                        <i class="fa fa-flag-o"></i>&nbsp; </div>
+                     {{#ifSelf ../userInfo.userId UserId}}  {{else}} 
+                     <div id="flag" data-comment-id="{{id}}" class="flag" style="float:right; text-align:right;">
+                        <i class="fa fa-flag-o"></i>&nbsp; </div> 
+                     {{/ifSelf}}   
+                    
                 </div>
             </div>
             <div class="reply-form hidden" data-comment-id="{{id}}">
