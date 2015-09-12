@@ -42,6 +42,15 @@ require('./components/dbconfig');
 // ROUTES
 var routes = require('./routes');
 
+
+if (process.env.NODE_ENV === 'production') {
+  var nullfunc = function() {};
+  console.log = nullfunc;
+  console.info = nullfunc;
+  console.error = nullfunc;
+  console.warn = nullfunc;
+}
+
 sequelize.sync().then(function() {
   // app.use(morgan('dev'));
   app.use(cookieParser());

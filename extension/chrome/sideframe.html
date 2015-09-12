@@ -26,8 +26,8 @@
                         <ul class="nav navbar-nav navbar-right">
                             <li role="presentation" class="dropdown">
                                 <a class="dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">
-                            Feed Type<span class="caret"></span>
-                        </a>
+                                    Feed Type<span class="caret"></span>
+                                </a>
                                 <ul class="dropdown-menu" id="feed-privacy-select">
                                     <li><a href="#"><i class="fa fa-globe"></i> Public Feed</a></li>
                                     <li><a href="#"><i class="fa fa-lock"></i> Private Feed</a></li>
@@ -36,8 +36,8 @@
                             <li class="dropdown">
                                 <a href="#" id="notifications" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"><i class="fa fa-bell-o"></i>&nbsp;</a>
                                 <ul class="dropdown-menu" style="text-align:right;">
-                                    <li><a href="http://www.oxidizer.io/#/profile" class="replies hidden"><i class="fa fa-commenting-o"></i> You have comment replies</a></li>
-                                    <li><a href="#" class="favs hidden"><i class="fa fa-heart-o"></i> You have comment likes</a></li>
+                                    <li><a target="_blank" href="http://www.oxidizer.io/#/profile" class="replies hidden"><i class="fa fa-commenting-o"></i> You have comment replies</a></li>
+                                    <li><a target="_blank" href="#" class="favs hidden"><i class="fa fa-heart-o"></i> You have comment likes</a></li>
                                     <li role="separator" class="divider"></li>
                                     <li><a href="http://www.oxidizer.io/#/profile" id="dismiss-notifications"><i class="fa fa-check-square-o"></i> Dismiss all</a></li>
                                 </ul>
@@ -88,43 +88,88 @@
         <!-- cd-panel -->
     </div>
     <script id="comment-entry-template" type="text/x-handlebars-template">
-        {{#each this}}
-        <div class="col-xs-12 comment {{repliesToId}}" id="{{id}}">
-            <div class="row">
-                <div class="media col-xs-12">
-                    <div class="media-left">
-                        <a href="#">
-                            <img class="media-object avatar" src="{{User.avatar}}" alt="">
-                        </a>
-                    </div>
-                    <div class="media-body media-middle">
-                        <h4 class="comment-username media-heading">{{User.name}}</h4>
-                        <div class="comment-timestamp">{{dateFormat createdAt format="MMMM YYYY"}}</div>
-                    </div>
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-xs-12 comment-text">{{{text}}}</div>
-            </div>
-            <div class="row " style="">
-                <div class="col-xs-12 comment-engage">
-                    <div id="reply" data-comment-id="{{id}}" class="reply" style="float:left;"><i class="fa fa-reply"></i>&nbsp;</div>
-                    <div id="replies" data-comment-id="{{id}}" class="replies" style="float:left;"><i class="fa fa-commenting-o"></i>&nbsp;{{replies}}</div>
-                    <div id="heart" data-comment-id="{{id}}" class="heart" style="float:left;">
-                        <i class="fa fa-heart-o"></i>&nbsp;{{Hearts}}</div>
-                    <div id="flag" data-comment-id="{{id}}" class="flag" style="float:right; text-align:right;">
-                        <i class="fa fa-flag-o"></i>&nbsp; </div>
-                </div>
-            </div>
-            <div class="reply-form hidden" data-comment-id="{{id}}">
-                <div class="form-horizontal col-xs-12" style="margin:10px 0;">
-                    <div class="form-group" style="margin-bottom:0px;">
-                        <div class="col-xs-10" style="padding-left:0px;">
-                            <input class="form-control reply-input" placeholder="Add your reply">
+        {{#each comments}}
+        <div class="col-xs-12 comment{{#if repliesToId}}-reply{{/if}} {{#ifSelf ../userInfo.userId UserId}}self{{/ifSelf}}" id="{{id}}">
+            <div class="comment-wrapper">
+                <div class="row">
+                    <div class="col-xs-10">
+                        <div class="media">
+                            <div class="media-left">
+                                <a href="#">
+                                    <img class="media-object avatar" src="{{User.avatar}}" alt="">
+                                </a>
+                            </div>
+                            <div class="media-body media-middle">
+                                <div class="">
+                                    <h4 class="comment-username media-heading">{{User.name}}</h4>
+                                    <div class="comment-timestamp">{{dateFormat createdAt format="MMMM YYYY"}} - {{#if repliesToId}} {{Hearts}} like(s){{/if}}
+                                    </div>
+                                    {{#if repliesToId}}
+                                    <div class="reply-text">{{text}}</div>
+                                    {{/if}}
+                                </div>
+                            </div>
                         </div>
-                        <button class="col-xs-2 btn btn-default reply-button">Reply</button>
+                    </div>
+                    {{#if repliesToId}}
+                    <div class="col-xs-2">
+                        <div class="dropdown">
+                            <div class="dropdown-toggle" type="button" id="dropdownMenu-{{id}}" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true" style="float:right; margin-right:7.5px; color:grey;">
+                                <i class="fa fa-bars"></i>
+                            </div>
+                            <br>
+                            <ul class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenu-{{id}}" style="min-width: 40px;">
+                                <li>
+                                    <a id="heart" data-comment-id="{{id}}" class="heart" style="">
+                                        <i class="fa fa-heart-o"></i>&nbsp; Like </a>
+                                </li>
+                                {{#ifSelf ../userInfo.userId UserId}}
+                                <li>
+                                    <a id="delete" data-comment-id="{{id}}" class="delete">
+                                        <i class="fa fa-trash-o"></i>&nbsp; Remove</a>
+                                </li>
+                                {{else}}
+                                <li>
+                                    <a id="flag" data-comment-id="{{id}}" class="flag">
+                                        <i class="fa fa-flag-o"></i>&nbsp; Flag</a>
+                                </li>
+                                {{/ifSelf}}
+                            </ul>
+                        </div>
+                    </div>
+                    {{/if}}
+                </div>
+                {{#unless repliesToId}}
+                <div class="row">
+                    <div class="comment-text">{{{text}}}</div>
+                </div>
+                <div id="comment-engage" class="row " style="">
+                    <div class="col-xs-12 comment-engage">
+                        <div id="reply" data-comment-id="{{id}}" class="reply" style="float:left;"><i class="fa fa-reply"></i>&nbsp;</div>
+                        <div id="replies" data-comment-id="{{id}}" class="replies" style="float:left;"><i class="fa fa-commenting-o"></i>&nbsp;{{replies}}</div>
+                        <div id="heart" data-comment-id="{{id}}" class="heart" style="float:left;">
+                            <i class="fa {{#if heartedByUser}} fa-heart{{else}} fa-heart-o{{/if}}"></i>&nbsp;{{Hearts}}</div>
+                        {{#ifSelf ../userInfo.userId UserId}}
+                        <div id="delete" data-comment-id="{{id}}" class="delete" style="float:right; text-align:right;">
+                            <i class="fa fa-trash-o"></i>&nbsp; </div>
+                        {{else}}
+                        <div id="flag" data-comment-id="{{id}}" class="flag" style="float:right; text-align:right;">
+                            <i class="fa {{#if flaggedByUser}} fa-flag {{else}} fa-flag-o{{/if}}"></i>&nbsp; </div>
+                        {{/ifSelf}}
                     </div>
                 </div>
+                
+                <div class="reply-form row hidden" data-comment-id="{{id}}">
+                    <div class="col-xs-12">
+                        <div class="input-group" style="padding:5px 0;">
+                            <input type="text" class="form-control reply-input" placeholder="Add your reply">
+                            <span class="input-group-btn">
+                                <button class="btn btn-default reply-button" type="button">Reply</button>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                {{/unless}}
             </div>
         </div>
         {{/each}}
@@ -139,11 +184,11 @@
                         <h4 class="modal-title" id="myModalLabel">Are you sure? </h4>
                     </div>
                     <div class="modal-body">
-                        <p>You are about to flag a comment as inappropriate. Please confirm.</p>
+                        <p>{{action}}</p>
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-block btn-default" data-dismiss="modal">Never Mind</button>
-                        <button type="button" class="btn btn-block btn-danger" data-dismiss="modal" id="confirm-flag">Yes! Flag the comment!</button>
+                        <button type="button" class="btn btn-block btn-danger" data-dismiss="modal" id="confirm-flag">Yes, sure!</button>
                     </div>
                 </div>
             </div>
