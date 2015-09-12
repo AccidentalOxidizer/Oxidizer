@@ -1,4 +1,5 @@
 var React = require('react');
+var moment = require('moment');
 
 // A Comment component that can be applied to a user profile feed,
 // a url feed, or any other comment list.
