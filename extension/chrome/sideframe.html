@@ -36,10 +36,10 @@
                             <li class="dropdown">
                                 <a href="#" id="notifications" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"><i class="fa fa-bell-o"></i>&nbsp;</a>
                                 <ul class="dropdown-menu" style="text-align:right;">
-                                    <li><a href="#" class="replies hidden"><i class="fa fa-commenting-o"></i> You have comment replies</a></li>
+                                    <li><a href="http://www.oxidizer.io/#/profile" class="replies hidden"><i class="fa fa-commenting-o"></i> You have comment replies</a></li>
                                     <li><a href="#" class="favs hidden"><i class="fa fa-heart-o"></i> You have comment likes</a></li>
                                     <li role="separator" class="divider"></li>
-                                    <li><a href="#" id="dismiss-notifications"><i class="fa fa-check-square-o"></i> Dismiss all</a></li>
+                                    <li><a href="http://www.oxidizer.io/#/profile" id="dismiss-notifications"><i class="fa fa-check-square-o"></i> Dismiss all</a></li>
                                 </ul>
                             </li>
                         </ul>
@@ -47,21 +47,20 @@
                 </nav>
             </header>
             <div id="comment-container" class="comment-container cd-panel-container">
-                
                 <div class="panel-content-wrapper">
-                <div id="notification-area" class='hidden'>
-                <h3>Login or Sign-up</h3>
-                    <a target="_blank" href="https://api.oxidizer.io/api/auth/chrome/facebook" id="facebook-login" class="btn btn-social btn-facebook">
-                        <i class="fa fa-facebook"></i> Login
-                    </a>
-                    <a target="_blank" href="https://api.oxidizer.io/api/auth/chrome/google" id="google-login" class="btn btn-social btn-google">
-                        <i class="fa fa-google"></i> Login
-                    </a>
-                    <p>then reload :)</p>
-                </div>
-                <div id="panel-content" class="cd-panel-content">
-                    <!-- Handlebars will append comments here-->
-                </div>
+                    <div id="notification-area" class='hidden'>
+                        <h3>Login or Sign-up</h3>
+                        <a target="_blank" href="https://api.oxidizer.io/api/auth/chrome/facebook" id="facebook-login" class="btn btn-social btn-facebook">
+                            <i class="fa fa-facebook"></i> Login
+                        </a>
+                        <a target="_blank" href="https://api.oxidizer.io/api/auth/chrome/google" id="google-login" class="btn btn-social btn-google">
+                            <i class="fa fa-google"></i> Login
+                        </a>
+                        <p>then reload :)</p>
+                    </div>
+                    <div id="panel-content" class="cd-panel-content">
+                        <!-- Handlebars will append comments here-->
+                    </div>
                 </div>
                 <!-- cd-panel-content -->
                 <footer class="cd-panel-footer submit-footer">
@@ -92,13 +91,22 @@
         {{#each this}}
         <div class="col-xs-12 comment {{repliesToId}}" id="{{id}}">
             <div class="row">
-                <div class="col-xs-6 comment-username">{{User.name}}</div>
-                <div class="col-xs-6 comment-timestamp">{{dateFormat createdAt format="MMMM YYYY"}}</div>
+                <div class="media col-xs-12">
+                    <div class="media-left">
+                        <a href="#">
+                            <img class="media-object avatar" src="{{User.avatar}}" alt="">
+                        </a>
+                    </div>
+                    <div class="media-body media-middle">
+                        <h4 class="comment-username media-heading">{{User.name}}</h4>
+                        <div class="comment-timestamp">{{dateFormat createdAt format="MMMM YYYY"}}</div>
+                    </div>
+                </div>
             </div>
             <div class="row">
                 <div class="col-xs-12 comment-text">{{{text}}}</div>
             </div>
-            <div class="row " style="margin-top:5px; margin-bottom:5px;">
+            <div class="row " style="">
                 <div class="col-xs-12 comment-engage">
                     <div id="reply" data-comment-id="{{id}}" class="reply" style="float:left;"><i class="fa fa-reply"></i>&nbsp;</div>
                     <div id="replies" data-comment-id="{{id}}" class="replies" style="float:left;"><i class="fa fa-commenting-o"></i>&nbsp;{{replies}}</div>
