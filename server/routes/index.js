@@ -6,6 +6,7 @@ var group = require('./groupRouter');
 var error = require('./errorRouter');
 var bodyParser = require('body-parser');
 var dummy = require('./dummyDataRouter');
+var stress = require('./stressTestRouter');
 
 var urlEncodedParser = bodyParser.urlencoded({
   extended: true
@@ -31,7 +32,7 @@ module.exports = function(express, app, passport) {
   comment(app);
   group(app);
   dummy(app);
-
+  stress(app);
   // error handling
   error(app);
 

@@ -38,7 +38,7 @@ document.addEventListener("DOMContentLoaded", function(e) {
   // it will tell the iframe to reload and redo what is needed
   // on 'open' we get 2 pieces of information from the parent content script:
   // 1. the URL of the parent window
-  // 2. the extension settings, which includes the server information 
+  // 2. the extension settings, which includes the server information
   window.addEventListener("message", function(e) {
     if (e.data.type === 'open') {
       url = e.data.url;
@@ -89,9 +89,7 @@ document.addEventListener("DOMContentLoaded", function(e) {
     dismissNotifications();
     // SEND MESSAGE TO SERVER TO SET TO ZERO
   });
-  // Register Events on DOM
-  document.querySelector('#facebook-login').addEventListener('click', facebookLogin);
-  document.querySelector('#google-login').addEventListener('click', googleLogin);
+
 
   // Update the feed privacy setting if the user changes it in the dropdown menu.
   $('#feed-privacy-select li a').click(function() {
@@ -190,7 +188,7 @@ function loadContent(url) {
 
   paramString = paramString.join('&');
   var apiURL = settings.server + "/api/comments/get?" + paramString;
-
+  console.log('APIURL', apiURL);
   var request = $.ajax({
     url: apiURL,
     method: "GET",
@@ -598,18 +596,7 @@ function loginButtons(showLogin) {
   }
 }
 
-// LOGIN STRATEGIES
-var googleLogin = function() {
-  // chrome.tabs.create({
-  //   url: settings.server + '/api/auth/chrome/google'
-  // });
-}
 
-var facebookLogin = function() {
-  // chrome.tabs.create({
-  //   url: settings.server + '/api/auth/chrome/facebook'
-  // });
-}
 
 //  format an ISO date using Moment.js
 //  http://momentjs.com/
