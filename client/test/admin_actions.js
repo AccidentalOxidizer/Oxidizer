@@ -2,7 +2,8 @@ $(document).ready(function() {
 
   // Initial vars
   // Setting this to emtpy so we can do some interesting stuff later.
-  var testSettings = {
+  var adminSettings = {
+    currentMode: 'recent', // This can either be 'recent' or 'flagged'
     url: '',
     urlId: '',
     userId: ''
@@ -12,7 +13,7 @@ $(document).ready(function() {
   // Basically, our AJAX call will get data back, loop over the array of comments
   // then send each individiaul comment here to build out the comment.
   var buildComments = function(comment) {
-    var commentHTML = '<div class="comment"><p>Comment ID:' + comment.id + '<br/>' + comment.User.name + ' | ' +
+    var commentHTML = '<div class="comment" data-commentid="' + comment.id + '"><p>Comment ID:' + comment.id + '<br/>' + comment.User.name + ' | ' +
       comment.createdAt + '<br/><a href="http://' + comment.Url.url + '" target="_blank">http://' + comment.Url.url + '</a><br/>' + comment.text + '<br/>' +
       '<a href="#" class="delete" data-comment-id="' + comment.id + '">DELETE</a> || <a href="#" class="unflag" data-comment-id="' + comment.id + '">REMOVE FLAGS</a> <br/>' +
       'TOTAL FAVS: <span id="faves-' + comment.id + '">' + comment.Hearts + '</span> || TOTAL FLAGS: <span id="flags-' + comment.id + '">' + comment.Flags + '</span></p></div>';
@@ -23,7 +24,7 @@ $(document).ready(function() {
   // That way we can update the server if I input a new URL to look at in the
   // input box at the top of the screen.
   var getComments = function(url) {
-    testSettings.url = url || null;
+    adminSettings.url = url || null;
     // Default website to show comments from on page load.
     // If this is for a POST request, we need to JSON.stringify() data.
     // If it's for a GET request, we don't need to stringify data.
@@ -45,7 +46,7 @@ $(document).ready(function() {
         //console.log('DONE!');
 
         // Set the logged in user's ID so we can pass into fav / flag functions.
-        testSettings.userId = data.userInfo.userId;
+        adminSettings.userId = data.userInfo.userId;
 
         var commentArrayHTML = '';
         // Render comment HTML
@@ -69,12 +70,25 @@ $(document).ready(function() {
   getComments();
 
 
+  // Sorting options
+  $(document).on('click', '#sort-flags', function(event) {
+    // Update Mode:
+    adminSettings.currentMode = "flags";
+    console.log('Current Sort Mode:', adminSettings.currentMode);
+  });
+
+  $(document).on('click', '#sort-recent', function(event) {
+    // Update Mode:
+    adminSettings.currentMode = "recent";
+    console.log('Current Sort Mode:', adminSettings.currentMode);
+  });
 
   // DELETE COMMENT FROM DATABASE
   $(document).on('click', '.delete', function(event) {
     event.preventDefault();
     console.log('DELETE clicked!');
     console.log('DELETE CLICKED, ID = ', $(this).attr('data-comment-id'));
+    var commentId = $(this).attr('data-comment-id');    
   });
 
 
@@ -83,6 +97,28 @@ $(document).ready(function() {
     event.preventDefault();
     console.log('UNFLAG clicked!');
     console.log('UNFLAG CLICKED, ID = ', $(this).attr('data-comment-id'));
+    var commentId = $(this).attr('data-comment-id');
+
+    $.ajax({
+      url: window.location.origin + '/api/flags/remove/' + commentId,
+      method: 'DELETE',
+      //dataType: 'json',
+      success: function(data) {
+        console.log('Removing flags: ', commentId);
+        var getDivId = 'div[data-commentid="' + commentId +'"]';
+        
+        // If current mode is for flags only, then let's go ahead and
+        // hide the div as well, since we reset current flags.
+        if (adminSettings.currentMode === 'flags') {
+          $(getDivId).hide();
+        } else {
+          $('#flags-' + commentId).text('0');
+        }
+      },
+      error: function(xhr, status, err) {
+        console.error(xhr, status, err.message);
+      }
+    });
   });
 
 
