@@ -1,5 +1,32 @@
 // *********** COMMENTS *************
 
+// GET api/comments/faves/getForUser
+// Request to get a list of all comments favorited by the logged in user
+var requestFavComments = {
+  // TODO? lastCommentId?
+};
+
+// Server Response: Format mostly the same as api/comments/get so the
+// response can be used similarly.
+var favComments = {
+  comments: [{
+    Url: {
+      url: 'parsedUrl',
+    },
+    User: {
+      name: 'string'
+    },
+    id: 'unique key of the comment',
+    text: 'string',
+    createdAt: 'date',
+  }],
+  currentTime: 'timestamp',
+  userInfo: {
+    username: 'string'
+  }
+}
+
+
 // GET request to api/comments/get
 var requestComments = {
   url: 'string unparsed url', // Set if loading all comments for a URL
@@ -34,32 +61,6 @@ var commentsForAPath = {
   heartedByUser: 'boolean'
 };
 
-// GET to /api/comments/get/user - get comments for logged in user
-// + total comments for the user.
-// Similar to above API, but also returns total number of comments
-// in the returned data.
-// Client sends:
-var requestCommentsForUser = {
-  oldestLoadedCommentId: 'number', // undefined on initial load
-}
-
-// Server returns:
-var data {
-  displayName: 'string',
-  comments: [{
-    Url: {
-      url: 'parsedUrl',
-    },
-    User: {
-      name: 'string'
-    },
-    text: 'string',
-    createdAt: 'date',
-    isPrivate: 'boolean'
-  }],
-  numComments: 'int',
-  currentTime: 'date'
-};
 
 // POST request to api/comments
 // extension sends:
