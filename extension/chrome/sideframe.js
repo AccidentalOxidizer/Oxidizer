@@ -405,7 +405,7 @@ function registerCommentEventListeners(comment) {
       var commentId = this.getAttribute('data-comment-id');
       console.log('Reply to: ', commentId);
       $(this).toggleClass('active');
-      $(this).parents('#' + commentId).children('.reply-form').toggleClass('hidden');
+      $('#' + commentId + ' .reply-form').toggleClass('hidden');
     })
   }
 
@@ -470,6 +470,27 @@ function registerCommentEventListeners(comment) {
     });
   }
 
+  var removes = document.getElementsByClassName('delete');
+  for (var i = 0; i < removes.length; i++) {
+    $(removes[i]).off('click').on('click', function() {
+      $('#confirm-modal').remove();
+      var id = this.getAttribute('data-comment-id');
+      var source = $("#confirm-flag-x-handlebars-template").html();
+      var template = Handlebars.compile(source);
+      var html = template({
+        action: 'Are you sure you want to delete the comment?',
+        modalId: 'confirm-modal',
+        commentId: id
+      });
+      $('body').append(html);
+      document.getElementById('confirm-flag').addEventListener('click', function() {
+        deletePost(id);
+      });
+      $('#confirm-modal').modal();
+    });
+  };
+
+
   var flags = document.getElementsByClassName('flag');
   for (var i = 0; i < flags.length; i++) {
     $(flags[i]).off('click').on('click', function() {
@@ -479,6 +500,7 @@ function registerCommentEventListeners(comment) {
       var source = $("#confirm-flag-x-handlebars-template").html();
       var template = Handlebars.compile(source);
       var html = template({
+        action: 'You are about to flag / unflag a comment. You sure?',
         modalId: 'confirm-modal',
         commentId: id
       });
@@ -587,6 +609,23 @@ function favePost(commentId) {
   });
 }
 
+function deletePost(commentId) {
+  var request = $.ajax({
+    url: settings.server + '/api/comments/remove/' + commentId,
+    method: "DELETE",
+    contentType: "application/json"
+  });
+
+  request.done(function(msg) {
+    console.log('successfully deleted comment,', msg);
+    document.getElementById(commentId).remove();
+  });
+
+  request.fail(function(err) {
+    console.log('Darn. something went wrong, could not delete comment', err);
+  });
+}
+
 function loginButtons(showLogin) {
   if (showLogin) {
     document.getElementById('notification-area').classList.remove('hidden');
@@ -623,4 +662,6 @@ Handlebars.registerHelper('ifSelf', function(v1, v2, options) {
   }
   return options.inverse(this);
 });
+
+
 // EOF
