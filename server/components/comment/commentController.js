@@ -28,16 +28,15 @@ var buildQueryOptions = function(req, filterByUser) {
 module.exports.getCommentsForUrl = function(req, res, next) {
   var Comment = req.app.get('models').Comment;
   var User = req.app.get('models').User;
-
   // build query Options
   var options = buildQueryOptions(req);
   // getComment and User info for the database
+
   Promise.all([Comment.getComments(options), User.getUserInfo(req.user.id)]) // TODO add userQuery
     .spread(function(comments, user){
-
       var response = {
         comments: comments[0],
-        userInfo: user,
+        userInfo: user[0],
         currentTime: new Date()
       };
 
@@ -51,9 +50,46 @@ module.exports.getCommentsForUser = function (req, res, next) {
   var User = req.app.get('models').User;
 
   var options = buildQueryOptions(req, true);
+};
 
+module.exports.addComment = function(req, res, next) {  
+  // post the comment, then get comment info and user info 
+  var Comment = req.app.get('models').Comment;
+  var User = req.app.get('models').User;
+
+  return Comment.addComment({
+    text: req.body.text,
+    isPrivate: req.body.isPrivate,
+    UserId: req.user.id,
+    url: req.body.url,
+    host: parseUrl(req.body.url).host,
+    repliesToId: req.body.repliesToId
+  })
+    .then(function(data){
+      console.log('////////////////////////////////',data.get('id'));
+      var newComment = {
+        commentId: data.get('id'),
+        repliesToId: req.body.repliesToId
+      };
+
+      return Promise.all([Comment.getComments(newComment), User.getUserInfo(req.user.id)]);
+    })
+    .spread(function(comments, user) {
+
+      var response = {
+        comments: comments[0],
+        userInfo: user[0],
+        currentTime: new Date()
+      };
+
+      res.send(201, response);
+    })
+    .catch(function(err){
+      console.log(err);
+    });
 
 };
+
 
 
 

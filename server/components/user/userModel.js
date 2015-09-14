@@ -83,7 +83,9 @@ module.exports = function(sequelize, dataTypes) {
           .catch(function(err) {
             console.log(err);
           });
-        }, getUserInfo: getUserInfo,
+        }, getUserInfo: function(userid){
+          return getUserInfo(sequelize, userid);
+        }
     }
 
   }, {

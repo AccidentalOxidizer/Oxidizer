@@ -42,6 +42,17 @@ for (var k in models) {
     through: 'UserGroup'
   });
 
+  // Comment can reply to one other comment
+  m.Comment.belongsTo(m.Comment, {
+    as: 'repliesTo', 
+    foreignKey: 'repliesToId'
+  });
+
+  m.Comment.hasMany(m.Comment, {
+    as: 'repliesTo',
+    foreignKey: 'repliesToId'
+  });
+
   m.Heart.belongsTo(m.User, {
     foreignKey: {
       allowNull: false

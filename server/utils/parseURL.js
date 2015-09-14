@@ -29,7 +29,6 @@ module.exports = function(unparsedURL) {
   if (blacklisted.hasOwnProperty(parsedURL.host + '/')) {
     return new Error('URL blacklisted');
   }
-  console.log('(((((((((((((((((((',parsedURL);
 
   // if hash seems legit path, return parsed url with hash
   if (parsedURL.hash && '/!'.indexOf(parsedURL.hash[1]) !== -1) {

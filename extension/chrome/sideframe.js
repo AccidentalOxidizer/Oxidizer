@@ -80,7 +80,6 @@ document.addEventListener("DOMContentLoaded", function(e) {
 
   // close Oxidizer IFrame Window when hitting Esc key
   document.addEventListener('keydown', function(e) {
-    console.log(e.keyCode);
     if (e.keyCode === 27) {
       closeOxidizer();
     }
@@ -224,14 +223,9 @@ function loadContent(url) {
   }
 
   paramString = paramString.join('&');
-<<<<<<< HEAD
-  var apiURL = settings.server + "/api/comments/get?" + paramString;
-  console.log('APIURL', apiURL);
+  var apiURL = settings.server + "/api/comments?" + paramString;
 
   toggleSpinner();
-=======
-  var apiURL = settings.server + "/api/comments/?" + paramString;
->>>>>>> commentRoutesCleanup
 
   var request = $.ajax({
     url: apiURL,
@@ -314,7 +308,7 @@ function postComment(text, repliesToId) {
     if (!repliesToId) {
       $(".cd-panel-content").prepend(html);
     } else {
-      $(repliesToId).append(html);
+      $('#' + repliesToId).prepend(html);
     }
     registerCommentEventListeners();
 
@@ -366,7 +360,6 @@ function loadMoreComments(destination, url, repliesToId) {
   toggleSpinner();
   // if not a reply, don't execute if we are at end of comments, or waiting for a request to return
   if (repliesToId === undefined && (tracking.mainLastComment.endOfComments || !tracking.requestReturned)) {
-    console.log(tracking.mainLastComment.endOfComments, tracking.requestReturned);
     return;
   }
 
@@ -387,7 +380,7 @@ function loadMoreComments(destination, url, repliesToId) {
     } else {
       tracking[repliesToId] = {
         endOfComments: false
-      }
+      };
     }
     params.repliesToId = repliesToId;
   } else {
@@ -404,9 +397,10 @@ function loadMoreComments(destination, url, repliesToId) {
   }
 
   paramString = paramString.join('&');
-  var apiURL = settings.server + "/api/comments/get?" + paramString;
+  var apiURL = settings.server + "/api/comments?" + paramString;
 
   tracking.requestReturned = false;
+
   var request = $.ajax({
     url: apiURL,
     method: "GET",
@@ -414,6 +408,7 @@ function loadMoreComments(destination, url, repliesToId) {
   });
 
   request.success(function(msg) {
+    console.log(msg);
     tracking.requestReturned = true;
 
     // set lastLoadedCommentId
@@ -479,7 +474,7 @@ function registerCommentEventListeners(comment) {
       $(this).toggleClass('active');
       $('#' + commentId + ' .reply-form').toggleClass('hidden');
       $('#' + commentId + ' .reply-input ').focus();
-    })
+    });
   }
 
   var replyForms = document.getElementsByClassName('reply-form');

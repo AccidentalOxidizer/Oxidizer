@@ -41,6 +41,8 @@ require('./components/user/passport')(passport, config);
 // ROUTES
 var routes = require('./routes');
 
+var models = require('./components');
+app.models = models;
 
 if (process.env.NODE_ENV === 'production') {
   var nullfunc = function() {};

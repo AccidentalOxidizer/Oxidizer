@@ -1,4 +1,5 @@
 // Options has the following optional properties:
+// commentId - will return an arrray with one comment
 // userId - will add columns to let you know if this user has flagged or hearted the comment, and whether this comment was written by user
 // url - filters by a url ** only supports either url or urlSearch - urlSearch will not work is url is present 
 // urlSearch - filters by matching url 

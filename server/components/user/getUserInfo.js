@@ -1,9 +1,7 @@
-var sequelize = require('../').sequelize;
-
-module.exports = function(id) {
+module.exports = function(sequelize, id) {
   var queryString = 
     'SELECT id AS userId, name AS username, avatar AS userAvatar, repliesToCheck, heartsToCheck ' +
     'FROM Users WHERE id=' + id + ';';
 
-  return queryString;
+  return sequelize.query(queryString);
 };
