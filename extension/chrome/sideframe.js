@@ -86,7 +86,18 @@ document.addEventListener("DOMContentLoaded", function(e) {
   });
 
   document.getElementById('dismiss-notifications').addEventListener('click', function() {
-    dismissNotifications();
+    var request = $.ajax({
+      url: settings.server + '/api/users/markread',
+      method: "GET",
+      contentType: "application/json",
+    });
+    request.success(function(msg) {
+      dismissNotifications();
+    });
+    reques.fail(function(err) {
+      console.log('Darn, could not mark notifications as read :/ ', err);
+    });
+
     // SEND MESSAGE TO SERVER TO SET TO ZERO
   });
 
@@ -187,6 +198,9 @@ function loadContent(url) {
   paramString = paramString.join('&');
   var apiURL = settings.server + "/api/comments/get?" + paramString;
   console.log('APIURL', apiURL);
+
+  toggleSpinner();
+
   var request = $.ajax({
     url: apiURL,
     method: "GET",
@@ -231,6 +245,7 @@ function loadContent(url) {
   });
 
   request.complete(function(jqXHR, textStatus) {
+    toggleSpinner();
     if (jqXHR.status === 401) {
       loginButtons(true);
     } else {
@@ -242,6 +257,7 @@ function loadContent(url) {
 
 // function to post new comments
 function postComment(text, repliesToId) {
+  toggleSpinner();
   var data = JSON.stringify({
     url: url,
     text: text,
@@ -257,7 +273,7 @@ function postComment(text, repliesToId) {
     dataType: 'json'
   });
 
-  request.done(function(msg) {
+  request.success(function(msg) {
     // compile and append successfully saved and returned message to DOM
     var html = compileComments(msg);
 
@@ -274,6 +290,15 @@ function postComment(text, repliesToId) {
 
   request.fail(function(jqXHR, textStatus) {
     console.log("Request failed: " + textStatus);
+  });
+
+  request.complete(function(jqXHR, textStatus) {
+    toggleSpinner();
+    if (jqXHR.status === 401) {
+      loginButtons(true);
+    } else {
+      loginButtons(false);
+    }
   });
 }
 
@@ -303,6 +328,7 @@ function compileComments(msg) {
 
 // destination is a jquery object that you want to append to
 function loadMoreComments(destination, url, repliesToId) {
+  toggleSpinner();
   // if not a reply, don't execute if we are at end of comments, or waiting for a request to return
   if (repliesToId === undefined && (tracking.mainLastComment.endOfComments || !tracking.requestReturned)) {
     console.log(tracking.mainLastComment.endOfComments, tracking.requestReturned);
@@ -352,7 +378,7 @@ function loadMoreComments(destination, url, repliesToId) {
     contentType: "application/json",
   });
 
-  request.done(function(msg) {
+  request.success(function(msg) {
     tracking.requestReturned = true;
 
     // set lastLoadedCommentId
@@ -393,6 +419,17 @@ function loadMoreComments(destination, url, repliesToId) {
   request.fail(function(jqXHR, textStatus) {
     console.log("Request failed: " + textStatus);
   });
+
+  request.complete(function(jqXHR, textStatus) {
+    toggleSpinner();
+    if (jqXHR.status === 401) {
+      loginButtons(true);
+    } else {
+      loginButtons(false);
+    }
+  });
+
+
 }
 
 
@@ -528,8 +565,6 @@ function registerCommentEventListeners(comment) {
 // FUNCTIONS
 
 function setNotifications(favs, replies) {
-  //testing:
-  // favs = 1, replies = 1;
   if (!favs && !replies) {
     dismissNotifications();
   } else {
@@ -555,8 +590,6 @@ function dismissNotifications() {
   document.querySelector('#notifications > i').classList.remove('fa-bell')
   document.querySelector('#notifications > i').classList.remove('notifications');
   document.querySelector('#notifications > i').classList.add('fa-bell-o');
-  // SEND MESSAGE TO SERVER TO SET TO ZERO
-
 }
 
 function flagPost(commentId) {
@@ -635,7 +668,10 @@ function loginButtons(showLogin) {
   }
 }
 
-
+// toggle spinner 
+function toggleSpinner() {
+  $('.loading').toggleClass('spinner');
+}
 
 //  format an ISO date using Moment.js
 //  http://momentjs.com/
@@ -662,6 +698,7 @@ Handlebars.registerHelper('ifSelf', function(v1, v2, options) {
   }
   return options.inverse(this);
 });
+
 
 
 // EOF
