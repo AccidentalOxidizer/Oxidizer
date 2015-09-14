@@ -11,6 +11,8 @@ var stress = require('./stressTestRouter');
 var urlEncodedParser = bodyParser.urlencoded({
   extended: true
 });
+var jsonParser = bodyParser.json();
+
 
 module.exports = function(express, app, passport) {
 
@@ -24,6 +26,13 @@ module.exports = function(express, app, passport) {
       res.sendStatus(200);
     });
   }
+
+  app.get('/welcome', urlEncodedParser, jsonParser, function(req,res, next){
+    console.log(req);
+    res.status(200).send({
+      loggedin: 'ok'
+    });
+  })
 
   // routes
   auth(app, passport);
