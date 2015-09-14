@@ -106,7 +106,7 @@
                             </div>
                             <div class="media-body media-middle">
                                 <div class="">
-                                    <h4 class="comment-username media-heading">{{User.name}}</h4>
+                                    <h4 class="comment-username media-heading"><a href={{../host}}/#/profile?userId={{UserId}}>{{User.name}}</a></h4>
                                     <div class="comment-timestamp">{{dateFormat createdAt format="MMMM YYYY"}} - {{#if repliesToId}} {{Hearts}} like(s){{/if}}
                                     </div>
                                     {{#if repliesToId}}
