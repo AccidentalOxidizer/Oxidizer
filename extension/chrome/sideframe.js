@@ -85,6 +85,20 @@ document.addEventListener("DOMContentLoaded", function(e) {
     }
   });
 
+  // Detect if user chooses a different view for feed and update comment box properly.
+  document.getElementById('feed-public').addEventListener('click', function() {
+    // console.log('PUBLIC FEED CLICKED!');
+    commentPrivately = false;
+    $(document.body).find('.btn-privacy').html('<a href="#"><i class="fa fa-globe"></i> Public</a>');
+  });
+
+  // Detect if user chooses a different view for feed and update comment box properly.
+  document.getElementById('feed-private').addEventListener('click', function() {
+    // console.log('PRIVATE FEED CLICKED!');
+    commentPrivately = true;
+    $(document.body).find('.btn-privacy').html('<a href="#"><i class="fa fa-lock"></i> Private</a>');
+  });
+
   // close Oxidizer IFrame Window when when clicking close button 
   document.getElementById('close').addEventListener('click', closeOxidizer);
 
