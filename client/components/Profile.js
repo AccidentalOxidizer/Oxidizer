@@ -266,41 +266,60 @@ var Profile = React.createClass({
     this.loadComments();
   },
 
+  // Delete the comment at index in the comments array.
+  // Optimistically delete the comment from the view.
+  deleteComment: function(index) {
+    // var deletedComment = this.state.comments[index];
+    // var updatedComments = this.state.comments.splice(index, 1);
+    var deletedComment = this.state.comments.splice(index, 1)[0];
+
+    console.log("Profile: requesting delete of comment ", deletedComment);
+    this.setState({comments: this.state.comments});
+
+    $.ajax({
+      url: window.location.origin + '/api/comments/remove/' + deletedComment.id,
+      method: "DELETE",
+      contentType: "application/json",
+      success: function(data) {
+        console.log('Profile: delete successful.');
+      },
+      error: function(xhr, status, err) {
+        console.error(xhr, status, err.message);
+      }
+    });
+  },
+
   render: function() {
 
     // Optional header with more options if loading our personal profile
+    var optionalHeader;
+    var isPersonalProfile = this.userId ? false : true;
 
-    var header = (function() {
-      if (this.userId) {
-        return;
-      } else {
-        return(
-          <div className="row">
-            <div className="dropdown">
-              <button className="btn btn-default dropdown-toggle" type="button" id="privacy-select"
-                data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
-                Comment Options <span className="caret"></span>
-              </button>
-              <ul className="dropdown-menu" aria-labelledby="privacy-select">
-                <li><a onClick={this.selectPrivateComments} href="#">Show Private Comments</a></li>
-                <li><a onClick={this.selectPublicComments} href="#">Show Public Comments</a></li>
-              </ul>
-                | <a onClick={this.resetComments} href="#">Clear Search</a>
-                | <a onClick={this.loadUserFavorites}>Load Favorites</a>
-            </div>
-            <hr />
+    if (isPersonalProfile) {
+      optionalHeader = (
+        <div className="row">
+          <div className="dropdown">
+            <button className="btn btn-default dropdown-toggle" type="button" id="privacy-select"
+              data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+              Comment Options <span className="caret"></span>
+            </button>
+            <ul className="dropdown-menu" aria-labelledby="privacy-select">
+              <li><a onClick={this.selectPrivateComments} href="#">Show Private Comments</a></li>
+              <li><a onClick={this.selectPublicComments} href="#">Show Public Comments</a></li>
+            </ul>
+              | <a onClick={this.resetComments} href="#">Clear Search</a>
+              | <a onClick={this.loadUserFavorites}>Load Favorites</a>
           </div>
-        );
-      }
-    }).bind(this)();
+          <hr />
+        </div>
+      );
+    }
 
+    var comments = this.state.comments.map(function(comment, i) {
+      return <Comment key={comment.id} comment={comment}
+              allowDelete={isPersonalProfile} deleteComment={this.deleteComment.bind(null, i)}  />;
+    }.bind(this));
 
-    var comments = this.state.comments.map(function(comment) {
-      return <Comment key={comment.id} comment={comment} />;
-    });
-
-          // <div className="col-sm-offset-3 col-sm-6">
-            // <p><a href="#">Clear Search</a> | <a href="#">Public</a></p>
     return (
       <div className="row">
         <div className="col-md-4">
@@ -310,7 +329,7 @@ var Profile = React.createClass({
         </div>
 
         <div className="col-md-8">
-          {header}
+          {optionalHeader}
 
           <form onSubmit={this.handleUrlSearch}>
             <div className="form-group col-sm-7">
