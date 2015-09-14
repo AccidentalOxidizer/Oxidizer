@@ -15,9 +15,10 @@ var Comment = React.createClass({
   },
   
   render: function() {
+    var userUrl = window.location.origin + '/#/profile?userId=' + this.props.comment.UserId;
     return (
       <div>
-        <p><strong>{this.props.comment.User.name}</strong> | {this.props.comment.Url.url} | {this.props.comment.createdAt}</p>
+        <p><strong><a href={userUrl}>{this.props.comment.User.name}</a></strong> | {this.props.comment.Url.url} | {this.props.comment.createdAt}</p>
         <p>{this.props.comment.text}</p>
       </div>
     );
