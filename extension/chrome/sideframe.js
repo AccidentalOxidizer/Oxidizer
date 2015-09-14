@@ -326,6 +326,9 @@ function compileComments(msg) {
     }
   });
 
+  // Include access to the host value to build url to link to user profiles.
+  msg.host = settings.server;
+
   return template(msg);
 }
 
