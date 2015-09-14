@@ -77,15 +77,16 @@ document.addEventListener("DOMContentLoaded", function(e) {
     }
   }, false);
 
-
-  // send message to background script to tell content script to close this iframe
-  document.getElementById('close').addEventListener('click', function() {
-    document.getElementById('panel').classList.remove('is-visible');
-    chrome.runtime.sendMessage({
-      from: 'iframe',
-      message: 'close iframe'
-    }, function() {});
+  // close Oxidizer IFrame Window when hitting Esc key
+  document.addEventListener('keydown', function(e) {
+    console.log(e.keyCode);
+    if (e.keyCode === 27) {
+      closeOxidizer();
+    }
   });
+
+  // close Oxidizer IFrame Window when when clicking close button 
+  document.getElementById('close').addEventListener('click', closeOxidizer);
 
   document.getElementById('dismiss-notifications').addEventListener('click', function() {
     var request = $.ajax({
@@ -674,6 +675,16 @@ function loginButtons(showLogin) {
 // toggle spinner 
 function toggleSpinner() {
   $('.loading').toggleClass('spinner');
+}
+
+// close Oxidizer IFrame Window 
+function closeOxidizer() {
+  document.getElementById('panel').classList.remove('is-visible');
+  //send message to background script to tell content script to close this iframe
+  chrome.runtime.sendMessage({
+    from: 'iframe',
+    message: 'close iframe'
+  }, function() {});
 }
 
 //  format an ISO date using Moment.js
