@@ -81,7 +81,7 @@ $(document).ready(function() {
         // Allow posting paths only and not URLs by prepending 'http://'
         if (getURL === undefined || getURL === '') {
           // DO NOTHING cause we'll just return all URLs
-          getURL = ''
+          getURL = '';
           void 0;
         } else if (getURL.substr(0, 5) === 'http:' || getURL.substr(0, 6) === 'https:') {
           // ALSO DO NOTHING. WHY IS THIS HERE?

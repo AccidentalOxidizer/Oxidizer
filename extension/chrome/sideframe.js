@@ -60,6 +60,7 @@ document.addEventListener("DOMContentLoaded", function(e) {
           var privacyText = commentPrivately ? '<i class="fa fa-lock"></i> Private' : '<i class="fa fa-globe"></i> Public';
           $('#comment-privacy-select').parents('.dropup').find('.btn-privacy').html(privacyText + ' <span class="caret"></span>');
           $('#feed-privacy-select').parents('.dropdown').find('.dropdown-toggle').html(privacyText + ' Feed <span class="caret"></span>');
+          $("#comment-submit-button").prop("disabled",true); // Disable the submit button since there is zero content.
 
           // show the panel with animation
           document.getElementById('panel').classList.add('is-visible');
@@ -83,6 +84,20 @@ document.addEventListener("DOMContentLoaded", function(e) {
     if (e.keyCode === 27) {
       closeOxidizer();
     }
+  });
+
+  // Detect if user chooses a different view for feed and update comment box properly.
+  document.getElementById('feed-public').addEventListener('click', function() {
+    // console.log('PUBLIC FEED CLICKED!');
+    commentPrivately = false;
+    $(document.body).find('.btn-privacy').html('<a href="#"><i class="fa fa-globe"></i> Public</a>');
+  });
+
+  // Detect if user chooses a different view for feed and update comment box properly.
+  document.getElementById('feed-private').addEventListener('click', function() {
+    // console.log('PRIVATE FEED CLICKED!');
+    commentPrivately = true;
+    $(document.body).find('.btn-privacy').html('<a href="#"><i class="fa fa-lock"></i> Private</a>');
   });
 
   // close Oxidizer IFrame Window when when clicking close button 
@@ -124,9 +139,19 @@ document.addEventListener("DOMContentLoaded", function(e) {
 
   // Post new comment
   document.getElementById('comment-input-field').addEventListener('keydown', function(e) {
-    if (e.keyCode === 13) {
+    // Check if length is 0 and disable post button.
+    var getTextLength = document.getElementById('comment-input-field').value.length;
+    //console.log('CUR LENGTH: ', getTextLength);
+    if (getTextLength === 0) {
+      $("#comment-submit-button").prop("disabled",true);
+    } else {
+      $("#comment-submit-button").prop("disabled",false);
+    }
+
+    if (e.keyCode === 13 && getTextLength > 0) {
       postComment(document.getElementById('comment-input-field').value);
       document.getElementById('comment-input-field').value = '';
+      $("#comment-submit-button").prop("disabled",true); // Disable the submit button since there is zero content.
     }
   });
 
