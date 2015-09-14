@@ -86,7 +86,18 @@ document.addEventListener("DOMContentLoaded", function(e) {
   });
 
   document.getElementById('dismiss-notifications').addEventListener('click', function() {
-    dismissNotifications();
+    var request = $.ajax({
+      url: settings.server + '/api/users/markread',
+      method: "GET",
+      contentType: "application/json",
+    });
+    request.success(function(msg) {
+      dismissNotifications();
+    });
+    reques.fail(function(err) {
+      console.log('Darn, could not mark notifications as read :/ ', err);
+    });
+
     // SEND MESSAGE TO SERVER TO SET TO ZERO
   });
 
@@ -528,8 +539,6 @@ function registerCommentEventListeners(comment) {
 // FUNCTIONS
 
 function setNotifications(favs, replies) {
-  //testing:
-  // favs = 1, replies = 1;
   if (!favs && !replies) {
     dismissNotifications();
   } else {
@@ -555,8 +564,6 @@ function dismissNotifications() {
   document.querySelector('#notifications > i').classList.remove('fa-bell')
   document.querySelector('#notifications > i').classList.remove('notifications');
   document.querySelector('#notifications > i').classList.add('fa-bell-o');
-  // SEND MESSAGE TO SERVER TO SET TO ZERO
-
 }
 
 function flagPost(commentId) {
