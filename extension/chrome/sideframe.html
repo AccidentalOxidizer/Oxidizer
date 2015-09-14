@@ -95,7 +95,7 @@
     </div>
     <script id="comment-entry-template" type="text/x-handlebars-template">
         {{#each comments}}
-        <div class="col-xs-12 comment{{#if repliesToId}}-reply{{/if}} {{#ifSelf ../userInfo.userId UserId}}self{{/ifSelf}}" id="{{id}}">
+        <div class="col-xs-12 comment{{#if repliesToId}}-reply{{/if}} {{#ifSelf ../userInfo.userId UserId}}self{{/ifSelf}} {{#if flaggedByUser}} flagged{{/if}}" id="{{id}}">
             <div class="comment-wrapper">
                 <div class="row">
                     <div class="col-xs-10">

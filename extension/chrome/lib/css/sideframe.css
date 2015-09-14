@@ -481,6 +481,9 @@ h4.comment-username,
     color:#2372CC;
 }
 
+.flagged {
+    display: none;
+}
 
 /*Loading Spinner*/
 
