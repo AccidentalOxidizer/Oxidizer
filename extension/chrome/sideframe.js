@@ -224,10 +224,14 @@ function loadContent(url) {
   }
 
   paramString = paramString.join('&');
+<<<<<<< HEAD
   var apiURL = settings.server + "/api/comments/get?" + paramString;
   console.log('APIURL', apiURL);
 
   toggleSpinner();
+=======
+  var apiURL = settings.server + "/api/comments/?" + paramString;
+>>>>>>> commentRoutesCleanup
 
   var request = $.ajax({
     url: apiURL,

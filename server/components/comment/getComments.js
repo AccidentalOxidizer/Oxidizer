@@ -1,5 +1,4 @@
 // Options has the following optional properties:
-// commentId - will return an arrray with one comment
 // userId - will add columns to let you know if this user has flagged or hearted the comment, and whether this comment was written by user
 // url - filters by a url ** only supports either url or urlSearch - urlSearch will not work is url is present 
 // urlSearch - filters by matching url 
@@ -68,7 +67,7 @@ module.exports = function(sequelize, options) {
     var userToFilter = options.userFilterId || options.userId;
     filters.push('Users.id = ' + userToFilter + ' ');
   }
-  
+
   if (options.commentId) filters.push('Comments.id = ' + options.commentId + ' ');
   if (options.lastCommentId) filters.push('Comments.id < ' + options.lastCommentId + ' ');
   if (options.repliesToId) filters.push('Comments.repliesToId = ' + options.repliesToId + ' ');
@@ -114,7 +113,7 @@ module.exports = function(sequelize, options) {
   queryString += 'LIMIT ' + limit + ' ';
   
   queryString += ';';
-  console.log(queryString);
+
   return sequelize.query(queryString);
 };
 

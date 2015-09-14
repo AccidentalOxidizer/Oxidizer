@@ -1,3 +1,5 @@
+var getComments = require('./getComments');
+
 module.exports = function(sequelize, dataTypes){
   return sequelize.define('Comment', {
     text: {
@@ -33,8 +35,15 @@ module.exports = function(sequelize, dataTypes){
             //console.log('test', results);
             return results;
           });
+      },
+
+      getComments: function(options){
+        return getComments(sequelize, options);
       }
-    }
+    },
+
+
+
   });
 };
 

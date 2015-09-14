@@ -53,7 +53,7 @@ var Website = React.createClass({
           }
         });
 
-        this.setState({paths: data});
+        // this.setState({paths: data});
       }.bind(this),
 
       error: function(xhr, status, err) {
@@ -77,7 +77,7 @@ var Website = React.createClass({
     console.log('websiteProfile loading comments:', query);
     this.pendingAjax = true;
     $.ajax({
-      url: window.location.origin + '/api/comments/get',
+      url: window.location.origin + '/api/comments/url',
       data: query,
       method: 'GET',
       dataType: 'json',

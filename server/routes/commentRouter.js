@@ -125,7 +125,12 @@ module.exports = function(app) {
   // Get all comments with search parameters in query string
   // With auth.isLoggedIn middleware, we should always have a 
   // valid req.user.
-  app.get('/api/comments/get', jsonParser, auth.isLoggedIn, function(req, res, next) {
+  app.get('/api/comments/', jsonParser, auth.isLoggedIn, Comment.getCommentsForUrl);
+  
+  // this was handled by including a parameter for 'filterByUser'
+  app.get('/api/comments/user/', jsonParser, auth.isLoggedIn, Comment.getCommentsForUser);
+
+  app.get('/api/comments/getcha', jsonParser, auth.isLoggedIn, function(req, res, next) {
     var searchObject = {};
     console.log("Comments get: req.query: ", req.query);
     
