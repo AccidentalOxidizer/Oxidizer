@@ -11,13 +11,14 @@ var React = require('react');
 //
 var Path = React.createClass({
   propTypes: {
-    path: React.PropTypes.object.isRequired
+    path: React.PropTypes.object.isRequired,
+    redirect: React.PropTypes.object.isRequired
   },
-  
+
   render: function() {
     return (
       <div>
-        <p><strong>{this.props.path.url}</strong> Comments: {this.props.commentCount} </p>
+        <p><div onClick={this.props.redirect}><strong>{this.props.path.url}</strong></div> Comments: {this.props.path.commentCount} </p>
       </div>
     );
   }
