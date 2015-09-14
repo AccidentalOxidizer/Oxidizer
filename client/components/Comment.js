@@ -11,14 +11,27 @@ var React = require('react');
 //
 var Comment = React.createClass({
   propTypes: {
-    comment: React.PropTypes.object.isRequired
+    comment: React.PropTypes.object.isRequired,
+    allowDelete: React.PropTypes.bool.isRequired,
+    deleteComment: React.PropTypes.func.isRequired
   },
   
   render: function() {
+    var userUrl = window.location.origin + '/#/profile?userId=' + this.props.comment.UserId;
+
+    // Optional Delete ...
+    var deleteButton;
+
+    if (this.props.allowDelete) {
+      deleteButton = (
+        <p><a onClick={this.props.deleteComment}>Delete Comment</a></p>
+      );
+    }
     return (
       <div>
-        <p><strong>{this.props.comment.User.name}</strong> | {this.props.comment.Url.url} | {this.props.comment.createdAt}</p>
+        <p><strong><a href={userUrl}>{this.props.comment.User.name}</a></strong> | {this.props.comment.Url.url} | {this.props.comment.createdAt}</p>
         <p>{this.props.comment.text}</p>
+        {deleteButton}
       </div>
     );
   }

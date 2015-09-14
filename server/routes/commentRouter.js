@@ -3,11 +3,13 @@ var Promise = require('bluebird');
 var xssFilters = require('xss-filters');
 var Url = Promise.promisifyAll(require('../components/url'));
 var Heart = Promise.promisifyAll(require('../components/heart'));
+var HeartModel = require('../components').Heart;
 var Flag = Promise.promisifyAll(require('../components/flag'));
 var Comment = Promise.promisifyAll(require('../components/comment'));
 var User = Promise.promisifyAll(require('../components/user'));
 var bodyParser = require('body-parser');
 var jsonParser = bodyParser.json();
+var _ = require('underscore');
 
 module.exports = function(app) {
 
@@ -40,6 +42,41 @@ module.exports = function(app) {
   // Count favorites for a specific comment
   app.get('/api/comments/faves/get', jsonParser, function(req, res, next) {
     
+    var favesToGet = {
+      url: req.body.commentId
+    };
+  });
+
+  // Get all favorited comments for the logged in user
+  app.get('/api/comments/faves/getForUser', jsonParser, auth.isLoggedIn, function(req, res, next) {
+
+    console.log("Comments faves for user, query: ", req.query);
+
+    HeartModel.getUserFaves(req.user.id, req.query.lastCommentId)
+      .then(function(result) {
+        console.log("getUserFaves, result[0]:");
+        console.log("Comment text: ", result[0].Comment.text);
+        console.log("Comment Url: ", result[0].Comment.Url.url);
+
+        var comments = _.pluck(result, 'Comment');
+
+        res.send({
+          comments: comments,
+          // numComments: result[0].count,
+          currentTime: new Date(), // TODO: Fill this out!
+          userInfo: {
+            userId: req.user.id,
+            username: req.user.name,
+            // repliesToCheck: result[1].repliesToCheck,
+            // heartsToCheck: result[1].heartsToCheck,
+          }
+        });
+      })
+      .catch(function(err) {
+        console.log("Comments get faves for user err: ", err);
+        res.send(500);
+      });
+      
     var favesToGet = {
       url: req.body.commentId
     };
@@ -92,9 +129,16 @@ module.exports = function(app) {
     var searchObject = {};
     console.log("Comments get: req.query: ", req.query);
     
-    // Are we requesting comments for the logged in user?
+    // Are we requesting comments for a given user?
+    // If userId is set, then load comments for that id;
+    // otherwise load comments for the logged in user.
     if (req.query.filterByUser) {
-      searchObject.UserId = req.user.id;
+      if (req.query.userId) {
+        searchObject.UserId = req.query.userId;
+        console.log("Comments get: querying for userId ", req.query.userId);
+      } else {
+        searchObject.UserId = req.user.id;
+      }
     }
 
     // Ensure that we have a boolean value for requesting a private feed;
@@ -231,6 +275,8 @@ module.exports = function(app) {
           comments: [formatComment],
           currentTime: new Date(), // TODO: add currentTime
           userInfo: {
+            userAvatar: req.user.avatar,
+            userId: req.user.id,
             username: req.user.name
           }
         });
@@ -249,7 +295,7 @@ module.exports = function(app) {
             })
             .catch(function(err) {
               console.log("Err: ", err);
-              res.send(200);
+              res.send(500);
             });
   });
 

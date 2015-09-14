@@ -1,6 +1,8 @@
 // Deployment only: 
-// require('newrelic');
-
+if (process.env.NODE_ENV === 'production') {
+  require('look').start();
+  require('newrelic');
+}
 // EXPRESS
 var express = require('express');
 var http = require('http');
@@ -42,8 +44,17 @@ require('./components/dbconfig');
 // ROUTES
 var routes = require('./routes');
 
+
+if (process.env.NODE_ENV === 'production') {
+  var nullfunc = function() {};
+  console.log = nullfunc;
+  console.info = nullfunc;
+  console.error = nullfunc;
+  console.warn = nullfunc;
+}
+
 sequelize.sync().then(function() {
-  app.use(morgan('dev'));
+  // app.use(morgan('dev'));
   app.use(cookieParser());
 
   if (process.env.NODE_ENV === 'production') {

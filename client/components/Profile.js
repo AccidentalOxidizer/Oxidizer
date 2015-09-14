@@ -1,10 +1,13 @@
 var React = require('react');
 var Comment = require('./Comment');
+var Router = require('react-router');
 var InfiniteScroll = require('react-infinite-scroll')(React);
 
 // At the moment, Profile will only be used to display your personal
 // profile, not that of others.
 var Profile = React.createClass({
+  mixins: [Router.State],
+
   getInitialState: function() {
     return {
       userAvatar: '',
@@ -15,6 +18,9 @@ var Profile = React.createClass({
   },
 
   initLoadState: function() {
+    // XXX: Error check that the userId is a valid number?
+    this.userId = this.getQuery().userId;
+
     this.oldestLoadedCommentId = 'undefined';
     this.currentTime = undefined;
 
@@ -33,6 +39,9 @@ var Profile = React.createClass({
     // Default to loading public comments initially.
     // TODO? Persist a default setting for the user?
     this.privateFeed = false;
+
+    // Are we loading the user's favorited comments?
+    this.loadFavorites = false;
   },
 
   // Query fields:
@@ -45,33 +54,55 @@ var Profile = React.createClass({
   //  * urlSearch 
   //  * textSearch
   loadComments: function() {
-    var query = {
-      filterByUser: true,
-      isPrivate: this.privateFeed
+    // Adjust loading API and parameters according to whether we
+    // are loading user comments or user favorited comments.
+    var url;
+    var query;
+
+    if (this.loadFavorites) {
+      url = window.location.origin + '/api/comments/faves/getForUser',
+      query = {};
+    } else {
+      url = window.location.origin + '/api/comments/get',
+
+      query = {
+        filterByUser: true,
+        isPrivate: this.privateFeed
+      }
+
+      // To load any user's comments, pass in the userId in a query string
+      // e.g. http://localhost:3000/#/profile?userId=1
+      console.log("Profile loadComments: userId param is ", this.userId);
+      if (this.userId) {
+        query.userId = +this.userId;
+      }
+
+      if (this.urlSearch !== '') {
+        query.urlSearch = this.urlSearch;
+      }
+
+      if (this.textSearch !== '') {
+        query.textSearch = this.textSearch;
+      }
     }
 
     // Don't send this query value on first load.
     if (this.numLoads !== 0) {
       query.lastCommentId = this.oldestLoadedCommentId;
     }
+    console.log("Profile loadComments: numLoads ", this.numLoads);
 
-    if (this.urlSearch !== '') {
-      query.urlSearch = this.urlSearch;
-    }
 
-    if (this.textSearch !== '') {
-      query.textSearch = this.textSearch;
-    }
-
+    console.log("Profile loadComments: url ", url);
     console.log("Profile loadComments: query ", query);
 
     $.ajax({
-      url: window.location.origin + '/api/comments/get',
+      url: url,
       data: query,
       method: 'GET',
       dataType: 'json',
       success: function(data) {
-        console.log('Profile init: successfully loaded user comments');
+        console.log('Profile: successfully loaded comments');
 
         // Print user data in the console.
         console.log('USER DATA: ', data);
@@ -81,7 +112,7 @@ var Profile = React.createClass({
         // What if you have comments, but then you run a query -> 0 comments returned?
         this.oldestLoadedCommentId = data.comments.length > 0 ?
           data.comments[data.comments.length - 1].id : this.oldestLoadedCommentId;
-        console.log('Profile init: oldestLoadedCommentId ' + this.oldestLoadedCommentId);
+        console.log('Profile loadComments: oldestLoadedCommentId ' + this.oldestLoadedCommentId);
 
         // Update the time ...
         this.currentTime = data.currentTime;
@@ -89,6 +120,7 @@ var Profile = React.createClass({
         // If the number of loaded comments is less than 25 (XXX - should have a 
         // constant for this), we've loaded all the comments of this type.
         this.hasMoreComments = (data.comments.length < 25) ? false : true;
+        console.log('Profile loadComments: comments.length: ' + data.comments.length + ' hasMoreComments? ' + this.hasMoreComments);
 
         // If reloading for a search query, reset the comments array;
         // otherwise append older comments now loaded to the end.
@@ -125,6 +157,7 @@ var Profile = React.createClass({
   loadUserComments: function() {
     console.log("Profile: loadUserComments, oldestLoadedCommentId " + this.oldestLoadedCommentId);
 
+    this.loadFavorites = false;
     this.oldestLoadedCommentId = 'undefined';
     this.numLoads = 0;
 
@@ -138,6 +171,7 @@ var Profile = React.createClass({
   loadUserCommentsForUrl: function(url) {
     console.log("Profile: loadUserCommentsForUrl, " + url);
 
+    this.loadFavorites = false;
     this.oldestLoadedCommentId = 'undefined';
     this.numLoads = 0;
 
@@ -151,6 +185,7 @@ var Profile = React.createClass({
   loadUserCommentsForText: function(text) {
     console.log("Profile: loadUserCommentsForText, " + text);
 
+    this.loadFavorites = false;
     this.oldestLoadedCommentId = 'undefined';
     this.numLoads = 0;
 
@@ -164,6 +199,7 @@ var Profile = React.createClass({
   // Used by InfiniteScroll addon
   loadMoreComments: function() {
     console.log("Profile: loadMoreComments");
+    
     this.loadComments();
   },
 
@@ -216,13 +252,74 @@ var Profile = React.createClass({
     this.loadUserComments();
   },
 
-  render: function() {
-    var comments = this.state.comments.map(function(comment) {
-      return <Comment key={comment.id} comment={comment} />;
-    });
+  loadUserFavorites: function() {
+    console.log('Profile: requested loadUserFavorites');
 
-          // <div className="col-sm-offset-3 col-sm-6">
-            // <p><a href="#">Clear Search</a> | <a href="#">Public</a></p>
+    this.loadFavorites = true;
+    this.oldestLoadedCommentId = 'undefined';
+    this.numLoads = 0;
+
+    // Clear out state for Url and Text search for load of favorites
+    this.urlSearch = '';
+    this.textSearch = '';
+
+    this.loadComments();
+  },
+
+  // Delete the comment at index in the comments array.
+  // Optimistically delete the comment from the view.
+  deleteComment: function(index) {
+    // var deletedComment = this.state.comments[index];
+    // var updatedComments = this.state.comments.splice(index, 1);
+    var deletedComment = this.state.comments.splice(index, 1)[0];
+
+    console.log("Profile: requesting delete of comment ", deletedComment);
+    this.setState({comments: this.state.comments});
+
+    $.ajax({
+      url: window.location.origin + '/api/comments/remove/' + deletedComment.id,
+      method: "DELETE",
+      contentType: "application/json",
+      success: function(data) {
+        console.log('Profile: delete successful.');
+      },
+      error: function(xhr, status, err) {
+        console.error(xhr, status, err.message);
+      }
+    });
+  },
+
+  render: function() {
+
+    // Optional header with more options if loading our personal profile
+    var optionalHeader;
+    var isPersonalProfile = this.userId ? false : true;
+
+    if (isPersonalProfile) {
+      optionalHeader = (
+        <div className="row">
+          <div className="dropdown">
+            <button className="btn btn-default dropdown-toggle" type="button" id="privacy-select"
+              data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+              Comment Options <span className="caret"></span>
+            </button>
+            <ul className="dropdown-menu" aria-labelledby="privacy-select">
+              <li><a onClick={this.selectPrivateComments} href="#">Show Private Comments</a></li>
+              <li><a onClick={this.selectPublicComments} href="#">Show Public Comments</a></li>
+            </ul>
+              | <a onClick={this.resetComments} href="#">Clear Search</a>
+              | <a onClick={this.loadUserFavorites}>Load Favorites</a>
+          </div>
+          <hr />
+        </div>
+      );
+    }
+
+    var comments = this.state.comments.map(function(comment, i) {
+      return <Comment key={comment.id} comment={comment}
+              allowDelete={isPersonalProfile} deleteComment={this.deleteComment.bind(null, i)}  />;
+    }.bind(this));
+
     return (
       <div className="row">
         <div className="col-md-4">
@@ -230,21 +327,10 @@ var Profile = React.createClass({
           <h2>{this.state.displayName}</h2>
           <p>Total Comments: {this.state.numComments}</p>
         </div>
+
         <div className="col-md-8">
-          <div className="row">
-            <div className="dropdown">
-              <button className="btn btn-default dropdown-toggle" type="button" id="privacy-select"
-                data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
-                Comment Options <span className="caret"></span>
-              </button>
-              <ul className="dropdown-menu" aria-labelledby="privacy-select">
-                <li><a onClick={this.selectPrivateComments} href="#">Show Private Comments</a></li>
-                <li><a onClick={this.selectPublicComments} href="#">Show Public Comments</a></li>
-              </ul>
-                | <a onClick={this.resetComments} href="#">Clear Search</a>
-            </div>
-            <hr />
-          </div>
+          {optionalHeader}
+
           <form onSubmit={this.handleUrlSearch}>
             <div className="form-group col-sm-7">
               <input type="text" className="form-control" placeholder="Search for URL" ref="searchUrl" />

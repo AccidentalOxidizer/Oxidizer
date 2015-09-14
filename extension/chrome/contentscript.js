@@ -55,6 +55,7 @@ function createAndShowTrigger() {
   svgDocument.setAttributeNS(null, 'data-oxidizer-trigger', triggerClass);
   var shape = document.createElementNS(svgns, "polygon");
   shape.setAttributeNS(null, "points", "45,0 0,45 45,45");
+  shape.setAttributeNS(null, "fill-opacity", ".5");
   var line = document.createElementNS(svgns, "polyline");
   line.setAttributeNS(null, "points", "45,0 0,45");
   svgDocument.appendChild(line);

@@ -13,7 +13,7 @@ var gravatarCheck = function(email) {
   var emailToMD5 = md5(emailCheck);
 
   //Generate Gravatar Link
-  return 'http://www.gravatar.com/avatar/' + emailToMD5 + '.jpg?d=mm';
+  return 'https://secure.gravatar.com/avatar/' + emailToMD5 + '.jpg?d=mm';
  };
 
 module.exports = function(passport, config) {

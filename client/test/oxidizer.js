@@ -43,7 +43,7 @@ $(document).ready(function() {
     // If this is for a POST request, we need to JSON.stringify() data.
     // If it's for a GET request, we don't need to stringify data.
     var data = {
-      url: testSettings.url
+      //url: testSettings.url
     };
 
     // AJAX call to server to get comments from a particular URL.

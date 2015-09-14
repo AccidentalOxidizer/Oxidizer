@@ -38,7 +38,7 @@ document.addEventListener("DOMContentLoaded", function(e) {
   // it will tell the iframe to reload and redo what is needed
   // on 'open' we get 2 pieces of information from the parent content script:
   // 1. the URL of the parent window
-  // 2. the extension settings, which includes the server information 
+  // 2. the extension settings, which includes the server information
   window.addEventListener("message", function(e) {
     if (e.data.type === 'open') {
       url = e.data.url;
@@ -60,9 +60,12 @@ document.addEventListener("DOMContentLoaded", function(e) {
           var privacyText = commentPrivately ? '<i class="fa fa-lock"></i> Private' : '<i class="fa fa-globe"></i> Public';
           $('#comment-privacy-select').parents('.dropup').find('.btn-privacy').html(privacyText + ' <span class="caret"></span>');
           $('#feed-privacy-select').parents('.dropdown').find('.dropdown-toggle').html(privacyText + ' Feed <span class="caret"></span>');
+          $("#comment-submit-button").prop("disabled",true); // Disable the submit button since there is zero content.
 
           // show the panel with animation
           document.getElementById('panel').classList.add('is-visible');
+          // put focus on input field
+          $('#comment-input-field').focus();
           // do what needs to be done. load content, etc..
           loadContent(url);
         });
@@ -75,23 +78,47 @@ document.addEventListener("DOMContentLoaded", function(e) {
     }
   }, false);
 
-
-  // send message to background script to tell content script to close this iframe
-  document.getElementById('close').addEventListener('click', function() {
-    document.getElementById('panel').classList.remove('is-visible');
-    chrome.runtime.sendMessage({
-      from: 'iframe',
-      message: 'close iframe'
-    }, function() {});
+  // close Oxidizer IFrame Window when hitting Esc key
+  document.addEventListener('keydown', function(e) {
+    console.log(e.keyCode);
+    if (e.keyCode === 27) {
+      closeOxidizer();
+    }
   });
+
+  // Detect if user chooses a different view for feed and update comment box properly.
+  document.getElementById('feed-public').addEventListener('click', function() {
+    // console.log('PUBLIC FEED CLICKED!');
+    commentPrivately = false;
+    $(document.body).find('.btn-privacy').html('<a href="#"><i class="fa fa-globe"></i> Public</a>');
+  });
+
+  // Detect if user chooses a different view for feed and update comment box properly.
+  document.getElementById('feed-private').addEventListener('click', function() {
+    // console.log('PRIVATE FEED CLICKED!');
+    commentPrivately = true;
+    $(document.body).find('.btn-privacy').html('<a href="#"><i class="fa fa-lock"></i> Private</a>');
+  });
+
+  // close Oxidizer IFrame Window when when clicking close button 
+  document.getElementById('close').addEventListener('click', closeOxidizer);
 
   document.getElementById('dismiss-notifications').addEventListener('click', function() {
-    dismissNotifications();
+    var request = $.ajax({
+      url: settings.server + '/api/users/markread',
+      method: "GET",
+      contentType: "application/json",
+    });
+    request.success(function(msg) {
+      dismissNotifications();
+    });
+    reques.fail(function(err) {
+      console.log('Darn, could not mark notifications as read :/ ', err);
+    });
+
     // SEND MESSAGE TO SERVER TO SET TO ZERO
   });
-  // Register Events on DOM
-  document.querySelector('#facebook-login').addEventListener('click', facebookLogin);
-  document.querySelector('#google-login').addEventListener('click', googleLogin);
+
 
   // Update the feed privacy setting if the user changes it in the dropdown menu.
   $('#feed-privacy-select li a').click(function() {
@@ -112,9 +139,19 @@ document.addEventListener("DOMContentLoaded", function(e) {
 
   // Post new comment
   document.getElementById('comment-input-field').addEventListener('keydown', function(e) {
-    if (e.keyCode === 13) {
+    // Check if length is 0 and disable post button.
+    var getTextLength = document.getElementById('comment-input-field').value.length;
+    //console.log('CUR LENGTH: ', getTextLength);
+    if (getTextLength === 0) {
+      $("#comment-submit-button").prop("disabled",true);
+    } else {
+      $("#comment-submit-button").prop("disabled",false);
+    }
+
+    if (e.keyCode === 13 && getTextLength > 0) {
       postComment(document.getElementById('comment-input-field').value);
       document.getElementById('comment-input-field').value = '';
+      $("#comment-submit-button").prop("disabled",true); // Disable the submit button since there is zero content.
     }
   });
 
@@ -179,8 +216,6 @@ function loadContent(url) {
     isPrivate: privateFeed
   };
 
-  console.log('param isPrivate', privateFeed);
-
   var paramString = [];
   for (var key in params) {
     if (params.hasOwnProperty(key)) {
@@ -190,6 +225,9 @@ function loadContent(url) {
 
   paramString = paramString.join('&');
   var apiURL = settings.server + "/api/comments/get?" + paramString;
+  console.log('APIURL', apiURL);
+
+  toggleSpinner();
 
   var request = $.ajax({
     url: apiURL,
@@ -224,7 +262,7 @@ function loadContent(url) {
     $(".cd-panel-content").html('');
     // compile and append new comments
 
-    var html = compileComments(msg.comments);
+    var html = compileComments(msg);
 
     $(".cd-panel-content").append(html);
     registerCommentEventListeners();
@@ -235,6 +273,7 @@ function loadContent(url) {
   });
 
   request.complete(function(jqXHR, textStatus) {
+    toggleSpinner();
     if (jqXHR.status === 401) {
       loginButtons(true);
     } else {
@@ -246,6 +285,7 @@ function loadContent(url) {
 
 // function to post new comments
 function postComment(text, repliesToId) {
+  toggleSpinner();
   var data = JSON.stringify({
     url: url,
     text: text,
@@ -261,9 +301,11 @@ function postComment(text, repliesToId) {
     dataType: 'json'
   });
 
-  request.done(function(msg) {
+  request.success(function(msg) {
     // compile and append successfully saved and returned message to DOM
-    var html = compileComments(msg.comments);
+    var html = compileComments(msg);
+
+    console.log('MESSAGE after POST', msg);
 
     if (!repliesToId) {
       $(".cd-panel-content").prepend(html);
@@ -277,17 +319,47 @@ function postComment(text, repliesToId) {
   request.fail(function(jqXHR, textStatus) {
     console.log("Request failed: " + textStatus);
   });
+
+  request.complete(function(jqXHR, textStatus) {
+    toggleSpinner();
+    if (jqXHR.status === 401) {
+      loginButtons(true);
+    } else {
+      loginButtons(false);
+    }
+  });
 }
 
-
-function compileComments(comments) {
+function compileComments(msg) {
   var source = $("#comment-entry-template").html();
   var template = Handlebars.compile(source);
-  return template(comments);
+
+  // Iterate over array of comments and search for anything that appears
+  // to be an image link using a regex pattern. If we find a match, replace
+  // the text with an image tag and a link.
+  msg.comments.forEach(function(element) {
+    var imagePattern = /(https?:\/\/.*\.(?:png|jpg|gif|jpeg))/;
+    var isImageLink = element.text.match(imagePattern);
+
+    //console.log('Text Input: ', element.text);
+
+    // If isImageLink is true and matches the RegEx pattern, let's
+    // go ahead and replace it! 
+    if (isImageLink) {
+      console.log('IMAGE URL FOUND');
+      element.text = '<p align="center"><img src="' + element.text + '" style="max-width: 450px;"/></p>';
+    }
+  });
+
+  // Include access to the host value to build url to link to user profiles.
+  msg.host = settings.server;
+
+  return template(msg);
 }
 
 // destination is a jquery object that you want to append to
 function loadMoreComments(destination, url, repliesToId) {
+  toggleSpinner();
   // if not a reply, don't execute if we are at end of comments, or waiting for a request to return
   if (repliesToId === undefined && (tracking.mainLastComment.endOfComments || !tracking.requestReturned)) {
     console.log(tracking.mainLastComment.endOfComments, tracking.requestReturned);
@@ -337,7 +409,7 @@ function loadMoreComments(destination, url, repliesToId) {
     contentType: "application/json",
   });
 
-  request.done(function(msg) {
+  request.success(function(msg) {
     tracking.requestReturned = true;
 
     // set lastLoadedCommentId
@@ -370,7 +442,7 @@ function loadMoreComments(destination, url, repliesToId) {
     $('.like-count').text(msg.userInfo.heartsToCheck);
 
     // compile and append new comments
-    var html = compileComments(msg.comments);
+    var html = compileComments(msg);
     destination.append(html);
     registerCommentEventListeners();
   });
@@ -378,6 +450,17 @@ function loadMoreComments(destination, url, repliesToId) {
   request.fail(function(jqXHR, textStatus) {
     console.log("Request failed: " + textStatus);
   });
+
+  request.complete(function(jqXHR, textStatus) {
+    toggleSpinner();
+    if (jqXHR.status === 401) {
+      loginButtons(true);
+    } else {
+      loginButtons(false);
+    }
+  });
+
+
 }
 
 
@@ -390,7 +473,8 @@ function registerCommentEventListeners(comment) {
       var commentId = this.getAttribute('data-comment-id');
       console.log('Reply to: ', commentId);
       $(this).toggleClass('active');
-      $(this).parents('#' + commentId).children('.reply-form').toggleClass('hidden');
+      $('#' + commentId + ' .reply-form').toggleClass('hidden');
+      $('#' + commentId + ' .reply-input ').focus();
     })
   }
 
@@ -455,6 +539,27 @@ function registerCommentEventListeners(comment) {
     });
   }
 
+  var removes = document.getElementsByClassName('delete');
+  for (var i = 0; i < removes.length; i++) {
+    $(removes[i]).off('click').on('click', function() {
+      $('#confirm-modal').remove();
+      var id = this.getAttribute('data-comment-id');
+      var source = $("#confirm-flag-x-handlebars-template").html();
+      var template = Handlebars.compile(source);
+      var html = template({
+        action: 'Are you sure you want to delete the comment?',
+        modalId: 'confirm-modal',
+        commentId: id
+      });
+      $('body').append(html);
+      document.getElementById('confirm-flag').addEventListener('click', function() {
+        deletePost(id);
+      });
+      $('#confirm-modal').modal();
+    });
+  };
+
+
   var flags = document.getElementsByClassName('flag');
   for (var i = 0; i < flags.length; i++) {
     $(flags[i]).off('click').on('click', function() {
@@ -464,6 +569,7 @@ function registerCommentEventListeners(comment) {
       var source = $("#confirm-flag-x-handlebars-template").html();
       var template = Handlebars.compile(source);
       var html = template({
+        action: 'You are about to flag / unflag a comment. You sure?',
         modalId: 'confirm-modal',
         commentId: id
       });
@@ -491,8 +597,6 @@ function registerCommentEventListeners(comment) {
 // FUNCTIONS
 
 function setNotifications(favs, replies) {
-  //testing:
-  // favs = 1, replies = 1;
   if (!favs && !replies) {
     dismissNotifications();
   } else {
@@ -518,8 +622,6 @@ function dismissNotifications() {
   document.querySelector('#notifications > i').classList.remove('fa-bell')
   document.querySelector('#notifications > i').classList.remove('notifications');
   document.querySelector('#notifications > i').classList.add('fa-bell-o');
-  // SEND MESSAGE TO SERVER TO SET TO ZERO
-
 }
 
 function flagPost(commentId) {
@@ -535,10 +637,11 @@ function flagPost(commentId) {
     data: data,
     dataType: 'json'
   });
-  request.done(function(msg) {
-    console.log('successfully flagged (or unflagged) comment', msg);
-    // we should rerender can change the color of the flag, 
-    // plus set a marker that prevents poping up confirmation for unflags
+  request.success(function(msg) {
+    console.log('successfully flagged (or unflagged) comment', msg, commentId);
+    $('#' + commentId + ' #flag i').toggleClass('fa-flag-o');
+    $('#' + commentId + ' #flag i').toggleClass('fa-flag');
+    // set a marker that prevents poping up confirmation for unflags
   });
   request.fail(function(err) {
     console.log("Awww, man. Couldn't flag! -- Dave", err);
@@ -558,17 +661,30 @@ function favePost(commentId) {
     dataType: 'json'
   });
 
-  request.done(function(msg) {
-    console.log('successfully faved (or unfaved) comment,', msg);
-
-    // msg will contain info if faved or unfaved. 
-    // we should toggle color and form of icon here.
-    // <i class="fa fa-heart"></i>
-    // <i class="fa fa-heart-o"></i>
-
+  request.success(function(msg) {
+    console.log('successfully faved (or unfaved) comment,', msg, commentId);
+    $('#' + commentId + ' #heart i').toggleClass('fa-heart-o');
+    $('#' + commentId + ' #heart i').toggleClass('fa-heart');
   });
   request.fail(function(err) {
     console.log('Darn. something went wrong, could not fave comment', err);
+  });
+}
+
+function deletePost(commentId) {
+  var request = $.ajax({
+    url: settings.server + '/api/comments/remove/' + commentId,
+    method: "DELETE",
+    contentType: "application/json"
+  });
+
+  request.done(function(msg) {
+    console.log('successfully deleted comment,', msg);
+    document.getElementById(commentId).remove();
+  });
+
+  request.fail(function(err) {
+    console.log('Darn. something went wrong, could not delete comment', err);
   });
 }
 
@@ -581,17 +697,19 @@ function loginButtons(showLogin) {
   }
 }
 
-// LOGIN STRATEGIES
-var googleLogin = function() {
-  // chrome.tabs.create({
-  //   url: settings.server + '/api/auth/chrome/google'
-  // });
+// toggle spinner 
+function toggleSpinner() {
+  $('.loading').toggleClass('spinner');
 }
 
-var facebookLogin = function() {
-  // chrome.tabs.create({
-  //   url: settings.server + '/api/auth/chrome/facebook'
-  // });
+// close Oxidizer IFrame Window 
+function closeOxidizer() {
+  document.getElementById('panel').classList.remove('is-visible');
+  //send message to background script to tell content script to close this iframe
+  chrome.runtime.sendMessage({
+    from: 'iframe',
+    message: 'close iframe'
+  }, function() {});
 }
 
 //  format an ISO date using Moment.js
@@ -610,3 +728,16 @@ Handlebars.registerHelper('dateFormat', function(context, block) {
     return context; //  moment plugin not available. return data as is.
   }
 });
+
+
+// if userInfo.userId === comments[i].UserId
+Handlebars.registerHelper('ifSelf', function(v1, v2, options) {
+  if (v1 === v2) {
+    return options.fn(this);
+  }
+  return options.inverse(this);
+});
+
+
+
+// EOF
