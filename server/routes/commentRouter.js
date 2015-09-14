@@ -295,7 +295,7 @@ module.exports = function(app) {
             })
             .catch(function(err) {
               console.log("Err: ", err);
-              res.send(200);
+              res.send(500);
             });
   });
 
