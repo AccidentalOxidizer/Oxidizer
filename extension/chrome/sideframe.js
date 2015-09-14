@@ -612,10 +612,11 @@ function flagPost(commentId) {
     data: data,
     dataType: 'json'
   });
-  request.done(function(msg) {
-    console.log('successfully flagged (or unflagged) comment', msg);
-    // we should rerender can change the color of the flag, 
-    // plus set a marker that prevents poping up confirmation for unflags
+  request.success(function(msg) {
+    console.log('successfully flagged (or unflagged) comment', msg, commentId);
+    $('#' + commentId + ' #flag i').toggleClass('fa-flag-o');
+    $('#' + commentId + ' #flag i').toggleClass('fa-flag');
+    // set a marker that prevents poping up confirmation for unflags
   });
   request.fail(function(err) {
     console.log("Awww, man. Couldn't flag! -- Dave", err);
@@ -635,14 +636,10 @@ function favePost(commentId) {
     dataType: 'json'
   });
 
-  request.done(function(msg) {
-    console.log('successfully faved (or unfaved) comment,', msg);
-
-    // msg will contain info if faved or unfaved. 
-    // we should toggle color and form of icon here.
-    // <i class="fa fa-heart"></i>
-    // <i class="fa fa-heart-o"></i>
-
+  request.success(function(msg) {
+    console.log('successfully faved (or unfaved) comment,', msg, commentId);
+    $('#' + commentId + ' #heart i').toggleClass('fa-heart-o');
+    $('#' + commentId + ' #heart i').toggleClass('fa-heart');
   });
   request.fail(function(err) {
     console.log('Darn. something went wrong, could not fave comment', err);
