@@ -66,7 +66,7 @@ module.exports.addComment = function(req, res, next) {
     repliesToId: req.body.repliesToId
   })
     .then(function(data){
-      console.log('////////////////////////////////',data.get('id'));
+
       var newComment = {
         commentId: data.get('id'),
         repliesToId: req.body.repliesToId
@@ -87,9 +87,23 @@ module.exports.addComment = function(req, res, next) {
     .catch(function(err){
       console.log(err);
     });
-
 };
 
+module.exports.remove = function(req, res, next) {
+  var Comment = req.app.get('models').Comment;
+  return Comment.destroy({
+      where: {
+        id: req.params.id
+      }
+    })
+     .then(function(url) {
+        res.send(200, "Deleted comment!");
+      })
+      .catch(function(err) {
+        console.log("Err: ", err);
+        res.send(500);
+      });
+};
 
 
 

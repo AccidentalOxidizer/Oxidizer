@@ -77,7 +77,7 @@ var Website = React.createClass({
     console.log('websiteProfile loading comments:', query);
     this.pendingAjax = true;
     $.ajax({
-      url: window.location.origin + '/api/comments/url',
+      url: window.location.origin + '/api/comments',
       data: query,
       method: 'GET',
       dataType: 'json',
