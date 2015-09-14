@@ -1,5 +1,6 @@
 var bcrypt = require('bcrypt-nodejs');
 var Promise = require('bluebird');
+var getUserInfo = require('./getUserInfo');
 
 module.exports = function(sequelize, dataTypes) {
   return sequelize.define('User', {
@@ -63,10 +64,16 @@ module.exports = function(sequelize, dataTypes) {
       type: dataTypes.INTEGER,
       defaultValue: 0
     },
-    lastCheckedUpdates: dataTypes.DATE
+
+    lastCheckedUpdates: dataTypes.DATE,
 
     // additional profile info here
   }, {
+    indexes: [{
+      // Create a unique index on email
+        unique: true,
+        fields: ['email']
+      }],
     classMethods: {
       getAvatar: function(id) {
         sequelize.query('SELECT avatar FROM Users WHERE id=' + id)
@@ -76,8 +83,11 @@ module.exports = function(sequelize, dataTypes) {
           .catch(function(err) {
             console.log(err);
           });
-      }
+        }, getUserInfo: function(userid){
+          return getUserInfo(sequelize, userid);
+        }
     }
+
   }, {
     instanceMethods: {
       generateHash: function(password) {
@@ -95,12 +105,5 @@ module.exports = function(sequelize, dataTypes) {
         return compare(password, this.password);
       },
     },
-    indexes: [{
-      // Create a unique index on email
-        unique: true,
-        fields: ['email']
-      }],
   });
 };
-
-

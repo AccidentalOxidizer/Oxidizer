@@ -22,14 +22,14 @@ var Website = React.createClass({
   // TODO: refactor to use to load additional comments too.
   initLoadState: function() {
     this.lastCommentId = -1;
-    
+    this.commentCount;
     this.host = undefined;
     this.path = undefined;
     this.textSearch = undefined;
 
     // for infinite scroll
     this.hasMoreComments = true;
-
+    this.pendingAjax = false;
     this.query = {};
   },
 
@@ -45,16 +45,15 @@ var Website = React.createClass({
       method: 'GET',
       dataType: 'json',
       success: function(data){
-
+        console.log('recieved paths');
         data = data.map(function(url){
-          console.log(url);
           return {
             url: url.url,
             commentCount: url.Comments[0].count
           }
         });
 
-        this.setState({paths: data});
+        // this.setState({paths: data});
       }.bind(this),
 
       error: function(xhr, status, err) {
@@ -76,16 +75,16 @@ var Website = React.createClass({
     }
 
     console.log('websiteProfile loading comments:', query);
-    
+    this.pendingAjax = true;
     $.ajax({
-      url: window.location.origin + '/api/comments/get',
+      url: window.location.origin + '/api/comments',
       data: query,
       method: 'GET',
       dataType: 'json',
       success: function(data){
-        console.log('received comments:', data.comments);
+        console.log('received comments:', data);
         console.log('received userInfo:', data.userInfo);
-
+        this.pendingAjax = false;
         
         var updatedComments; 
         if (this.lastCommentId === -1) {  
@@ -102,6 +101,7 @@ var Website = React.createClass({
         } else {
           this.lastCommentId = data.comments[data.comments.length - 1].id;
         }
+        this.count = data.numComments;
         this.setState({comments: updatedComments});
       }.bind(this),
 
@@ -153,15 +153,21 @@ var Website = React.createClass({
     this.loadComments(query);  
   },
 
+  urlLink: function(){
+    console.log('happening');
+  },
+
   render: function() {
     var comments = this.state.comments.map(function(comment) {
       return <Comment key={comment.id} comment={comment} />;
     });
 
+    var handler = this.urlLink;
+
     var paths = this.state.paths.map(function(path) {
-      return <Path key={path.url} path={path} />;
+      return <Path key={path.url} path={path} redirect={handler} />;
     });
-    console.log(paths);
+
     return (
       <div>
         <div className="row">  
@@ -173,8 +179,8 @@ var Website = React.createClass({
 
         <div className="col-md-4">
           <h2>{this.host}</h2>
-          <p>Total Comments:</p>
-          <div> {paths}</div>
+          <p>Total Comments: {this.count}</p>
+          <div>{paths}</div>
         </div>  
 
         {(() => {
@@ -198,7 +204,7 @@ var Website = React.createClass({
                       <button type="submit" className="btn btn-block btn-primary">Search</button>
                     </div>
                   </form>
-                  <InfiniteScroll pageStart="0" loadMore={this.loadComments} hasMore={this.hasMoreComments}
+                  <InfiniteScroll pageStart="0" loadMore={this.loadComments} hasMore={this.hasMoreComments && !this.pendingAjax}
                       loader={<div className="loader">Loading ...</div>}>
                     {comments}
                   </InfiniteScroll>

@@ -3,5 +3,5 @@
   "autoshow": true,
   "showtrigger": true,
   "triggerposition": 0,
-  "server": "https://api.oxidizer.io"
+  "server": "http://localhost:3000"
 }

@@ -10,15 +10,17 @@ var Signup = require('./components/Signup');
 var Login = require('./components/Login');
 var Website = require('./components/Website');
 var Navigation = require('./components/Navigation');
+var Footer = require('./components/Footer');
 
 var App = React.createClass({
   render: function() {
     return (
       <div className="main-container">
         <Navigation />
-        <div className="container">
+        <div className="no-container-class-here-please">
           <RouteHandler />
         </div>
+        <Footer />
       </div>
     );
   }

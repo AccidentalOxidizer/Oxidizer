@@ -63,7 +63,7 @@ var Profile = React.createClass({
       url = window.location.origin + '/api/comments/faves/getForUser',
       query = {};
     } else {
-      url = window.location.origin + '/api/comments/get',
+      url = window.location.origin + '/api/comments',
 
       query = {
         filterByUser: true,
