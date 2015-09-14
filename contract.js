@@ -3,7 +3,7 @@
 // GET api/comments/faves/getForUser
 // Request to get a list of all comments favorited by the logged in user
 var requestFavComments = {
-  // TODO? lastCommentId?
+  lastCommentId: 'number', // Don't send in initial query, otherwise oldest comment loaded so far
 };
 
 // Server Response: Format mostly the same as api/comments/get so the
@@ -31,6 +31,7 @@ var favComments = {
 var requestComments = {
   url: 'string unparsed url', // Set if loading all comments for a URL
   filterByUser: 'boolean', // True if loading all comments for logged in user; should be undefined otherwise
+  userId: 'number', // Only used if filterByUser, and optional. If set, load for that userid; else for the logged in user.
   lastCommentId: 'number', // Don't send in initial query, otherwise oldest comment loaded so far
   isPrivate: 'boolean'
   urlSearch: 'url search term', // Set if filtering on url; must not be in query otherwise

@@ -129,9 +129,16 @@ module.exports = function(app) {
     var searchObject = {};
     console.log("Comments get: req.query: ", req.query);
     
-    // Are we requesting comments for the logged in user?
+    // Are we requesting comments for a given user?
+    // If userId is set, then load comments for that id;
+    // otherwise load comments for the logged in user.
     if (req.query.filterByUser) {
-      searchObject.UserId = req.user.id;
+      if (req.query.userId) {
+        searchObject.UserId = req.query.userId;
+        console.log("Comments get: querying for userId ", req.query.userId);
+      } else {
+        searchObject.UserId = req.user.id;
+      }
     }
 
     // Ensure that we have a boolean value for requesting a private feed;

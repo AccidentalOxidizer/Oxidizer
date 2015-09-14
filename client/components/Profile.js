@@ -1,10 +1,13 @@
 var React = require('react');
 var Comment = require('./Comment');
+var Router = require('react-router');
 var InfiniteScroll = require('react-infinite-scroll')(React);
 
 // At the moment, Profile will only be used to display your personal
 // profile, not that of others.
 var Profile = React.createClass({
+  mixins: [Router.State],
+
   getInitialState: function() {
     return {
       userAvatar: '',
@@ -15,6 +18,9 @@ var Profile = React.createClass({
   },
 
   initLoadState: function() {
+    // XXX: Error check that the userId is a valid number?
+    this.userId = this.getQuery().userId;
+
     this.oldestLoadedCommentId = 'undefined';
     this.currentTime = undefined;
 
@@ -62,6 +68,13 @@ var Profile = React.createClass({
       query = {
         filterByUser: true,
         isPrivate: this.privateFeed
+      }
+
+      // To load any user's comments, pass in the userId in a query string
+      // e.g. http://localhost:3000/#/profile?userId=1
+      console.log("Profile loadComments: userId param is ", this.userId);
+      if (this.userId) {
+        query.userId = +this.userId;
       }
 
       if (this.urlSearch !== '') {
@@ -254,20 +267,14 @@ var Profile = React.createClass({
   },
 
   render: function() {
-    var comments = this.state.comments.map(function(comment) {
-      return <Comment key={comment.id} comment={comment} />;
-    });
 
-          // <div className="col-sm-offset-3 col-sm-6">
-            // <p><a href="#">Clear Search</a> | <a href="#">Public</a></p>
-    return (
-      <div className="row">
-        <div className="col-md-4">
-          <p><img src={this.state.userAvatar} width="200px" /></p>
-          <h2>{this.state.displayName}</h2>
-          <p>Total Comments: {this.state.numComments}</p>
-        </div>
-        <div className="col-md-8">
+    // Optional header with more options if loading our personal profile
+
+    var header = (function() {
+      if (this.userId) {
+        return;
+      } else {
+        return(
           <div className="row">
             <div className="dropdown">
               <button className="btn btn-default dropdown-toggle" type="button" id="privacy-select"
@@ -283,6 +290,28 @@ var Profile = React.createClass({
             </div>
             <hr />
           </div>
+        );
+      }
+    }).bind(this)();
+
+
+    var comments = this.state.comments.map(function(comment) {
+      return <Comment key={comment.id} comment={comment} />;
+    });
+
+          // <div className="col-sm-offset-3 col-sm-6">
+            // <p><a href="#">Clear Search</a> | <a href="#">Public</a></p>
+    return (
+      <div className="row">
+        <div className="col-md-4">
+          <p><img src={this.state.userAvatar} width="200px" /></p>
+          <h2>{this.state.displayName}</h2>
+          <p>Total Comments: {this.state.numComments}</p>
+        </div>
+
+        <div className="col-md-8">
+          {header}
+
           <form onSubmit={this.handleUrlSearch}>
             <div className="form-group col-sm-7">
               <input type="text" className="form-control" placeholder="Search for URL" ref="searchUrl" />

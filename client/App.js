@@ -28,7 +28,7 @@ var routes = (
   <Route name="app" path="/" handler={App}>
     <DefaultRoute handler={Home} />
     <Route name="admin" path="/admin" handler={Admin} />
-    <Route name="profile" path="/profile" handler={Profile} />
+    <Route name="profile" path="/profile/?:userId?" handler={Profile} />
     <Route name="website" path="/website/:website?" handler={Website} />
   </Route>
 );
