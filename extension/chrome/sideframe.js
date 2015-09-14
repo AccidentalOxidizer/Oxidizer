@@ -63,6 +63,8 @@ document.addEventListener("DOMContentLoaded", function(e) {
 
           // show the panel with animation
           document.getElementById('panel').classList.add('is-visible');
+          // put focus on input field
+          $('#comment-input-field').focus();
           // do what needs to be done. load content, etc..
           loadContent(url);
         });
@@ -443,6 +445,7 @@ function registerCommentEventListeners(comment) {
       console.log('Reply to: ', commentId);
       $(this).toggleClass('active');
       $('#' + commentId + ' .reply-form').toggleClass('hidden');
+      $('#' + commentId + ' .reply-input ').focus();
     })
   }
 
