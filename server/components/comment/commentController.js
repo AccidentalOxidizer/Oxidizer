@@ -1,10 +1,10 @@
 var Promise = require('bluebird');
-var parseUrl = require('../../utils/parseUrl');
+var parseUrl = require('../../utils/parseURL');
 
 var buildQueryOptions = function(req, filterByUser) {  
   var options = {};
 
-  if (req.user) options.userId = req.user.id;
+  options.userId = req.query.userId || req.user.id;
   if (req.query.host) options.host = req.query.host;
  
 
@@ -32,7 +32,7 @@ module.exports.getCommentsForUrl = function(req, res, next) {
   var options = buildQueryOptions(req);
   // getComment and User info for the database
 
-  Promise.all([Comment.getComments(options), User.getUserInfo(req.user.id)]) // TODO add userQuery
+  Promise.all([Comment.getComments(options), User.getUserInfo(options.userId)]) // TODO add userQuery
     .spread(function(comments, user){
       var response = {
         comments: comments[0],

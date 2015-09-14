@@ -25,8 +25,8 @@ module.exports = function(app) {
 
   app.delete('/api/comments/remove/:id', jsonParser, auth.isAuthorized, Comment.remove);
   
+  // app.post('/api/comments/fave', jsonParser, Heart.addHeart);
 
-  
   // Users marks a specific comment as a new favorite.
   app.post('/api/comments/fave', jsonParser, function(req, res, next) {
     Heart.fave({
