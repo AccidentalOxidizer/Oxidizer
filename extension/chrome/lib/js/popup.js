@@ -7,20 +7,17 @@ chrome.storage.sync.get(['server', 'keepprivate', 'autoshow', 'showtrigger'],
     settings.keepprivate = store.keepprivate;
     settings.autoshow = store.autoshow;
     settings.showtrigger = store.showtrigger;
-    console.log(store.server);
-    console.log(settings.server);
-
   });
 
 // update settings as they are changed in the chrome storage
-// chrome.storage.onChanged.addListener(function(changes, namespace) {
-//   for (key in changes) {
-//     if (settings.hasOwnProperty(key)) {
-//       var storageChange = changes[key];
-//       settings[key] = storageChange.newValue;
-//     }
-//   }
-// });
+chrome.storage.onChanged.addListener(function(changes, namespace) {
+  for (key in changes) {
+    if (settings.hasOwnProperty(key)) {
+      var storageChange = changes[key];
+      settings[key] = storageChange.newValue;
+    }
+  }
+});
 
 
 // LOGIN STRATEGIES
