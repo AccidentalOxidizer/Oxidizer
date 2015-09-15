@@ -349,17 +349,38 @@ function compileComments(msg) {
   // to be an image link using a regex pattern. If we find a match, replace
   // the text with an image tag and a link.
   msg.comments.forEach(function(element) {
-    var imagePattern = /(https?:\/\/.*\.(?:png|jpg|gif|jpeg))/;
+    // RegEx for matching image URLs
+    var imagePattern = /\b(https?:\/\/\S+(?:png|jpe?g|gif)\S*)\b/igm;
+
+    // Create an array of matching image URLs
     var isImageLink = element.text.match(imagePattern);
 
-    //console.log('Text Input: ', element.text);
+    // Let's eliminate any duplicate items in our array so things don't get too crazy.
+    // Also, if we have the same URL In our array multiple times, things will break!
+    if (isImageLink !== null && isImageLink.length > 0) {
+      // Create an array of nonDuplicate image links.
+      var nonDuplicateImages = [];
+      isImageLink.forEach(function(element, index) {
+        if (nonDuplicateImages.indexOf(element) === -1) {
+          nonDuplicateImages.push(element);
+        }
+      });
 
-    // If isImageLink is true and matches the RegEx pattern, let's
-    // go ahead and replace it! 
-    if (isImageLink) {
-      console.log('IMAGE URL FOUND');
-      element.text = '<p align="center"><img src="' + element.text + '" style="max-width: 450px;"/></p>';
+      // Iterate through our array of unique URLs and replace matching image URLs
+      // with HTML img tags.
+      nonDuplicateImages.forEach(function(imageLink) {
+        // Since we want to replace all instances of the URL,
+        // we need to create a regEx object and tell it to look
+        // for all instances that match within the string using the "/g" modifier.
+        
+        var replaceURL = new RegExp(imageLink, 'g');
+
+        element.text = element.text.replace(replaceURL, '<p align="center"><img src="' + imageLink + '" style="max-width: 450px;"/></p>');
+      });
     }
+
+    //console.log('Text Input: ', element.text);
+    //element.text = element.text.replace(imagePattern, '<p align="center"><img src="' + element.text + '" style="max-width: 450px;"/></p>');
   });
 
   // Include access to the host value to build url to link to user profiles.
