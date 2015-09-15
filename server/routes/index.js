@@ -18,15 +18,6 @@ module.exports = function(express, app, passport) {
 
   app.use(express.static(__dirname + '/../../client/'));
 
-  // setup route for development only
-  // to enable run: NODE_ENV='development' node server/app.js
-  if (process.env.NODE_ENV === 'development') {
-    app.get('/setup', urlEncodedParser, function(req, res, next) {
-      // to populate with dummy data
-      res.sendStatus(200);
-    });
-  }
-
   app.get('/welcome', urlEncodedParser, jsonParser, function(req,res, next){
     //console.log(req);
     res.status(200).send({
