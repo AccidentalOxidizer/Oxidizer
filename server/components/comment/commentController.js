@@ -35,7 +35,7 @@ module.exports.getCommentsForUrl = function(req, res, next) {
     .spread(function(comments, user){
       var response = {
         comments: comments[0],
-        userInfo: user[0],
+        userInfo: user[0][0],
         currentTime: new Date()
       };
 
@@ -49,6 +49,46 @@ module.exports.getCommentsForUser = function (req, res, next) {
   var User = req.app.get('models').User;
 
   var options = buildQueryOptions(req, true);
+
+  Promise.all([Comment.getComments(options), User.getUserInfo(options.userId)]) // TODO add userQuery
+    .spread(function(comments, user){
+      var response = {
+        comments: comments[0],
+        userInfo: user[0][0],
+        currentTime: new Date()
+      };
+      console.log(response);
+
+      // res.data.userInfo = 
+      res.send(200, response);
+    })
+    .catch(function(err){
+      console.log(err);
+      res.send(404);
+    });
+};
+
+module.exports.getHeartedCommentsForUser = function(req, res, next){
+  var Comment = req.app.get('models').Comment;
+  var User = req.app.get('models').User;
+    
+  var options = buildQueryOptions(req, true);
+
+  Promise.all([Comment.getComments(options), User.getUserInfo(options.userId)]) // TODO add userQuery
+    .spread(function(comments, user){
+      var response = {
+        comments: comments[0],
+        userInfo: user[0][0],
+        currentTime: new Date()
+      };
+
+      // res.data.userInfo = 
+      res.send(200, response);
+    })
+    .catch(function(err){
+      console.log(err);
+      res.send(404);
+    });
 };
 
 module.exports.addComment = function(req, res, next) {  

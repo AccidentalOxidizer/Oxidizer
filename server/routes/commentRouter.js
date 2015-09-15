@@ -39,39 +39,7 @@ module.exports = function(app) {
   });
 
   // Get all favorited comments for the logged in user
-  app.get('/api/comments/faves/getForUser', jsonParser, auth.isLoggedIn, function(req, res, next) {
-
-    console.log("Comments faves for user, query: ", req.query);
-
-    HeartModel.getUserFaves(req.user.id, req.query.lastCommentId)
-      .then(function(result) {
-        console.log("getUserFaves, result[0]:");
-        console.log("Comment text: ", result[0].Comment.text);
-        console.log("Comment Url: ", result[0].Comment.Url.url);
-
-        var comments = _.pluck(result, 'Comment');
-
-        res.send({
-          comments: comments,
-          // numComments: result[0].count,
-          currentTime: new Date(), // TODO: Fill this out!
-          userInfo: {
-            userId: req.user.id,
-            username: req.user.name,
-            // repliesToCheck: result[1].repliesToCheck,
-            // heartsToCheck: result[1].heartsToCheck,
-          }
-        });
-      })
-      .catch(function(err) {
-        console.log("Comments get faves for user err: ", err);
-        res.send(500);
-      });
-      
-    var favesToGet = {
-      url: req.body.commentId
-    };
-  });
+  app.get('/api/comments/faves/getForUser', jsonParser, auth.isLoggedIn, Comment.getHeartedCommentsForUser);
 
   // Users marks a specific comment as flagged for bad behavior.
   app.post('/api/comments/flag', jsonParser, function(req, res, next) {
