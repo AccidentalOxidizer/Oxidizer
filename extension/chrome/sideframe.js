@@ -103,6 +103,7 @@ document.addEventListener("DOMContentLoaded", function(e) {
   document.getElementById('close').addEventListener('click', closeOxidizer);
 
   document.getElementById('dismiss-notifications').addEventListener('click', function() {
+    console.log(settings.server);
     var request = $.ajax({
       url: settings.server + '/api/users/markread',
       method: "GET",
@@ -111,13 +112,22 @@ document.addEventListener("DOMContentLoaded", function(e) {
     request.success(function(msg) {
       dismissNotifications();
     });
-    reques.fail(function(err) {
+    request.fail(function(err) {
       console.log('Darn, could not mark notifications as read :/ ', err);
     });
-
-    // SEND MESSAGE TO SERVER TO SET TO ZERO
   });
 
+
+  // Reigster all elements with class 'link' to ahve click event and open new tab with target href
+  var links = document.getElementsByClassName('link');
+  for (var i = 0; i < links.length; i++) {
+    if (links[i].nodeName === 'A') {
+      links[i].addEventListener('click', function(event){
+        event.preventDefault();
+        window.open(event.target.href);
+      });
+    }
+  };
 
   // Update the feed privacy setting if the user changes it in the dropdown menu.
   $('#feed-privacy-select li a').click(function() {
