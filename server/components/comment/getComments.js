@@ -81,7 +81,7 @@ module.exports = function(sequelize, options) {
   // // if there are any filters, add them to the query
   if (filters.length > 0){
     // keeps correct user associated with the comment
-    queryString += 'WHERE Users.id = Comments.userId ';
+    queryString += 'WHERE Users.id = Comments.userId AND Comments.UrlId = Url.id ';
 
     for (var i = 0; i < filters.length; i++) {
       queryString += 'AND ';
@@ -113,7 +113,7 @@ module.exports = function(sequelize, options) {
   queryString += 'LIMIT ' + limit + ' ';
   
   queryString += ';';
-  console.log(queryString);
+
   return sequelize.query(queryString);
 };
 

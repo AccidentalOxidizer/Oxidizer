@@ -6,7 +6,6 @@ var buildQueryOptions = function(req, filterByUser) {
 
   options.userId = req.query.userId || req.user.id;
   if (req.query.host) options.host = req.query.host;
- 
 
   if (req.query.url) options.url = parseUrl(req.query.url).url;
   if (req.query.urlSearch) options.urlSearch = req.query.urlSearch;
