@@ -134,11 +134,11 @@ var Profile = React.createClass({
         this.numLoads++;
 
         // Only update the numComments total if not null, i.e. on first load
-        var updatedNumComments = this.state.numComments || data.userInfo[0].numComments;
+        var updatedNumComments = this.state.numComments || data.userInfo.numComments;
 
         this.setState({
-          displayName: data.userInfo[0].username,
-          userAvatar: data.userInfo[0].userAvatar,
+          displayName: data.userInfo.username,
+          userAvatar: data.userInfo.userAvatar,
           comments: updatedComments,
           numComments: updatedNumComments,
         });
