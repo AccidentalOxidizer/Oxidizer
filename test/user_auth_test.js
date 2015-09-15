@@ -32,6 +32,8 @@ request.postAsync({
     // server each time we make a new request.
     // This is what keeps our "robot" user authenticated.
     cookie = user[0].headers['set-cookie'][0];
+    etag = user[0].headers['etag'];
+    //console.log('COOKIE!', cookie);
 
     // LOGGING / DEBUGGING INFO
     //console.log('COOKIE: ', user[0].headers['set-cookie'][0]);
@@ -46,7 +48,8 @@ request.postAsync({
     return request.postAsync({
       url: testServer + '/api/comments/add',
       headers: {
-        'Cookie': cookie
+        'Cookie': cookie,
+        'etag': etag
       },
       json: {
         url: testUrl,
@@ -57,7 +60,7 @@ request.postAsync({
   })
   .then(function(comment) {
     var commentResponse = comment[1];
-    //console.log('New Comment Added!\n Comment response:\n', commentResponse);
+    console.log('New Comment Added!\n Comment response:\n', commentResponse);
 
   })
   .catch(function(err) {
