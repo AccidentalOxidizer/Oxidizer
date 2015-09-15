@@ -103,7 +103,6 @@ document.addEventListener("DOMContentLoaded", function(e) {
   document.getElementById('close').addEventListener('click', closeOxidizer);
 
   document.getElementById('dismiss-notifications').addEventListener('click', function() {
-    console.log(settings.server);
     var request = $.ajax({
       url: settings.server + '/api/users/markread',
       method: "GET",

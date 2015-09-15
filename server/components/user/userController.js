@@ -77,8 +77,9 @@ var decrementNotification = function(userId, stringAttribute){
     });
 };
 
-var markRead = function(userId){
-  return User.findOne({where: {id: userId}})
+var markRead = function(req, res, next){
+
+  return User.findOne({where: {id: req.user.id}})
     .then(function(user){
       user.updateAttributes({
         lastCheckedUpdates: Sequelize.fn('NOW'),
@@ -88,10 +89,14 @@ var markRead = function(userId){
       });
 
       user.save();
-      return {
+
+      res.send(200, {
         repliesToCheck: user.repliesToCheck,
         heartsToCheck: user.heartsToCheck
-      };
+      });
+    })
+    .catch(function(){
+      res.send(404);
     });
 };
 
