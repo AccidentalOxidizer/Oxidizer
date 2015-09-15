@@ -6,7 +6,7 @@ var InfiniteScroll = require('react-infinite-scroll')(React);
 // At the moment, Profile will only be used to display your personal
 // profile, not that of others.
 var Profile = React.createClass({
-  mixins: [Router.State], // to retrieve query params
+  mixins: [Router.State, Router.Navigation],
 
   getInitialState: function() {
     return {
@@ -147,6 +147,10 @@ var Profile = React.createClass({
       }.bind(this),
       error: function(xhr, status, err) {
         console.error(xhr, status, err.message);
+        
+        // We usually get an error if the user isn't logged in.
+        // Transition to route:
+        this.transitionTo('app');
       }
     });
   },
