@@ -28,11 +28,11 @@ module.exports = function(express, app, passport) {
   }
 
   app.get('/welcome', urlEncodedParser, jsonParser, function(req,res, next){
-
+    //console.log(req);
     res.status(200).send({
       loggedin: 'ok'
     });
-  })
+  });
 
   // routes
   auth(app, passport);

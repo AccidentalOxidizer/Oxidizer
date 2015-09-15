@@ -18,6 +18,34 @@ module.exports = function(unparsedURL) {
   }
   var parsedURL = url.parse(unparsedURL);
 
+  // Let's check if there are any query strings. 
+  // If so, we're going to parse them and temporarily store it as an object.
+  // Then, we're going to attach the FIRST query param to the end of our URL before we return it.
+  // Now, you should be able to comment on YouTube videos. :)
+
+  // This needs to be outside the parsedURL query stuff below. 
+  // Otherwise, we start attaching 'undefined' to our URLs.
+  var getQuery = ''; 
+  
+  if (parsedURL.query !== null) {
+    var parsedQuery = JSON.parse('{"' + decodeURI(parsedURL.query).replace(/"/g, '\\"').replace(/&/g, '","').replace(/=/g,'":"') + '"}');
+    // console.log('QUERY PARAMS: ', parsedQuery);
+
+    //Build query string for FIRST parameter
+    var firstQuery = false;
+
+    for (var key in parsedQuery) {
+      if (!firstQuery) {
+        getQuery = '?' + key + '=' + encodeURI(parsedQuery[key]);
+        firstQuery = true;
+      }
+    }
+    
+    // console.log('FIRST QUERY: ', getQuery);
+    // console.log('------>\n\nPARSED URL: ', parsedURL);
+  }
+
+  
   // Replace only 'www.' at beginning of string via regex: /(^w)\w+\./i
   // not working totally, because it also triggers for 'wwwSOMETHING.domain.com'
   // it would be valuable to learn how to solve this with regular expressions to replace also www1. www2.
@@ -34,7 +62,7 @@ module.exports = function(unparsedURL) {
   if (parsedURL.hash && '/!'.indexOf(parsedURL.hash[1]) !== -1) {
     // remove ? 
     return {
-      url: parsedURL.host + parsedURL.pathname + parsedURL.hash,
+      url: parsedURL.host + parsedURL.pathname + parsedURL.hash + getQuery,
       host: parsedURL.host,
       pathname: parsedURL.pathname
     };
@@ -42,7 +70,7 @@ module.exports = function(unparsedURL) {
 
   // return parsed url
   return {
-    url: parsedURL.host + parsedURL.pathname,
+    url: parsedURL.host + parsedURL.pathname + getQuery,
     host: parsedURL.host,
     pathname: parsedURL.pathname
   };

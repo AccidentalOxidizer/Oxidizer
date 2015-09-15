@@ -62,7 +62,7 @@ module.exports = function(app, passport) {
   });
 
   app.get('/api/auth/chrome/logout', function(req, res, next) {
-    console.log(req.session, req.user);
+    //console.log(req.session, req.user);
     req.logOut();
     req.logout();
     req.session.destroy();
