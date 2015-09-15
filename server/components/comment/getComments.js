@@ -15,7 +15,7 @@
 //    'ReplyCount',
 //    ''   
 // filterByUser - if true, it will only return comments for the user set at userFilterId - default is requesting user
-//  TODO!!!! - userFilterId -  
+// userFilterId -  
 // isPrivate - if true, will only return a user's private comments;
 // host - hard search for host
 // 

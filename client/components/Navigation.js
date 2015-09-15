@@ -13,8 +13,7 @@ var Navigation = React.createClass({
         <div className="navbar-header">
           <a className="navbar-brand" href="#">Oxidizer</a>
         </div>
-        <ul className="nav navbar-nav navbar-right">
-<<<<<<< HEAD
+        <ul className="nav navbar-nav navbar-right">ß
           <li><Link to="website" params={{website: ""}}>Websites</Link></li>
           
           <li className="dropdown">
@@ -23,11 +22,6 @@ var Navigation = React.createClass({
                     <li><a href="test/test_favs.html">Test Page</a></li>
                   </ul>
                 </li>
-=======
-          <li><a href="test/test_favs.html">Test Page</a></li>
-          <li><Link to="website">Websites</Link></li>
-          <li><Link to="profile">My Profile</Link></li>
->>>>>>> websiteProfile
 
           <li className="dropdown">
             <a href="#" className="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
