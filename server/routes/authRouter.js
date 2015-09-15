@@ -5,7 +5,6 @@ var urlEncodedParser = bodyParser.urlencoded({
 });
 var auth = require('../middleware').auth;
 
-
 module.exports = function(app, passport) {
   app.post('/api/auth/local', jsonParser, passport.authenticate('local', {
     successRedirect: '/',

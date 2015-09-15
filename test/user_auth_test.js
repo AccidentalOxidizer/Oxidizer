@@ -57,7 +57,7 @@ request.postAsync({
   })
   .then(function(comment) {
     var commentResponse = comment[1];
-    //console.log('New Comment Added!\n Comment response:\n', commentResponse);
+    console.log('New Comment Added!\n Comment response:\n', commentResponse);
 
   })
   .catch(function(err) {
