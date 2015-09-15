@@ -83,13 +83,15 @@ var fave = function(req, res, next) {
     .then(function(result) {
       // Return total number of faves found for this comment.
       console.log('GET TOTAL FAVE COUNT!!!!: ', result.count);
-      return {
+      res.send(201, {
         count: result.count, 
         faved: faved
-      };
+      });
+      return;
     })
     .catch(function(err) {
       console.log("Fave error: ", err);
+      res.end();
       return;
     });
 };

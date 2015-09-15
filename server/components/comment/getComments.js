@@ -113,7 +113,7 @@ module.exports = function(sequelize, options) {
   queryString += 'LIMIT ' + limit + ' ';
   
   queryString += ';';
-
+  console.log(options, queryString);
   return sequelize.query(queryString);
 };
 
