@@ -35,10 +35,13 @@ module.exports = function(sequelize, dataTypes){
               text: object.text,
               isPrivate: object.isPrivate,
               UserId: object.UserId,
-              UrlId: url[0].get('id'),
+              UrlId: url[0].get('id')
             };
 
             return Comment.create(options);
+          })
+          .then(function(data){
+            User.incrementNotification(data.get('UserId'), 'replies');
           })
           .catch(function(err){
             console.log(err);
