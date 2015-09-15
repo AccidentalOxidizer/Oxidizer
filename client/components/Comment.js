@@ -19,20 +19,41 @@ var Comment = React.createClass({
   
   render: function() {
     var userUrl = window.location.origin + '/#/profile?userId=' + this.props.comment.UserId;
+    var hearts = this.props.comment.HeartCount ? this.props.comment.HeartCount : 0;
+    var heartClass;
 
-    // Optional Delete ...
-    var deleteButton;
+    console.log("Comment: heartedByUser: ", this.props.comment.HeartedByUser);
+
+    if (this.props.comment.HeartedByUser) {
+      heartClass = "fa fa-heart";
+    } else {
+      heartClass = "fa fa-heart-o";
+    }
+
+    // Delete Link: only show if allowed.
+    var deleteLink;
 
     if (this.props.allowDelete) {
-      deleteButton = (
-        <p><a onClick={this.props.deleteComment}>Delete Comment</a></p>
+      deleteLink = (
+        <div className="delete">
+          <a onClick={this.props.deleteComment}>
+            <i className="fa fa-trash-o"></i>&nbsp; 
+          </a>
+        </div>
       );
     }
+
     return (
       <div>
         <p><strong><a href={userUrl}>{this.props.comment.username}</a></strong> | {this.props.comment.url} | {moment(this.props.comment.createdAt).fromNow()}</p>
         <p>{this.props.comment.text}</p>
-        {deleteButton}
+
+        <div className="row">
+          <div className="heart">
+            <i className={heartClass}></i>&nbsp;{hearts}
+          </div>
+          {deleteLink}
+        </div>
       </div>
     );
   }
