@@ -103,18 +103,15 @@ var Profile = React.createClass({
       dataType: 'json',
       success: function(data) {
         console.log('Profile: successfully loaded comments');
-
-        // Print user data in the console.
         console.log('USER DATA: ', data);
 
-        // XXX EE: what's the right thing to store here?
-        // For now, if no comments returned, keep it the same as it was.
-        // What if you have comments, but then you run a query -> 0 comments returned?
+        // If we loaded new comments on this iteration, update the value
+        // to store the id of the oldest comment loaded which will be
+        // at the last element of the comments array.
         this.oldestLoadedCommentId = data.comments.length > 0 ?
           data.comments[data.comments.length - 1].id : this.oldestLoadedCommentId;
         console.log('Profile loadComments: oldestLoadedCommentId ' + this.oldestLoadedCommentId);
 
-        // Update the time ...
         this.currentTime = data.currentTime;
 
         // If the number of loaded comments is less than 25 (XXX - should have a 
@@ -122,9 +119,9 @@ var Profile = React.createClass({
         this.hasMoreComments = (data.comments.length < 25) ? false : true;
         console.log('Profile loadComments: comments.length: ' + data.comments.length + ' hasMoreComments? ' + this.hasMoreComments);
 
-        // If reloading for a search query, reset the comments array;
+        // If reloading for a new comment set (e.g. for a search query, 
+        // or for loading favorited comments) reset the comments array;
         // otherwise append older comments now loaded to the end.
-        // Also, only update the numComments total if not querying.
         var updatedComments;
 
         // If loading a comment feed for the first time, intialize the comments; 
@@ -137,13 +134,11 @@ var Profile = React.createClass({
         this.numLoads++;
 
         // Only update the numComments total if not null, i.e. on first load
-        var updatedNumComments = this.state.numComments || data.numComments;
-
-        console.log('Ava', data.userInfo);
+        var updatedNumComments = this.state.numComments || data.userInfo[0].numComments;
 
         this.setState({
-          displayName: data.userInfo.username,
-          userAvatar: data.userInfo.userAvatar,
+          displayName: data.userInfo[0].username,
+          userAvatar: data.userInfo[0].userAvatar,
           comments: updatedComments,
           numComments: updatedNumComments,
         });
@@ -154,12 +149,16 @@ var Profile = React.createClass({
     });
   },
 
+  resetLoadState: function(loadFavorites) {
+    this.loadFavorites = loadFavorites;
+    this.oldestLoadedCommentId = 'undefined';
+    this.numLoads = 0;
+  },
+
   loadUserComments: function() {
     console.log("Profile: loadUserComments, oldestLoadedCommentId " + this.oldestLoadedCommentId);
 
-    this.loadFavorites = false;
-    this.oldestLoadedCommentId = 'undefined';
-    this.numLoads = 0;
+    this.resetLoadState(false);
 
     // Clear out state for Url and Text search if we are loading all comments
     this.urlSearch = '';
@@ -171,9 +170,7 @@ var Profile = React.createClass({
   loadUserCommentsForUrl: function(url) {
     console.log("Profile: loadUserCommentsForUrl, " + url);
 
-    this.loadFavorites = false;
-    this.oldestLoadedCommentId = 'undefined';
-    this.numLoads = 0;
+    this.resetLoadState(false);
 
     // Only allow search on Url or Text, not both
     this.urlSearch = url;
@@ -185,10 +182,8 @@ var Profile = React.createClass({
   loadUserCommentsForText: function(text) {
     console.log("Profile: loadUserCommentsForText, " + text);
 
-    this.loadFavorites = false;
-    this.oldestLoadedCommentId = 'undefined';
-    this.numLoads = 0;
-
+    this.resetLoadState(false);
+    
     // Only allow search on Url or Text, not both
     this.urlSearch = '';
     this.textSearch = text;
@@ -255,9 +250,7 @@ var Profile = React.createClass({
   loadUserFavorites: function() {
     console.log('Profile: requested loadUserFavorites');
 
-    this.loadFavorites = true;
-    this.oldestLoadedCommentId = 'undefined';
-    this.numLoads = 0;
+    this.resetLoadState(true);
 
     // Clear out state for Url and Text search for load of favorites
     this.urlSearch = '';
@@ -269,8 +262,6 @@ var Profile = React.createClass({
   // Delete the comment at index in the comments array.
   // Optimistically delete the comment from the view.
   deleteComment: function(index) {
-    // var deletedComment = this.state.comments[index];
-    // var updatedComments = this.state.comments.splice(index, 1);
     var deletedComment = this.state.comments.splice(index, 1)[0];
 
     console.log("Profile: requesting delete of comment ", deletedComment);
@@ -290,7 +281,6 @@ var Profile = React.createClass({
   },
 
   render: function() {
-
     // Optional header with more options if loading our personal profile
     var optionalHeader;
     var isPersonalProfile = this.userId ? false : true;
