@@ -355,11 +355,27 @@ function compileComments(msg) {
     // Create an array of matching image URLs
     var isImageLink = element.text.match(imagePattern);
 
-    console.log('IMAGE ARRAY? ', isImageLink);
-
+    // Let's eliminate any duplicate items in our array so things don't get too crazy.
+    // Also, if we have the same URL In our array multiple times, things will break!
     if (isImageLink !== null && isImageLink.length > 0) {
-      isImageLink.forEach(function(imageLink, index) {
-        element.text = element.text.replace(imageLink, '<p align="center"><img src="' + imageLink + '" style="max-width: 450px;"/></p>');
+      // Create an array of nonDuplicate image links.
+      var nonDuplicateImages = [];
+      isImageLink.forEach(function(element, index) {
+        if (nonDuplicateImages.indexOf(element) === -1) {
+          nonDuplicateImages.push(element);
+        }
+      });
+
+      // Iterate through our array of unique URLs and replace matching image URLs
+      // with HTML img tags.
+      nonDuplicateImages.forEach(function(imageLink) {
+        // Since we want to replace all instances of the URL,
+        // we need to create a regEx object and tell it to look
+        // for all instances that match within the string using the "/g" modifier.
+        
+        var replaceURL = new RegExp(imageLink, 'g');
+
+        element.text = element.text.replace(replaceURL, '<p align="center"><img src="' + imageLink + '" style="max-width: 450px;"/></p>');
       });
     }
 
