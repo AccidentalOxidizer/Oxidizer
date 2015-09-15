@@ -14,6 +14,10 @@ module.exports = function(sequelize, dataTypes) {
     }
   }, {
     classMethods: {
+      toggleHeart: function(){
+        var faved = true;
+        
+      },
 
       // TODO:
       //  - limit the query results like other comment loads? would need

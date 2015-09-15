@@ -61,7 +61,7 @@ module.exports.addComment = function(req, res, next) {
     text: req.body.text,
     isPrivate: req.body.isPrivate,
     UserId: req.user.id,
-    url: req.body.url,
+    url: parseUrl(req.body.url).url,
     host: parseUrl(req.body.url).host,
     repliesToId: req.body.repliesToId
   })

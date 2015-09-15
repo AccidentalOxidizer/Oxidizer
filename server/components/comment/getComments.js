@@ -23,7 +23,7 @@ module.exports = function(sequelize, options) {
   options = options || {};
 
   // add more columns here!!
-  var queryString = 'SELECT DISTINCT Comments.id, Comments.UserId, Comments.text, Comments.UrlId, Comments.RepliesToId, Comments.isPrivate, Comments.createdAt, Urls.url, Urls.host, Users.name AS username, Users.avatar AS userAvatar,' +
+  var queryString = 'SELECT DISTINCT Comments.id, Comments.UserId, Comments.text, Comments.UrlId, Comments.repliesToId, Comments.isPrivate, Comments.createdAt, Urls.url, Urls.host, Users.name AS username, Users.avatar AS userAvatar,' +
     '(SELECT COUNT(1) AS other FROM Hearts AS h ' +
       'WHERE Comments.id = h.CommentId GROUP BY Comments.id) AS HeartCount, ' +
     '(SELECT COUNT(1) AS other FROM Comments AS c ' +
@@ -66,7 +66,7 @@ module.exports = function(sequelize, options) {
   
   if (options.filterByUser) {
     var userToFilter = options.userFilterId || options.userId;
-    filters.push('Users.id = ' + userToFilter + ' ');
+    filters.push('Comments.UserId = ' + userToFilter + ' ');
   }
 
   if (options.commentId) filters.push('Comments.id = ' + options.commentId + ' ');
@@ -80,12 +80,11 @@ module.exports = function(sequelize, options) {
 
   // // if there are any filters, add them to the query
   if (filters.length > 0){
-    queryString += 'WHERE ';
+    // keeps correct user associated with the comment
+    queryString += 'WHERE Users.id = Comments.userId ';
 
     for (var i = 0; i < filters.length; i++) {
-      if (i > 0){
-        queryString += 'AND ';
-      }
+      queryString += 'AND ';
       queryString += filters[i];
     }
   }
@@ -114,12 +113,9 @@ module.exports = function(sequelize, options) {
   queryString += 'LIMIT ' + limit + ' ';
   
   queryString += ';';
-
+  console.log(queryString);
   return sequelize.query(queryString);
 };
-
-
-
 
 
 

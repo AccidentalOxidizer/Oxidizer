@@ -28,7 +28,7 @@ module.exports = function(app) {
   // app.post('/api/comments/fave', jsonParser, Heart.addHeart);
 
   // Users marks a specific comment as a new favorite.
-  app.post('/api/comments/fave', jsonParser, function(req, res, next) {
+  app.post('/api/comments/faveritess', jsonParser, function(req, res, next) {
     Heart.fave({
         UserId: req.user.id,
         CommentId: req.body.CommentId

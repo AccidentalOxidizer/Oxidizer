@@ -23,7 +23,6 @@ module.exports = function(sequelize, dataTypes){
         var Url = sequelize.models.Url;
         var Comment = sequelize.models.Comment;
 
-        console.log(object);
         return Url.findOrCreate({where: { 
             url: object.url,
             host: object.host
