@@ -311,7 +311,7 @@ function postComment(text, repliesToId) {
     if (!repliesToId) {
       $(".cd-panel-content").prepend(html);
     } else {
-      $('#' + repliesToId).prepend(html);
+      $('#' + repliesToId).append(html);
     }
     registerCommentEventListeners();
 

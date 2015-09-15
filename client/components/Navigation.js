@@ -3,9 +3,6 @@ var Router = require('react-router');
 var Link = Router.Link;
 
 var Navigation = React.createClass({
-  // <i className="fa fa-google"></i> Sign Up
-  // <li><a href="/api/auth/google">Login | Sign Up with Google</a></li>
-  // <a href="/api/auth/google" className="btn btn-social-icon btn-xs btn-google"><i className="fa fa-google"></i></a>
   render: function() {
     return (
       <nav className="navbar navbar-inverse navbar-static-top" role="navigation">
