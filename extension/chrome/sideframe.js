@@ -544,8 +544,8 @@ function registerCommentEventListeners(comment) {
   var showReplies = document.getElementsByClassName('replies');
 
   for (var i = 0; i < showReplies.length; i++) {
+    
     $(showReplies[i]).off('click').on('click', function() {
-
       var target = $(this).parents('.comment');
       var repliesToId = $($(this)[0]).attr('data-comment-id');
 
