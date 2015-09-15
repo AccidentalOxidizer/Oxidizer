@@ -151,7 +151,7 @@ var Profile = React.createClass({
         // We usually get an error if the user isn't logged in.
         // Transition to route:
         this.transitionTo('app');
-      }
+      }.bind(this)
     });
   },
 
