@@ -38,7 +38,7 @@ var getId = function(url){
   return Url.findOrCreate({where: {url: parsedUrl.url, host: parsedUrl.host}})
     .then(function(url,b,c){
       return url[0].get('id');
-    })
+    });
 };
 
 // GET all comments for a URL from the database

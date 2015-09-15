@@ -14,6 +14,7 @@ module.exports = function(sequelize, dataTypes){
     classMethods: {
       // returns comments with all of the fields we love
       getComments: function(options){
+        console.log('GET COMMENTS: ', options);
         return getComments(sequelize, options);
       },
 
