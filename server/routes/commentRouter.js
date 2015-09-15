@@ -30,6 +30,8 @@ module.exports = function(app) {
   // Users marks a specific comment as a new favorite.
   app.post('/api/comments/fave', jsonParser, Heart.fave);
 
+  // app.get('/api/comments/')
+
   // Count favorites for a specific comment
   app.get('/api/comments/faves/get', jsonParser, function(req, res, next) {
     

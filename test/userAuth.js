@@ -37,13 +37,11 @@ request.postAsync({
     etag = user[0].headers['etag'];
     //console.log('COOKIE!', cookie);
     
-    var user = {
+    return {
       user: user,
       cookie: cookie,
       etag: etag
     };
-
-    return user;
 
     // LOGGING / DEBUGGING INFO
     //console.log('COOKIE: ', user[0].headers['set-cookie'][0]);

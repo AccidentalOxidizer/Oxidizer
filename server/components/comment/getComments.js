@@ -15,6 +15,7 @@
 //    'ReplyCount',
 //    ''   
 // filterByUser - if true, it will only return comments for the user set at userFilterId - default is requesting user
+// getHeartedByUser - will only returned favorited ids
 // userFilterId -  
 // isPrivate - if true, will only return a user's private comments;
 // host - hard search for host
@@ -78,6 +79,10 @@ module.exports = function(sequelize, options) {
     else filters.push('Comments.isPrivate = 0 ');
   }
 
+  if (options.getHeartedByUser){
+    filters.push('(SELECT COUNT(1) AS other FROM Hearts AS h WHERE Comments.id = h.CommentId AND h.UserId = 1) = 1 ');
+  }
+
   // // if there are any filters, add them to the query
   if (filters.length > 0){
     // keeps correct user associated with the comment
@@ -113,17 +118,7 @@ module.exports = function(sequelize, options) {
   queryString += 'LIMIT ' + limit + ' ';
   
   queryString += ';';
-  console.log(options, queryString);
+
+  console.log(queryString);
   return sequelize.query(queryString);
 };
-
-
-
-
-
-
-
-
-
-
-

@@ -107,7 +107,7 @@ module.exports.addComment = function(req, res, next) {
     .then(function(data){
 
       var newComment = {
-        commentId: data.get('id'),
+        commentId: data,
         repliesToId: req.body.repliesToId
       };
 
@@ -122,6 +122,8 @@ module.exports.addComment = function(req, res, next) {
       };
 
       res.send(201, response);
+
+
     })
     .catch(function(err){
       console.log(err);

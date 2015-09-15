@@ -23,6 +23,8 @@ module.exports = function(sequelize, dataTypes){
         var User = sequelize.models.User;
         var Url = sequelize.models.Url;
         var Comment = sequelize.models.Comment;
+        var userController = require('../user');
+
 
         return Url.findOrCreate({where: { 
             url: object.url,
@@ -35,10 +37,14 @@ module.exports = function(sequelize, dataTypes){
               text: object.text,
               isPrivate: object.isPrivate,
               UserId: object.UserId,
-              UrlId: url[0].get('id'),
+              UrlId: url[0].get('id')
             };
 
             return Comment.create(options);
+          })
+          .then(function(data){
+            userController.incrementNotification(data.get('UserId'), 'replies');
+            return data.get('id');
           })
           .catch(function(err){
             console.log(err);
