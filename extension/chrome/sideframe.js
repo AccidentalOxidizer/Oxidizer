@@ -528,14 +528,14 @@ function registerCommentEventListeners(comment) {
       var repliesToId = $($(this)[0]).attr('data-comment-id');
 
       var thisComment = $(this).parents('.comment');
-      var replies = thisComment.find('.comment');
+      var replies = thisComment.find('.comment-reply');
 
       // toggle whether
       if (replies.length > 0) {
         if (!$(replies[0]).hasClass('hidden')) {
-          $(replies).addClass('hidden')
+          $(replies).addClass('hidden');
         } else {
-          $(replies).removeClass('hidden')
+          $(replies).removeClass('hidden');
           loadMoreComments(target, url, repliesToId);
         }
       } else {

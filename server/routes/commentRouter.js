@@ -80,9 +80,4 @@ module.exports = function(app) {
               res.send(200);
             });
   });
-
-
-  // app.put('/api/comments/:id', jsonParser, auth.isAuthorized, function(req, res, next) {
-  //   // Updates a comment!
-  // });
 };
