@@ -3,22 +3,14 @@
   "description": "The Commenting System of the Internet",
   "version": "0.3",
   "permissions": [
-    "http://localhost:3000/test/comments",
-    "http://127.0.0.1:3000/test/comments",
-    "http://localhost:4568/*",
-    "http://localhost:4568/auth/github",
-    "http://localhost:4568/auth/github/callback",
+    "http://localhost:3000/*",
+    "http://127.0.0.1:3000/*",
+    "https://www.oxidizer.io/*",
     "activeTab",
     "webNavigation",
     "tabs",
     "background",
-    "storage",
-    "http://*/*",
-    "https://*/*",
-    "file:///*/*",
-    "*://*/*",
-    "<all_urls>",
-    "http://localhost:3000/*"
+    "storage"
   ],
   "background": {
     "scripts": ["background.js"],
