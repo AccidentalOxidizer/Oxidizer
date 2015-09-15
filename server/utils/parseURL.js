@@ -22,13 +22,18 @@ module.exports = function(unparsedURL) {
   // If so, we're going to parse them and temporarily store it as an object.
   // Then, we're going to attach the FIRST query param to the end of our URL before we return it.
   // Now, you should be able to comment on YouTube videos. :)
+
+  // This needs to be outside the parsedURL query stuff below. 
+  // Otherwise, we start attaching 'undefined' to our URLs.
+  var getQuery = ''; 
+  
   if (parsedURL.query !== null) {
     var parsedQuery = JSON.parse('{"' + decodeURI(parsedURL.query).replace(/"/g, '\\"').replace(/&/g, '","').replace(/=/g,'":"') + '"}');
     // console.log('QUERY PARAMS: ', parsedQuery);
 
     //Build query string for FIRST parameter
     var firstQuery = false;
-    var getQuery = '';
+
     for (var key in parsedQuery) {
       if (!firstQuery) {
         getQuery = '?' + key + '=' + encodeURI(parsedQuery[key]);
