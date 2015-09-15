@@ -119,15 +119,7 @@ document.addEventListener("DOMContentLoaded", function(e) {
 
 
   // Reigster all elements with class 'link' to ahve click event and open new tab with target href
-  var links = document.getElementsByClassName('link');
-  for (var i = 0; i < links.length; i++) {
-    if (links[i].nodeName === 'A') {
-      links[i].addEventListener('click', function(event){
-        event.preventDefault();
-        window.open(event.target.href);
-      });
-    }
-  };
+  registerLinks();
 
   // Update the feed privacy setting if the user changes it in the dropdown menu.
   $('#feed-privacy-select li a').click(function() {
@@ -502,12 +494,14 @@ function loadMoreComments(destination, url, repliesToId) {
 
 // EVENT LISTENERS
 function registerCommentEventListeners(comment) {
+
+  registerLinks();
+
   // or jquery : .off().on('click')
   var replies = document.getElementsByClassName('reply');
   for (var i = 0; i < replies.length; i++) {
     $(replies[i]).off('click').on('click', function() {
       var commentId = this.getAttribute('data-comment-id');
-      console.log('Reply to: ', commentId);
       $(this).toggleClass('active');
       $('#' + commentId + ' .reply-form').toggleClass('hidden');
       $('#' + commentId + ' .reply-input ').focus();
@@ -520,8 +514,6 @@ function registerCommentEventListeners(comment) {
     var $replyForm = $(replyForms[i]);
 
     $replyForm.find('.reply-button').off('click').on('click', function() {
-      console.log('reply clicked...');
-
       // get input text
       var text = $(this).parents('.reply-form').find('.reply-input').val();
       // clear text field
@@ -631,6 +623,18 @@ function registerCommentEventListeners(comment) {
 }
 
 // FUNCTIONS
+
+function registerLinks() {
+  var links = document.getElementsByClassName('link');
+  for (var i = 0; i < links.length; i++) {
+    if (links[i].nodeName === 'A') {
+      $(links[i]).off('click').on('click', function() { 
+        event.preventDefault();
+        window.open(event.target.href);
+      });
+    }
+  };
+}
 
 function setNotifications(favs, replies) {
   if (!favs && !replies) {
