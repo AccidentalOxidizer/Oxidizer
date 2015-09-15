@@ -23,6 +23,8 @@ module.exports = function(sequelize, dataTypes){
         var User = sequelize.models.User;
         var Url = sequelize.models.Url;
         var Comment = sequelize.models.Comment;
+        var userController = require('../user');
+
 
         return Url.findOrCreate({where: { 
             url: object.url,
@@ -41,7 +43,8 @@ module.exports = function(sequelize, dataTypes){
             return Comment.create(options);
           })
           .then(function(data){
-            User.incrementNotification(data.get('UserId'), 'replies');
+            userController.incrementNotification(data.get('UserId'), 'replies');
+            return data.get('id');
           })
           .catch(function(err){
             console.log(err);
