@@ -26,7 +26,7 @@ var get = function(searchObject, userId) {
     });
 };
 
-var fave = function(searchObject) {
+var toggleHeart = function(searchObject) {
   //First: Search
   // if a fave for this particular user and comment combination already exists.
   var faved = true;
@@ -60,7 +60,6 @@ var fave = function(searchObject) {
         faved = false;
         userId = result.get('UserId');
         // User has already faved this item before. Let's remove the fave!
-        console.log('Faved result already found. Removing existing result.');
         return Heart.destroy({
             where: searchObject
           })
@@ -91,4 +90,4 @@ var fave = function(searchObject) {
 };
 
 exports.get = get;
-exports.fave = fave;
+exports.toggleHeart = toggleHeart;

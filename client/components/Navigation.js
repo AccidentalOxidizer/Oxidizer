@@ -13,7 +13,7 @@ var Navigation = React.createClass({
         <div className="navbar-header">
           <a className="navbar-brand" href="#">Oxidizer</a>
         </div>
-        <ul className="nav navbar-nav navbar-right">ß
+        <ul className="nav navbar-nav navbar-right">
           <li><Link to="website" params={{website: ""}}>Websites</Link></li>
           
           <li className="dropdown">
