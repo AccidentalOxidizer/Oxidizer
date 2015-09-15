@@ -28,30 +28,7 @@ module.exports = function(app) {
   // app.post('/api/comments/fave', jsonParser, Heart.addHeart);
 
   // Users marks a specific comment as a new favorite.
-  app.post('/api/comments/faveritess', jsonParser, function(req, res, next) {
-    Heart.fave({
-        UserId: req.user.id,
-        CommentId: req.body.CommentId
-      })
-      .then(function(result) {
-        console.log('Comment faved!');
-        console.log('Faved result: ', result);
-        // The result returned is the number of favorites for this particular comment.
-        var faveCount = {
-          favs: result.count,
-          faved: result.faved
-        };
-        res.send(faveCount);
-
-        return Comment.getUserId(req.body.CommentId)
-          .then(function(userId){
-            return User.updateNotification(userId, 'hearts');
-          });
-      })
-      .catch(function(err) {
-        console.log("Error: Comment not faved...", err);
-      });
-  });
+  app.post('/api/comments/fave', jsonParser, Heart.fave);
 
   // Count favorites for a specific comment
   app.get('/api/comments/faves/get', jsonParser, function(req, res, next) {
