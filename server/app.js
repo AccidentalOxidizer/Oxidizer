@@ -94,8 +94,8 @@ sequelize.sync().then(function() {
 
   if (process.env.NODE_ENV === 'production') {
     var options = {
-      key: fs.readFileSync(__dirname + '/../keys/key.pem', 'utf-8'),
-      cert: fs.readFileSync(__dirname + '/../keys/api_oxidizer_io.crt', 'utf-8')
+      key: fs.readFileSync(__dirname + '/../keys/www/key.pem', 'utf-8'),
+      cert: fs.readFileSync(__dirname + '/../keys/www/www_oxidizer_io.crt', 'utf-8')
     }
     https.createServer(options, app).listen(443);
   }
