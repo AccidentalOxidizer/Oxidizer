@@ -26,10 +26,15 @@ var get = function(searchObject, userId) {
     });
 };
 
-var toggleHeart = function(searchObject) {
+var fave = function(req, res, next) {
   //First: Search
   // if a fave for this particular user and comment combination already exists.
+  console.log(req);
   var faved = true;
+  var searchObject ={ 
+    UserId: req.user.id,
+    CommentId: req.body.CommentId
+  };
 
   return Heart.findOne({
       where: searchObject
@@ -51,7 +56,7 @@ var toggleHeart = function(searchObject) {
                 model: User,
                 attributes: ['id']
               }]
-            })       
+            });       
           })
           .then(function(comment){
             return userController.incrementNotification(comment.UserId, 'hearts');
@@ -90,4 +95,4 @@ var toggleHeart = function(searchObject) {
 };
 
 exports.get = get;
-exports.toggleHeart = toggleHeart;
+exports.fave = fave;

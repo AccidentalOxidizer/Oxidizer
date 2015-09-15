@@ -152,9 +152,9 @@
                 <div id="comment-engage" class="row " style="">
                     <div class="col-xs-12 comment-engage">
                         <div id="reply" data-comment-id="{{id}}" class="reply" style="float:left;"><i class="fa fa-reply"></i>&nbsp;</div>
-                        <div id="replies" data-comment-id="{{id}}" class="replies" style="float:left;"><i class="fa fa-commenting-o"></i>&nbsp;{{replies}}</div>
+                        <div id="replies" data-comment-id="{{id}}" class="replies" style="float:left;"><i class="fa fa-commenting-o"></i>&nbsp;{{ReplyCount}}</div>
                         <div id="heart" data-comment-id="{{id}}" class="heart" style="float:left;">
-                            <i class="fa {{#if heartedByUser}} fa-heart{{else}} fa-heart-o{{/if}}"></i>&nbsp;{{Hearts}}</div>
+                            <i class="fa {{#if heartedByUser}} fa-heart{{else}} fa-heart-o{{/if}}"></i>&nbsp;{{HeartCount}}</div>
                         {{#ifSelf ../userInfo.userId UserId}}
                         <div id="delete" data-comment-id="{{id}}" class="delete" style="float:right; text-align:right;">
                             <i class="fa fa-trash-o"></i>&nbsp; </div>

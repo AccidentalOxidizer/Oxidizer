@@ -172,9 +172,10 @@ document.addEventListener("DOMContentLoaded", function(e) {
   });
 
   // sends request for new comments when we get to the bottom of comments
-  document.querySelector('.cd-panel-content').addEventListener('scroll', function(e) {
+  document.querySelector('.panel-content-wrapper').addEventListener('scroll', function(e) {
 
-    var commentContainer = document.getElementsByClassName('cd-panel-content')[0];
+    var commentContainer = document.getElementsByClassName('panel-content-wrapper')[0];
+      
 
     // calculates how much space is left to scroll through the comments
     var spaceLeft = commentContainer.scrollHeight - (commentContainer.clientHeight + commentContainer.scrollTop);
@@ -262,8 +263,10 @@ function loadContent(url) {
 
     var html = compileComments(msg);
 
+
     $(".cd-panel-content").append(html);
     registerCommentEventListeners();
+
   });
 
   request.fail(function(jqXHR, textStatus) {
@@ -357,17 +360,20 @@ function compileComments(msg) {
 
 // destination is a jquery object that you want to append to
 function loadMoreComments(destination, url, repliesToId) {
-  toggleSpinner();
+
   // if not a reply, don't execute if we are at end of comments, or waiting for a request to return
   if (repliesToId === undefined && (tracking.mainLastComment.endOfComments || !tracking.requestReturned)) {
     return;
   }
 
-  if (repliesToId && tracking[repliesToId])
+  if (repliesToId && tracking[repliesToId]){
     if (tracking[repliesToId].endOfComments || !tracking.requestReturned) {
       return;
     }
-
+  }
+  
+  toggleSpinner();
+  
   var params = {
     url: encodeURIComponent(url),
     isPrivate: privateFeed
