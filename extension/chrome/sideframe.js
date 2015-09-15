@@ -349,17 +349,22 @@ function compileComments(msg) {
   // to be an image link using a regex pattern. If we find a match, replace
   // the text with an image tag and a link.
   msg.comments.forEach(function(element) {
-    var imagePattern = /(https?:\/\/.*\.(?:png|jpg|gif|jpeg))/;
+    // RegEx for matching image URLs
+    var imagePattern = /\b(https?:\/\/\S+(?:png|jpe?g|gif)\S*)\b/igm;
+
+    // Create an array of matching image URLs
     var isImageLink = element.text.match(imagePattern);
 
-    //console.log('Text Input: ', element.text);
+    console.log('IMAGE ARRAY? ', isImageLink);
 
-    // If isImageLink is true and matches the RegEx pattern, let's
-    // go ahead and replace it! 
-    if (isImageLink) {
-      console.log('IMAGE URL FOUND');
-      element.text = '<p align="center"><img src="' + element.text + '" style="max-width: 450px;"/></p>';
+    if (isImageLink !== null && isImageLink.length > 0) {
+      isImageLink.forEach(function(imageLink, index) {
+        element.text = element.text.replace(imageLink, '<p align="center"><img src="' + imageLink + '" style="max-width: 450px;"/></p>');
+      });
     }
+
+    //console.log('Text Input: ', element.text);
+    //element.text = element.text.replace(imagePattern, '<p align="center"><img src="' + element.text + '" style="max-width: 450px;"/></p>');
   });
 
   // Include access to the host value to build url to link to user profiles.
