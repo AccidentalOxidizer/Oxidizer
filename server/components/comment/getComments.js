@@ -126,7 +126,6 @@ module.exports = function(sequelize, options) {
   
   queryString += ';';
 
-  console.log('HEY ELIOT, '); 
   return sequelize.query(queryString);
 };
 
