@@ -13,6 +13,7 @@ var Navigation = React.createClass({
         
         <ul className="nav navbar-nav navbar-right">
           <li><Link to="website" params={{website: ""}}>Websites</Link></li>
+          <li><Link to="leaderboard">Leaderboard</Link></li>
           
           <li className="dropdown">
             <a href="#" className="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Testing <span className="caret"></span></a>

@@ -6,7 +6,7 @@ var InfiniteScroll = require('react-infinite-scroll')(React);
 // At the moment, Profile will only be used to display your personal
 // profile, not that of others.
 var Profile = React.createClass({
-  mixins: [Router.State],
+  mixins: [Router.State], // to retrieve query params
 
   getInitialState: function() {
     return {
@@ -53,6 +53,8 @@ var Profile = React.createClass({
   //  - url (n/a for this route)
   //  * urlSearch 
   //  * textSearch
+  //  ? numberOfComments: optional value that determines number of 
+  //    comments loaded per call; defaults to 25
   loadComments: function() {
     // Adjust loading API and parameters according to whether we
     // are loading user comments or user favorited comments.
