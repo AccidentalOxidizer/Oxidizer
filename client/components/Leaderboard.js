@@ -85,8 +85,8 @@ var Leaderboard = React.createClass({
 
     return (
       <div className="row">
-        <div className="col-md-8 col-md-offset-2">
-          <h3>Top Comments</h3>
+        <div className="col-md-8 col-md-offset-2 leaderboard">
+          <h3>The Highest Rated Comments Across The Web</h3>
           <InfiniteScroll pageStart="0" loadMore={this.loadComments} hasMore={this.hasMoreComments} 
               loader={<div className="loader">Loading ...</div>}>
             {comments}
