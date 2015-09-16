@@ -1,4 +1,6 @@
 var getComments = require('./getComments');
+var getNewReplies = require('./getNewReplies');
+var getNewHearts = require('./getNewHearts');
 
 module.exports = function(sequelize, dataTypes){
   return sequelize.define('Comment', {
@@ -14,7 +16,6 @@ module.exports = function(sequelize, dataTypes){
     classMethods: {
       // returns comments with all of the fields we love
       getComments: function(options){
-        //console.log('GET COMMENTS: ', options);
         return getComments(sequelize, options);
       },
 
@@ -45,7 +46,15 @@ module.exports = function(sequelize, dataTypes){
           .catch(function(err){
             console.log(err);
           });
-      }
+      },
+
+      getNewReplies: function(userid){
+        return getNewReplies(sequelize, userid);
+      },
+
+      getNewHearts: function(userid){
+        return getNewHearts(sequelize, userid);
+      },
     },
   });
 };

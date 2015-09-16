@@ -42,6 +42,8 @@ var Profile = React.createClass({
 
     // Are we loading the user's favorited comments?
     this.loadFavorites = false;
+
+    this.showNewReplies = false;
   },
 
   // Query fields:
@@ -61,10 +63,24 @@ var Profile = React.createClass({
     var url;
     var query;
 
+    
     if (this.loadFavorites) {
-      url = window.location.origin + '/api/comments/faves/getForUser',
+      url = window.location.origin + '/api/comments/faves/getForUser';
       query = {
-        getHeartedByUser: true
+        getHeartedByUser: true,
+      };
+    } else if (this.showNewHearts){ 
+      url = window.location.origin + '/api/comments/newhearts';
+
+      query = {
+        userId: this.userId,
+      };
+    } else if (this.showNewReplies){
+
+      url = window.location.origin + '/api/comments/newreplies';
+
+      query = {
+        userId: this.userId,
       };
     } else {
       url = window.location.origin + '/api/comments',
@@ -157,7 +173,9 @@ var Profile = React.createClass({
     });
   },
 
-  resetLoadState: function(loadFavorites) {
+  resetLoadState: function(loadFavorites, showNewReplies, showNewHearts) {
+    this.showNewReplies = showNewReplies || false;
+    this.showNewHearts = showNewHearts || false;
     this.loadFavorites = loadFavorites;
     this.oldestLoadedCommentId = 'undefined';
     this.numLoads = 0;
@@ -267,6 +285,30 @@ var Profile = React.createClass({
     this.loadComments();
   },
 
+  loadNewReplies: function() {
+    console.log('Profile: requested loadNewReplies');
+
+    this.resetLoadState(false, true);
+
+    // Clear out state for Url and Text search for load of favorites
+    this.urlSearch = '';
+    this.textSearch = '';
+
+    this.loadComments();
+  },
+  
+  loadNewHearts: function() {
+    console.log('Profile: requested loadNewHearts');
+
+    this.resetLoadState(false, false, true);
+
+    // Clear out state for Url and Text search for load of favorites
+    this.urlSearch = '';
+    this.textSearch = '';
+
+    this.loadComments();
+  },
+
   // Delete the comment at index in the comments array.
   // Optimistically delete the comment from the view.
   deleteComment: function(index) {
@@ -312,6 +354,8 @@ var Profile = React.createClass({
                       </ul>
                     </li>
                     <li><a className="" onClick={this.loadUserFavorites}><i className="fa fa-heart"></i> Load Favorites</a></li>
+                    <li><a className="" onClick={this.loadNewReplies}><i className="fa fa-heart"></i> Load New Replies</a></li>
+                    <li><a className="" onClick={this.loadNewHearts}><i className="fa fa-heart"></i> Load New Hearts</a></li>
                     <li><a className="" onClick={this.resetComments} href="#"><i className="fa fa-times"></i> Clear Search</a></li>
                   </ul>
                 </div>

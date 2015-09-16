@@ -25,12 +25,17 @@ module.exports = function(app) {
 
   app.delete('/api/comments/remove/:id', jsonParser, auth.isAuthorized, Comment.remove);
   
-  // app.post('/api/comments/fave', jsonParser, Heart.addHeart);
-
   // Users marks a specific comment as a new favorite.
   app.post('/api/comments/fave', jsonParser, Heart.fave);
 
-  // app.get('/api/comments/')
+  // return all replies to a given comment
+  app.get('/api/comments/replies', jsonParser, Comment.getRepliesForComment);
+  
+  // return all comments with new replies 
+  app.get('/api/comments/newreplies', jsonParser, Comment.getNewRepliesForUser);
+  
+  // return all comments that have ben hearted since the last time a user checked
+  app.get('/api/comments/newhearts', jsonParser, Comment.getNewHeartsForUser);
 
   // Count favorites for a specific comment
   app.get('/api/comments/faves/get', jsonParser, function(req, res, next) {
