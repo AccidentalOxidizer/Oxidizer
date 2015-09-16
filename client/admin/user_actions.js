@@ -17,8 +17,8 @@ $(document).ready(function() {
     var userHTML = '<div class="user" data-userid="' + user.id + '"><img src="' + user.avatar + '" width=150><br/>' + 
       '<p>User ID:' + user.id + '<br/>Username: ' + user.name +
       '<br/>Registered on: ' + user.createdAt +
-      '<br/>User status: ' + user.status +
-      '<br/><a href="#" class="delete" data-user-id="' + user.id + '">DELETE USER?</a> || <a href="#" class="ban-user" data-user-id="' + user.id + '">BAN USER</a> || <a href="#" class="unflag" data-comment-id="' + user.id + '">CHANGE PERMISSION</a> <br/>' +
+      '<br/>User status: ' + userLevelDescription(user.status) +
+      '<br/><a href="#" class="ban-user" data-user-id="' + user.id + '">BAN USER</a> || <a href="#" class="change-permissions" data-user-id="' + user.id + '">CHANGE PERMISSION</a> <br/>' +
       '</div>';
     return userHTML;
   };
@@ -85,12 +85,58 @@ $(document).ready(function() {
     });
   });
 
+  // This function takes a level and returns an English Description.
+  var userLevelDescription = function(level) {
+    if (level === null) {
+      return "default user (active)";
+    }
+
+    if (level === -1) {
+      return "banned";
+    } else if (level === 0) {
+      return "default user (active)";
+    } else if (level === 10) {
+      return "admin user";
+    }
+  };
+
+  // CHANGE USER PERMISSIONS
+  $(document).on('click', '.change-permissions', function(event) {
+    var userLevel = Number(prompt('Enter new user level:\n -1: Banned\n 0: Default (Active)\n 10: Admin User', 0));
+    var userId = $(this).attr('data-user-id');
+
+    if (userLevel === -1 || userLevel === 0 || userLevel === 10) {
+      // Input is okay, continue...
+      //console.log('Valid UserLevel: ', userLevel);
+    } else {
+      // Set default user level to 0...
+      userLevel = 0;
+    }
+
+    var data = {
+      status: userLevel
+    };
+
+    $.ajax({
+      url: window.location.origin + '/api/users/' + userId,
+      method: 'PUT',
+      data: JSON.stringify(data),
+      contentType: 'application/json', // content type sent to server
+      success: function(data) {
+        console.log('User permissions updated!');
+      },
+      error: function(xhr, status, err) {
+        console.error(xhr, status, err.message);
+      }
+    });
+
+  });
 
   // BAN USER
   $(document).on('click', '.ban-user', function(event) {
     event.preventDefault();
-    console.log('BAN USER clicked!');
-    console.log('BAN USER ID = ', $(this).attr('data-user-id'));
+    // console.log('BAN USER clicked!');
+    // console.log('BAN USER ID = ', $(this).attr('data-user-id'));
     var userId = $(this).attr('data-user-id');
 
     var data = {
@@ -104,17 +150,7 @@ $(document).ready(function() {
       contentType: 'application/json', // content type sent to server
       //dataType: 'json',
       success: function(data) {
-        console.log('User banned!', data);
-
-        //var getDivId = 'div[data-commentid="' + commentId +'"]';
-        
-        // If current mode is for flags only, then let's go ahead and
-        // hide the div as well, since we reset current flags.
-        // if (adminSettings.currentMode === 'flags') {
-        //   $(getDivId).hide();
-        // } else {
-        //   $('#flags-' + commentId).text('0');
-        // }
+        console.log('User banned!');
       },
       error: function(xhr, status, err) {
         console.error(xhr, status, err.message);
