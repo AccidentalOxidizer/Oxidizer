@@ -105,7 +105,7 @@
   padding:15px;
 }
 .comment:hover {
-  background-color: #E8E8E8;
+  background-color: rgba(168, 202, 255, .2);
 }
 .comment-header, .comment-footer {
   color: #808080;
@@ -130,4 +130,31 @@
 .website-search .search-results {
   margin:15px;
   font-weight: bold;
+}
+
+/* Leaderboard 
+------------------------ */
+.leaderboard div div.comment:nth-child(1){
+  background-color: rgba(168, 202, 255, .9);
+}
+.leaderboard div div.comment:nth-child(2){
+  background-color: rgba(168, 202, 255, .8);
+}
+.leaderboard div div.comment:nth-child(3){
+  background-color: rgba(168, 202, 255, .7);
+}
+.leaderboard div div.comment:nth-child(4){
+  background-color: rgba(168, 202, 255, .6);
+}
+.leaderboard div div.comment:nth-child(5){
+  background-color: rgba(168, 202, 255, .5);
+}
+.leaderboard div div.comment:nth-child(6){
+  background-color: rgba(168, 202, 255, .4);
+}
+.leaderboard div div.comment:nth-child(7){
+  background-color: rgba(168, 202, 255, .3);
+}
+.leaderboard div div.comment:nth-child(8){
+  background-color: rgba(168, 202, 255, .2);
 }
