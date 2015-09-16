@@ -56,6 +56,16 @@ $(document).ready(function() {
         var commentArrayHTML = '';
         // Render comment HTML
         data.comments.forEach(function(element, index) {
+
+          // Check if Total Flags or Total Hearts is Null set to 0.
+          if (data['comments'][index].FlagCount === null) {
+            data['comments'][index].FlagCount = 0;
+          }
+
+          if (data['comments'][index].HeartCount === null) {
+            data['comments'][index].HeartCount = 0;
+          }
+
           commentArrayHTML = commentArrayHTML.concat(buildComments(data['comments'][index]));
         });
 
