@@ -21,6 +21,7 @@ var Website = React.createClass({
 
   // TODO: refactor to use to load additional comments too.
   initLoadState: function() {
+    console.log('initLoadState');
     this.lastCommentId = -1;
     this.commentCount;
     this.host = undefined;
@@ -31,11 +32,34 @@ var Website = React.createClass({
     this.hasMoreComments = true;
     this.pendingAjax = false;
     this.query = {};
+    this.paths = [];
+    this.hosts = [];
   },
 
   componentDidMount: function() {
     this.initLoadState();
+
+    // get all hosts from db for typeahead
+
+    this.getAllHosts();
     // TODO: what do we want to show when we first land on this page?
+  },
+
+  getAllHosts: function() {
+
+    $.ajax({
+      url: window.location.origin + '/api/gethosts',
+      method: 'GET',
+      dataType: 'json',
+      success: function(data){
+        console.log('recieved hosts', data);
+        this.hosts = data;
+      }.bind(this),
+
+      error: function(xhr, status, err) {
+        console.error(xhr, status, err.message);
+      }
+    });
   },
 
   getPaths: function(host){
@@ -52,8 +76,6 @@ var Website = React.createClass({
             commentCount: url.Comments[0].count
           };
         });
-
-        // this.setState({paths: data});
       }.bind(this),
 
       error: function(xhr, status, err) {
@@ -137,7 +159,7 @@ var Website = React.createClass({
 
   hostSearch: function(e){
     e.preventDefault();
-    console.log('hostSearch');
+    
     var query = {};
     
     this.lastCommentId = -1;
@@ -151,10 +173,6 @@ var Website = React.createClass({
 
     this.getPaths(this.host);
     this.loadComments(query);  
-  },
-
-  urlLink: function(){
-    console.log('happening');
   },
 
   render: function() {

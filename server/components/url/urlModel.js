@@ -25,14 +25,12 @@ module.exports = function(sequelize, dataTypes) {
           group: ['id']
         });
         return result;
+      },
+      getAllHosts: function(){
+        return this.findAll().map(function(url){
+          return url.get('host');
+        });
       }
     },
-    getAllUrls: function(){
-      return this.findAll().map(function(url){
-        return url.get('host');
-      });
-    }
   });
 };
-
-          // attributes: [[sequelize.fn('count', sequelize.col('Comment.id')), 'NumberOfComments']],
