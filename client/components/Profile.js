@@ -353,7 +353,7 @@ var Profile = React.createClass({
       optionalHeader = (
         <div>
             <nav className="navbar navbar-default navbar-comments">
-              <div className="container">
+              <div className="">
                 <div className="navbar-header">
                   <p className="navbar-brand" href="#">Comments</p>
                 </div>
@@ -388,23 +388,29 @@ var Profile = React.createClass({
                         </div>
                       </form>
                     </li>
-                    <li><a className="" onClick={this.resetComments} href="#"><i className="fa fa-times"></i></a></li>
+                  </ul>
+                  <ul className="nav navbar-nav navbar-right">
+                  
+                    <li className="reset-comment-search"><a className="reset-comment-search" onClick={this.resetComments}><i className="fa fa-times"></i></a></li>
+                  
                   </ul>
                 </div>
               </div>
             </nav>
 
             <nav className="navbar navbar-default navbar-comments">
-              <div className="container">
+              <div className="">
                 <div className="navbar-header">
                   <p className="navbar-brand">Reactions</p>
                 </div>
                 <div id="navbar" className="navbar-collapse">
                   <ul className="nav navbar-nav">
-          
+      
                     <li><a className="" onClick={this.loadNewReplies}><i className="fa fa-comments-o"></i> New replies received</a></li>
                     <li><a className="" onClick={this.loadNewHearts}><i className="fa fa-heart"></i> New favorites received</a></li>
-                    <li><a className="" onClick={this.dismissNotifications} href="#"><i className="fa fa-times"></i> Dismiss all</a></li>
+                  </ul>
+                  <ul className="nav navbar-nav navbar-right">
+                    <li className="dismiss-notifications"><a className="dismiss-notifications" onClick={this.dismissNotifications}><i className="fa fa-times"></i> Dismiss all</a></li>
                   </ul>
                 </div>
               </div>

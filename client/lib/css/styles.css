@@ -90,7 +90,7 @@
 }
 
 
-/* Porfile 
+/* Profile 
 ------------------------ */
 
 .profile-image {
@@ -99,6 +99,14 @@
 
 .profile nav {
   max-height: 50px;
+}
+
+.reset-comment-search {
+  float:right;
+}
+
+.dismiss-notifications {
+  float:right;
 }
 
 /* Comments 
