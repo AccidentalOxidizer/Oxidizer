@@ -293,21 +293,29 @@ var Profile = React.createClass({
 
     if (isPersonalProfile) {
       optionalHeader = (
-        <div className="row">
-          <div className="dropdown">
-            <button className="btn btn-default dropdown-toggle" type="button" id="privacy-select"
-              data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
-              Comment Options <span className="caret"></span>
-            </button>
-            <ul className="dropdown-menu" aria-labelledby="privacy-select">
-              <li><a onClick={this.selectPrivateComments} href="#">Show Private Comments</a></li>
-              <li><a onClick={this.selectPublicComments} href="#">Show Public Comments</a></li>
-            </ul>
-          </div>
-          <a className="btn btn-default" onClick={this.resetComments} href="#"><i className="fa fa-times"></i> Clear Search</a>
-          <a className="btn btn-default" onClick={this.loadUserFavorites}><i className="fa fa-heart"></i> Load Favorites</a>
-          <hr />
-        </div>
+        
+            <nav className="navbar navbar-default navbar-comments">
+              <div className="container">
+                <div className="navbar-header">
+                  <a className="navbar-brand" href="#">Comment Filter</a>
+                </div>
+                <div id="navbar" className="navbar-collapse">
+                  <ul className="nav navbar-nav">
+                    <li className="dropdown">
+                      <a id="privacy-select" href="#" className="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
+                      Privacy <span className="caret"></span></a>
+                      <ul className="dropdown-menu" aria-labelledby="privacy-select">
+                        <li><a onClick={this.selectPrivateComments} href="#">Show Private Comments</a></li>
+                        <li><a onClick={this.selectPublicComments} href="#">Show Public Comments</a></li>
+                      </ul>
+                    </li>
+                    <li><a className="" onClick={this.loadUserFavorites}><i className="fa fa-heart"></i> Load Favorites</a></li>
+                    <li><a className="" onClick={this.resetComments} href="#"><i className="fa fa-times"></i> Clear Search</a></li>
+                  </ul>
+                </div>
+              </div>
+            </nav>
+        
       );
     }
 
@@ -316,11 +324,13 @@ var Profile = React.createClass({
               allowDelete={isPersonalProfile} deleteComment={this.deleteComment.bind(null, i)}  />;
     }.bind(this));
 
+
+
     return (
       <div className="container">
       <div className="row">
         <div className="hidden-xs col-sm-3 col-md-4">
-          <p><img src={this.state.userAvatar} className="img-thumbnail profile-image" /></p>
+          <p><img src={this.state.userAvatar + '&s=512'} className="img-thumbnail profile-image" /></p>
           <h2>{this.state.displayName}</h2>
           <p>Total Comments: {this.state.numComments}</p>
         </div>
@@ -328,7 +338,8 @@ var Profile = React.createClass({
         <div className="col-xs-12 col-sm-9 col-md-8">
           {optionalHeader}
 
-          <form onSubmit={this.handleUrlSearch}>
+          <div className="row"> 
+          <form className="col-xs-6" onSubmit={this.handleUrlSearch}>
             <div className="input-group">
               <input type="text" className="form-control" placeholder="Search for URL" ref="searchUrl" />
               <div className="input-group-btn">
@@ -336,7 +347,7 @@ var Profile = React.createClass({
               </div>
             </div>
           </form>
-          <form onSubmit={this.handleTextSearch}>
+          <form className="col-xs-6" onSubmit={this.handleTextSearch}>
           <div className="input-group">
               <input type="text" className="form-control" placeholder="Search for Comment Text" ref="searchText" />
               <div className="input-group-btn">
@@ -344,10 +355,16 @@ var Profile = React.createClass({
               </div>
             </div>
           </form>
+          </div>
+          <div className="row">
+          <div className="col-xs-12">
+
           <InfiniteScroll pageStart="0" loadMore={this.loadMoreComments} hasMore={this.hasMoreComments} 
               loader={<div className="loader">Loading ...</div>}>
             {comments}
           </InfiniteScroll>
+          </div>
+          </div>
         </div>
       </div>
       </div>

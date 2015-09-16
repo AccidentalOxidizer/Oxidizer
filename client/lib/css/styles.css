@@ -88,3 +88,37 @@
 .user-menu { 
   text-align: right;
 }
+
+
+/* Porfile 
+------------------------ */
+
+.profile-image {
+  width:100%;
+}
+
+/* Comments 
+------------------------ */
+
+.comment {
+  margin-bottom:5px;
+  padding:15px;
+}
+.comment:hover {
+  background-color: #E8E8E8;
+}
+.comment-header, .comment-footer {
+  color: #808080;
+}
+.heart {
+  float:left;
+  margin-right: 10px;
+}
+.delete {
+  /*float:right;*/
+}
+.navbar-comments {
+/*  position:fixed;
+  top: 60px;*/
+}
+

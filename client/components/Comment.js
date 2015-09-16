@@ -38,22 +38,29 @@ var Comment = React.createClass({
       deleteLink = (
         <div className="delete">
           <a onClick={this.props.deleteComment}>
-            <i className="fa fa-trash-o"></i>&nbsp; 
+            Delete Comment
           </a>
         </div>
       );
     }
 
     return (
-      <div>
-        <p><strong><a href={userUrl}>{this.props.comment.username}</a></strong> | {this.props.comment.url} | {moment(this.props.comment.createdAt).fromNow()}</p>
-        <p>{this.props.comment.text}</p>
-
+      <div className="comment">
         <div className="row">
-          <div className="heart">
-            <i className={heartClass}></i>&nbsp;{hearts}
+          <div className="col-xs-12 comment-header"> 
+          Comment on: <a target="_blank" href={'http://'+this.props.comment.url}>{this.props.comment.url}</a> posted: {moment(this.props.comment.createdAt).fromNow()}
+          
           </div>
+        </div>
+       
+        <div className="row"> 
+          <div className="col-xs-12 comment-body">{this.props.comment.text}</div>
+        </div>
+        <div className="row">
+        <div className="col-xs-12 comment-footer">
+          <div className="heart">Received: <i className={heartClass}></i>&nbsp;{hearts} </div>
           {deleteLink}
+        </div>
         </div>
       </div>
     );
