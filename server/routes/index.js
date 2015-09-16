@@ -23,7 +23,6 @@ module.exports = function(express, app, passport) {
     
     // Determine where the user is logging in from.
     // referer undefined = Chrome extension.
-    console.log('TEST REFERRER: ', req.headers['referer']);
 
     if (req.headers['referer'] === undefined) {
       // This should pass in a script that will automatically close the popup window
