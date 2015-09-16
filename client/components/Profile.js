@@ -303,9 +303,9 @@ var Profile = React.createClass({
               <li><a onClick={this.selectPrivateComments} href="#">Show Private Comments</a></li>
               <li><a onClick={this.selectPublicComments} href="#">Show Public Comments</a></li>
             </ul>
-              | <a onClick={this.resetComments} href="#">Clear Search</a>
-              | <a onClick={this.loadUserFavorites}>Load Favorites</a>
           </div>
+          <a className="btn btn-default" onClick={this.resetComments} href="#"><i className="fa fa-times"></i> Clear Search</a>
+          <a className="btn btn-default" onClick={this.loadUserFavorites}><i className="fa fa-heart"></i> Load Favorites</a>
           <hr />
         </div>
       );
@@ -317,30 +317,31 @@ var Profile = React.createClass({
     }.bind(this));
 
     return (
+      <div className="container">
       <div className="row">
-        <div className="col-md-4">
-          <p><img src={this.state.userAvatar} width="200px" /></p>
+        <div className="hidden-xs col-sm-3 col-md-4">
+          <p><img src={this.state.userAvatar} className="img-thumbnail profile-image" /></p>
           <h2>{this.state.displayName}</h2>
           <p>Total Comments: {this.state.numComments}</p>
         </div>
 
-        <div className="col-md-8">
+        <div className="col-xs-12 col-sm-9 col-md-8">
           {optionalHeader}
 
           <form onSubmit={this.handleUrlSearch}>
-            <div className="form-group col-sm-7">
+            <div className="input-group">
               <input type="text" className="form-control" placeholder="Search for URL" ref="searchUrl" />
-            </div>
-            <div className="form-group col-sm-5">
-              <button type="submit" className="btn btn-block btn-primary">Search</button>
+              <div className="input-group-btn">
+                  <button type="submit" className="btn btn-default btn-success">Search</button>
+              </div>
             </div>
           </form>
           <form onSubmit={this.handleTextSearch}>
-            <div className="form-group col-sm-7">
+          <div className="input-group">
               <input type="text" className="form-control" placeholder="Search for Comment Text" ref="searchText" />
-            </div>
-            <div className="form-group col-sm-5">
-              <button type="submit" className="btn btn-block btn-primary">Search</button>
+              <div className="input-group-btn">
+                  <button type="submit" className="btn btn-default btn-success">Search</button>
+              </div>
             </div>
           </form>
           <InfiniteScroll pageStart="0" loadMore={this.loadMoreComments} hasMore={this.hasMoreComments} 
@@ -348,6 +349,7 @@ var Profile = React.createClass({
             {comments}
           </InfiniteScroll>
         </div>
+      </div>
       </div>
     );
   }
