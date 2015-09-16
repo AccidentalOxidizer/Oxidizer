@@ -239,7 +239,6 @@ function loadContent(url) {
     console.log('GET ALL:', msg);
     if (msg.userInfo.heartsToCheck > 0 ||
       msg.userInfo.repliesToCheck > 0) {
-      console.log('fave of replies!');
       setNotifications(msg.userInfo.heartsToCheck, msg.userInfo.repliesToCheck);
     } else {
       setNotifications(null, null);
@@ -313,6 +312,8 @@ function postComment(text, repliesToId) {
       $(".cd-panel-content").prepend(html);
     } else {
       $('#' + repliesToId).append(html);
+      var ReplyCount = Number($('#' + repliesToId +' .ReplyCount').html())+1;
+      $('#' + repliesToId +' .ReplyCount').html(ReplyCount);
     }
     registerCommentEventListeners();
 
@@ -688,7 +689,7 @@ function flagPost(commentId) {
 }
 
 function favePost(commentId) {
-  console.log('Comment to fave:', commentId);
+  console.log('Comment to favorite:', commentId);
   var data = JSON.stringify({
     CommentId: commentId
   });
@@ -702,8 +703,10 @@ function favePost(commentId) {
 
   request.success(function(msg) {
     console.log('successfully faved (or unfaved) comment,', msg, commentId);
+    $('#' + commentId + ' #heart .HeartCount').html(msg.count);
     $('#' + commentId + ' #heart i').toggleClass('fa-heart-o');
     $('#' + commentId + ' #heart i').toggleClass('fa-heart');
+
   });
   request.fail(function(err) {
     console.log('Darn. something went wrong, could not fave comment', err);
