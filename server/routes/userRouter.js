@@ -52,5 +52,8 @@ module.exports = function(app) {
 
   });
 
+  app.get('/api/user/loggedin', jsonParser, auth.isLoggedIn, function(req, res, next) {
+    res.status(200).send({user:true});
+  })
 
 };
