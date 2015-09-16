@@ -103,7 +103,6 @@ document.addEventListener("DOMContentLoaded", function(e) {
   document.getElementById('close').addEventListener('click', closeOxidizer);
 
   document.getElementById('dismiss-notifications').addEventListener('click', function() {
-    console.log(settings.server);
     var request = $.ajax({
       url: settings.server + '/api/users/markread',
       method: "GET",
@@ -545,8 +544,8 @@ function registerCommentEventListeners(comment) {
   var showReplies = document.getElementsByClassName('replies');
 
   for (var i = 0; i < showReplies.length; i++) {
+    
     $(showReplies[i]).off('click').on('click', function() {
-
       var target = $(this).parents('.comment');
       var repliesToId = $($(this)[0]).attr('data-comment-id');
 

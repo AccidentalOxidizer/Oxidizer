@@ -1,6 +1,6 @@
 var Promise = require('bluebird');
 var parseUrl = require('../../utils/parseURL');
-
+var userController = require('../user');
 var buildQueryOptions = function(req, filterByUser) {  
   var options = {};
 
@@ -105,16 +105,16 @@ module.exports.addComment = function(req, res, next) {
     repliesToId: req.body.repliesToId
   })
     .then(function(data){
-
+      newCommentId = data.get('id');
       var newComment = {
-        commentId: data,
+        commentId: data.get('id'),
         repliesToId: req.body.repliesToId
       };
 
-      return Promise.all([Comment.getComments(newComment), User.getUserInfo(req.user.id)]);
+      return Promise.all([Comment.getComments(newComment), User.getUserInfo(req.user.id), Comment.getComments({commentId: req.body.repliesToId})]);
     })
-    .spread(function(comments, user) {
-
+    .spread(function(comments, user, repliesToComment) {
+      console.log(repliesToComment[0][0]);
       var response = {
         comments: comments[0],
         userInfo: user[0],
@@ -123,7 +123,9 @@ module.exports.addComment = function(req, res, next) {
 
       res.send(201, response);
 
-
+      if (req.body.repliesToId && repliesToComment[0][0].UserId !== req.user.id) {
+        userController.incrementNotification(repliesToComment[0][0].UserId, 'replies');
+      }
     })
     .catch(function(err){
       console.log(err);
