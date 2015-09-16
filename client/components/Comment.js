@@ -11,11 +11,39 @@ var Comment = React.createClass({
     deleteComment: React.PropTypes.func
   },
 
+  getInitialState: function() {
+    return {
+      replies: []
+    };
+  },
+
   getDefaultProps: function() {
     return {
       allowDelete: false,
       deleteComment: function() {}
     };
+  },
+
+  getReplies: function(){
+    var query = {
+      repliesToId: this.props.comment.id
+    };
+
+    var context = this;
+
+    $.ajax({
+      url: window.location.origin + '/api/comments/replies',
+      data: query,
+      method: 'GET',
+      dataType: 'json',
+      success: function(data){
+        console.log('received data', data);
+        context.setState({replies: data.comments});
+      },  
+      error: function(err){
+        console.log(error);
+      }
+    });
   },
   
   render: function() {
@@ -42,6 +70,12 @@ var Comment = React.createClass({
       );
     }
 
+    var isPersonalProfile = false;
+
+    var replies = this.state.replies.map(function(comment, i) {
+      return <Comment key={comment.id} comment={comment}  />;
+    }.bind(this));
+
     return (
       <div className="comment">
         <div className="row">
@@ -58,7 +92,11 @@ var Comment = React.createClass({
         <div className="col-xs-12 comment-footer">
           <div className="heart">Received: <i className={heartClass}></i>&nbsp;{hearts} </div>
           {deleteLink}
+          <div className="replies">Received: <i className={heartClass}></i><a onClick={this.getReplies}>
+            get replies!
+          </a> </div>
         </div>
+        <div>Replies!!!: {replies}</div>
         </div>
       </div>
     );

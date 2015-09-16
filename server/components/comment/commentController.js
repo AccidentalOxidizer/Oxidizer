@@ -77,7 +77,7 @@ module.exports.getHeartedCommentsForUser = function(req, res, next){
   var User = req.app.get('models').User;
     
   var options = buildQueryOptions(req, true);
-  console.log(options);
+
   Promise.all([Comment.getComments(options), User.getUserInfo(options.userId)]) // TODO add userQuery
     .spread(function(comments, user){
       var response = {
@@ -93,6 +93,29 @@ module.exports.getHeartedCommentsForUser = function(req, res, next){
       console.log(err);
       res.send(404);
     });
+};
+
+module.exports.getRepliesForComment = function(req, res, next){
+  var Comment = req.app.get('models').Comment;
+  var User = req.app.get('models').User;
+  req.user = {
+    id: req.session.passport.user
+  };
+
+  // build query Options
+  var options = buildQueryOptions(req);
+
+  Promise.all([Comment.getComments(options), User.getUserInfo(options.userId)]) // TODO add userQuery
+    .spread(function(comments, user){
+      var response = {
+        comments: comments[0],
+        userInfo: user[0][0],
+        currentTime: new Date()
+      };
+
+      res.send(200, response);
+    });
+
 };
 
 module.exports.addComment = function(req, res, next) {  
@@ -118,7 +141,7 @@ module.exports.addComment = function(req, res, next) {
       return Promise.all([Comment.getComments(newComment), User.getUserInfo(req.user.id), Comment.getComments({commentId: req.body.repliesToId})]);
     })
     .spread(function(comments, user, repliesToComment) {
-      console.log(repliesToComment[0][0]);
+
       var response = {
         comments: comments[0],
         userInfo: user[0][0],
