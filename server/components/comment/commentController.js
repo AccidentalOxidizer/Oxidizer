@@ -61,7 +61,6 @@ module.exports.getCommentsForUser = function (req, res, next) {
         userInfo: user[0][0],
         currentTime: new Date()
       };
-      console.log(response);
 
       // res.data.userInfo = 
       res.send(200, response);
@@ -98,6 +97,7 @@ module.exports.getHeartedCommentsForUser = function(req, res, next){
 module.exports.getRepliesForComment = function(req, res, next){
   var Comment = req.app.get('models').Comment;
   var User = req.app.get('models').User;
+
   req.user = {
     id: req.session.passport.user
   };
@@ -156,6 +156,48 @@ module.exports.addComment = function(req, res, next) {
     })
     .catch(function(err){
       console.log(err);
+    });
+};
+
+module.exports.getNewRepliesForUser = function(req, res, next){
+  var Comment = req.app.get('models').Comment;
+  var User = req.app.get('models').User;
+  var userId = req.session.passport.user;
+
+  return Promise.all([Comment.getNewReplies(userId), User.getUserInfo(userId)])
+    .spread(function(comments, user){
+      var response = {
+        comments: comments[0],
+        userInfo: user[0][0],
+        currentTime: new Date()
+      };
+
+      res.send(200, response);
+    })
+    .catch(function(err){
+      console.log('Err loading replies', err);
+    });
+
+
+};
+
+module.exports.getNewHeartsForUser = function(req, res, next){
+  var Comment = req.app.get('models').Comment;
+  var User = req.app.get('models').User;
+  var userId = req.session.passport.user;
+
+  return Promise.all([Comment.getNewHearts(userId), User.getUserInfo(userId)])
+    .spread(function(comments, user){
+      var response = {
+        comments: comments[0],
+        userInfo: user[0][0],
+        currentTime: new Date()
+      };
+
+      res.send(200, response);
+    })
+    .catch(function(err){
+      console.log('Err loading replies', err);
     });
 };
 
