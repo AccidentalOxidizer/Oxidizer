@@ -84,11 +84,11 @@ module.exports = function(sequelize, options) {
   if (options.getHeartedByUser){
     filters.push('(SELECT COUNT(1) AS other FROM Hearts AS h WHERE Comments.id = h.CommentId AND h.UserId = 1) = 1 ');
   }
+  // keeps correct user associated with the comment
+  queryString += 'WHERE Users.id = Comments.userId AND Comments.UrlId = Urls.id ';
 
   // // if there are any filters, add them to the query
   if (filters.length > 0){
-    // keeps correct user associated with the comment
-    queryString += 'WHERE Users.id = Comments.userId AND Comments.UrlId = Urls.id ';
 
     for (var i = 0; i < filters.length; i++) {
       queryString += 'AND ';
@@ -125,6 +125,9 @@ module.exports = function(sequelize, options) {
   }
   
   queryString += ';';
-
+  console.log(queryString);
   return sequelize.query(queryString);
 };
+
+
+

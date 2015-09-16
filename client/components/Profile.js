@@ -63,14 +63,16 @@ var Profile = React.createClass({
 
     if (this.loadFavorites) {
       url = window.location.origin + '/api/comments/faves/getForUser',
-      query = {};
+      query = {
+        getHeartedByUser: true
+      };
     } else {
       url = window.location.origin + '/api/comments',
 
       query = {
         filterByUser: true,
         isPrivate: this.privateFeed
-      }
+      };
 
       // To load any user's comments, pass in the userId in a query string
       // e.g. http://localhost:3000/#/profile?userId=1

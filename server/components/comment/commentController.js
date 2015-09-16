@@ -23,6 +23,7 @@ var buildQueryOptions = function(req, filterByUser) {
   if (req.query.commentOffset) options.offset = req.query.commentOffset;
   if (req.query.filterByUser || filterByUser) options.filterByUser = req.query.filterByUser;
   if (req.query.isPrivate) options.isPrivate = req.query.isPrivate;
+  if (req.query.getHeartedByUser) options.getHeartedByUser = true;
 
   return options;
 };
@@ -76,7 +77,7 @@ module.exports.getHeartedCommentsForUser = function(req, res, next){
   var User = req.app.get('models').User;
     
   var options = buildQueryOptions(req, true);
-
+  console.log(options);
   Promise.all([Comment.getComments(options), User.getUserInfo(options.userId)]) // TODO add userQuery
     .spread(function(comments, user){
       var response = {
