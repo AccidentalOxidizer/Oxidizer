@@ -121,7 +121,7 @@ module.exports.addComment = function(req, res, next) {
       console.log(repliesToComment[0][0]);
       var response = {
         comments: comments[0],
-        userInfo: user[0],
+        userInfo: user[0][0],
         currentTime: new Date()
       };
 
