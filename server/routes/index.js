@@ -20,9 +20,18 @@ module.exports = function(express, app, passport) {
 
   app.get('/welcome', urlEncodedParser, jsonParser, function(req,res, next){
     //console.log(req);
-    res.status(200).send({
-      loggedin: 'ok'
-    });
+    
+    // Determine where the user is logging in from.
+    // referer undefined = Chrome extension.
+
+    if (req.headers['referer'] === undefined) {
+      // This should pass in a script that will automatically close the popup window
+      // created by the Chrome extension.
+      res.status(200).send('<script>window.close();</script>');
+    } else {
+      // Attempting to do a relative JavaScript redirect here.
+      res.status(200).send('<script>window.location = "/#/profile/";</script>'); 
+    }
   });
 
   // routes

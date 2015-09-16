@@ -13,10 +13,10 @@ $(document).ready(function() {
   // Basically, our AJAX call will get data back, loop over the array of comments
   // then send each individiaul comment here to build out the comment.
   var buildComments = function(comment) {
-    var commentHTML = '<div class="comment" data-commentid="' + comment.id + '"><p>Comment ID:' + comment.id + '<br/>' + comment.User.name + ' | ' +
-      comment.createdAt + '<br/><a href="http://' + comment.Url.url + '" target="_blank">http://' + comment.Url.url + '</a><br/>' + comment.text + '<br/>' +
+    var commentHTML = '<div class="comment" data-commentid="' + comment.id + '"><p>Comment ID:' + comment.id + '<br/>' + comment.username + ' | ' +
+      comment.createdAt + '<br/><a href="http://' + comment.url + '" target="_blank">http://' + comment.url + '</a><br/>' + comment.text + '<br/>' +
       '<a href="#" class="delete" data-comment-id="' + comment.id + '">DELETE</a> || <a href="#" class="unflag" data-comment-id="' + comment.id + '">REMOVE FLAGS</a> <br/>' +
-      'TOTAL FAVS: <span id="faves-' + comment.id + '">' + comment.Hearts + '</span> || TOTAL FLAGS: <span id="flags-' + comment.id + '">' + comment.Flags + '</span></p></div>';
+      'TOTAL FAVS: <span id="faves-' + comment.id + '">' + comment.HeartCount + '</span> || TOTAL FLAGS: <span id="flags-' + comment.id + '">' + comment.FlagCount + '</span></p></div>';
     return commentHTML;
   };
 
@@ -32,6 +32,7 @@ $(document).ready(function() {
     
     // Setting this to nothing (e.g., data = {}) returns ALL comments.
     var data = {};
+    
     if (url) {
       data.url = url;
     }
@@ -39,7 +40,7 @@ $(document).ready(function() {
     // AJAX call to server to get comments from a particular URL.
     $.ajax({
       type: "GET",
-      url: 'http://localhost:3000/api/comments/get',
+      url: 'http://localhost:3000/api/comments',
       data: data,
       contentType: 'application/json', // content type sent to server
       dataType: 'json', //Expected data format from server
