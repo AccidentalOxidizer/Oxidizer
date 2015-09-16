@@ -32,6 +32,7 @@ $(document).ready(function() {
     
     // Setting this to nothing (e.g., data = {}) returns ALL comments.
     var data = {};
+    
     if (url) {
       data.url = url;
     }
