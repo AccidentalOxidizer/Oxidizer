@@ -10,6 +10,10 @@ var commentPrivately;
 // Also initialized to 'keepprivate' options value.
 var privateFeed;
 
+// Boolean: true if sorting comments from most favorited to least;
+// otherwise sorts from most recent to least. Defaults to sorting by date.
+var sortByFaves = false;
+
 // requestReturned tracks if we have a pending http request so that we don't receive back the same comments twice
 // tracking.mainLastComment - id tracks last comments we've retrieved for main thread, endOfComments tracks if we've returned all of the comments there are. When we get replies, we will set a key with the comments id and a value of the last loaded reply
 var tracking = {
@@ -62,6 +66,9 @@ document.addEventListener("DOMContentLoaded", function(e) {
           $('#feed-privacy-select').parents('.dropdown').find('.dropdown-toggle').html(privacyText + ' Feed <span class="caret"></span>');
           $("#comment-submit-button").prop("disabled",true); // Disable the submit button since there is zero content.
 
+          // Set default display for sort select.
+          $('#sort-by-select').parents('.dropdown').find('.dropdown-toggle').html('<i class="fa fa-calendar-check-o"></i> Date <span class="caret"></span>');
+
           // show the panel with animation
           document.getElementById('panel').classList.add('is-visible');
           // put focus on input field
@@ -98,6 +105,26 @@ document.addEventListener("DOMContentLoaded", function(e) {
     commentPrivately = true;
     $(document.body).find('.btn-privacy').html('<a href="#"><i class="fa fa-lock"></i> Private</a>');
   });
+
+
+  // Sort by date or number of faves
+  document.getElementById('sort-date').addEventListener('click', function() {
+    console.log('Sort by date selected.');
+    sortByFaves = false;
+    $('#sort-by-select').parents('.dropdown').find('.dropdown-toggle').html('<i class="fa fa-calendar-check-o"></i> Date <span class="caret"></span>');
+
+    // reload the feed with the updated setting.
+    loadContent(url);
+  });
+  document.getElementById('sort-faves').addEventListener('click', function() {
+    console.log('Sort by faves selected.');
+    sortByFaves = true;
+    $('#sort-by-select').parents('.dropdown').find('.dropdown-toggle').html('<i class="fa fa-heart-o"></i> Popular <span class="caret"></span>');
+
+    // reload the feed with the updated setting.
+    loadContent(url);
+  });
+
 
   // close Oxidizer IFrame Window when when clicking close button 
   document.getElementById('close').addEventListener('click', closeOxidizer);
