@@ -8,9 +8,16 @@ var Navigation = React.createClass({
       <nav className="navbar navbar-inverse navbar-static-top" role="navigation">
       <div className="container">
         <div className="navbar-header">
+        <button type="button" className="navbar-toggle collapsed" data-toggle="collapse" data-target="#oxidizer-collapse" aria-expanded="false">
+        <span className="sr-only">Toggle navigation</span>
+        <span className="icon-bar"></span>
+        <span className="icon-bar"></span>
+        <span className="icon-bar"></span>
+      </button>
           <a className="navbar-brand" href="#">Oxidizer</a>
         </div>
 
+        <div className="collapse navbar-collapse" id="oxidizer-collapse">
         <ul className="nav navbar-nav navbar-right">
           <li><Link to="website" params={{website: ""}}>Websites</Link></li>
           <li><Link to="leaderboard">Leaderboard</Link></li>
@@ -34,6 +41,7 @@ var Navigation = React.createClass({
             </ul>
           </li>
         </ul>
+        </div>
         </div>
       </nav>
     );
