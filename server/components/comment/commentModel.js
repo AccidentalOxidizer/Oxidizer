@@ -42,10 +42,6 @@ module.exports = function(sequelize, dataTypes){
 
             return Comment.create(options);
           })
-          .then(function(data){
-            userController.incrementNotification(data.get('UserId'), 'replies');
-            return data.get('id');
-          })
           .catch(function(err){
             console.log(err);
           });
