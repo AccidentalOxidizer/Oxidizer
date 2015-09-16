@@ -58,7 +58,7 @@ module.exports = function(sequelize, options) {
 
   var filters = [];
 
-  filters.push('AND (SELECT COUNT(1) AS other FROM Flags AS f WHERE Comments.id = f.CommentId) < 5');
+  filters.push('(SELECT COUNT(1) AS other FROM Flags AS f WHERE Comments.id = f.CommentId) < 5 ');
 
   if (options.url) {
     filters.push('Urls.url = "' + options.url + '" ');
