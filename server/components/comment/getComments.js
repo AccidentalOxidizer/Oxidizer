@@ -25,7 +25,7 @@
 module.exports = function(sequelize, options) {
   options = options || {};
 
-  // add more columns here!!
+  // Adds base
   var queryString = 'SELECT DISTINCT Comments.id, Comments.UserId, Comments.text, Comments.UrlId, Comments.repliesToId, Comments.isPrivate, Comments.createdAt, Urls.url, Urls.host, Users.name AS username, Users.avatar AS userAvatar,' +
     '(SELECT COUNT(1) AS other FROM Hearts AS h ' +
       'WHERE Comments.id = h.CommentId GROUP BY Comments.id) AS HeartCount, ' +
@@ -58,6 +58,7 @@ module.exports = function(sequelize, options) {
 
   var filters = [];
 
+  filters.push('AND (SELECT COUNT(1) AS other FROM Flags AS f WHERE Comments.id = f.CommentId) < 5');
 
   if (options.url) {
     filters.push('Urls.url = "' + options.url + '" ');

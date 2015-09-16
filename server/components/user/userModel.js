@@ -65,7 +65,10 @@ module.exports = function(sequelize, dataTypes) {
       defaultValue: 0
     },
 
-    lastCheckedUpdates: dataTypes.DATE,
+    lastCheckedUpdates: {
+      type: dataTypes.DATE,
+      defaultValue: sequelize.fn('NOW')
+    },
 
     // additional profile info here
   }, {
