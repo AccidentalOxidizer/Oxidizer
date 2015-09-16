@@ -29,7 +29,7 @@ var get = function(searchObject, userId) {
 var fave = function(req, res, next) {
   //First: Search
   // if a fave for this particular user and comment combination already exists.
-  console.log(req);
+
   var faved = true;
   var searchObject ={ 
     UserId: req.user.id,

@@ -50,7 +50,7 @@ var Website = React.createClass({
           return {
             url: url.url,
             commentCount: url.Comments[0].count
-          }
+          };
         });
 
         // this.setState({paths: data});
@@ -71,7 +71,7 @@ var Website = React.createClass({
     query.textSearch = searchObject.textSearch || this.textSearch;
     
     if (this.lastCommentId > -1) {
-      query.lastCommentId = this.lastCommentId
+      query.lastCommentId = this.lastCommentId;
     }
 
     console.log('websiteProfile loading comments:', query);
