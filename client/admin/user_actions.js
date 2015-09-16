@@ -86,33 +86,40 @@ $(document).ready(function() {
   });
 
 
-  // REMOVE FLAGS FROM COMMENT
+  // BAN USER
   $(document).on('click', '.ban-user', function(event) {
     event.preventDefault();
     console.log('BAN USER clicked!');
     console.log('BAN USER ID = ', $(this).attr('data-user-id'));
     var userId = $(this).attr('data-user-id');
 
-    // $.ajax({
-    //   url: window.location.origin + '/api/flags/remove/' + commentId,
-    //   method: 'DELETE',
-    //   //dataType: 'json',
-    //   success: function(data) {
-    //     console.log('Removing flags: ', commentId);
-    //     var getDivId = 'div[data-commentid="' + commentId +'"]';
+    var data = {
+      status: -1
+    };
+
+    $.ajax({
+      url: window.location.origin + '/api/users/' + userId,
+      method: 'PUT',
+      data: JSON.stringify(data),
+      contentType: 'application/json', // content type sent to server
+      //dataType: 'json',
+      success: function(data) {
+        console.log('User banned!', data);
+
+        //var getDivId = 'div[data-commentid="' + commentId +'"]';
         
-    //     // If current mode is for flags only, then let's go ahead and
-    //     // hide the div as well, since we reset current flags.
-    //     if (adminSettings.currentMode === 'flags') {
-    //       $(getDivId).hide();
-    //     } else {
-    //       $('#flags-' + commentId).text('0');
-    //     }
-    //   },
-    //   error: function(xhr, status, err) {
-    //     console.error(xhr, status, err.message);
-    //   }
-    // });
+        // If current mode is for flags only, then let's go ahead and
+        // hide the div as well, since we reset current flags.
+        // if (adminSettings.currentMode === 'flags') {
+        //   $(getDivId).hide();
+        // } else {
+        //   $('#flags-' + commentId).text('0');
+        // }
+      },
+      error: function(xhr, status, err) {
+        console.error(xhr, status, err.message);
+      }
+    });
   });
 
 });
