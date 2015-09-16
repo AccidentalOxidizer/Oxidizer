@@ -49,7 +49,6 @@ module.exports = function(app) {
 
   app.delete('/api/users/:id', jsonParser, auth.isAuthorized, function(req, res, next) {
       var userId = req.params.userid;
-
   });
 
   app.get('/api/user/loggedin', jsonParser, auth.isLoggedIn, function(req, res, next) {

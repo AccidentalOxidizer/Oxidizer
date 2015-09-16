@@ -1,17 +1,74 @@
-  // Initial vars
-  // Setting this to emtpy so we can do some interesting stuff later.
-  var adminSettings = {
-    currentMode: 'recent', // This can either be 'recent' or 'flagged'
-    url: '',
-    urlId: '',
-    userId: ''
-  };
-
-
 $(document).ready(function() {
 
-  // Initial Load
-  $('#search-users').hide();
+  // Listen for User tools selection.
+  $('#show-users').on('click', function() {
+    $('#comments').html('');
+    $('#search-url').hide();
+    $('#search-comments').hide();
+    $('#search-users').show();
+    $('#sort-type').text('Showing Users:');
+    getUsers();
+  });
+
+  // Use this to build out HTML for individual comments.
+  // Basically, our AJAX call will get data back, loop over the array of comments
+  // then send each individiaul comment here to build out the comment.
+  var buildUsers = function(user) {
+    var userHTML = '<div class="user" data-userid="' + user.id + '"><img src="' + user.avatar + '" width=150><br/>' + 
+      '<p>User ID:' + user.id + '<br/>Username: ' + user.name +
+      '<br/>Registered on: ' + user.createdAt +
+      '<br/>User status: ' + user.status +
+      '<br/><a href="#" class="delete" data-user-id="' + user.id + '">DELETE USER?</a> || <a href="#" class="unflag" data-comment-id="' + user.id + '">BAN USER</a> || <a href="#" class="unflag" data-comment-id="' + user.id + '">CHANGE PERMISSION</a> <br/>' +
+      '</div>';
+    return userHTML;
+  };
+
+  // Wrapping our AJAX call to the server to get comments in a function. Why?
+  // That way we can update the server if I input a new URL to look at in the
+  // input box at the top of the screen.
+  var getUsers = function() {
+    // Default website to show comments from on page load.
+    // If this is for a POST request, we need to JSON.stringify() data.
+    // If it's for a GET request, we don't need to stringify data.
+    
+    // Setting this to nothing (e.g., data = {}) returns ALL comments.
+    var data = {};
+    
+    // AJAX call to server to get all users.
+    $.ajax({
+      type: "GET",
+      url: 'http://localhost:3000/api/users/',
+      data: data,
+      contentType: 'application/json', // content type sent to server
+      dataType: 'json', //Expected data format from server
+      success: function(data) {
+        $('#users').html('');
+
+        console.log('USER DATA: ', data);
+        //console.log('DONE!');
+
+        // Set the logged in user's ID so we can pass into fav / flag functions.
+        //adminSettings.userId = data.userInfo.userId;
+
+        var userArrayHTML = '';
+        // Render comment HTML
+        data.forEach(function(element, index) {
+          userArrayHTML = userArrayHTML.concat(buildUsers(data[index]));
+        });
+
+        $('#users').html(userArrayHTML);
+      },
+      error: function(err) {
+        $('#comments').html('Please login with valid credentials first :)');
+      }
+    });
+  };
+
+  // On Initial Page Load (Providing we're ultimately logged into Google):
+  // GET NEW COMMENTS!
+  // We don't need to pass in an initial URL since the getComments() function will
+  // check if anything exists, otherwise it's set to a default.
+  //getComments();
 
   // SEARCH COMMENTS FROM URL
   $("#url-search").keydown(function(event){
@@ -53,7 +110,7 @@ $(document).ready(function() {
 
     // Reset Comments HTML and get comments again.
     $('#comments').html();
-    getComments();
+    //getComments();
   });
 
   // DELETE COMMENT FROM DATABASE!!!!
