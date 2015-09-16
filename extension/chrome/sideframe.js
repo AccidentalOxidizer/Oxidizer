@@ -16,12 +16,15 @@ var sortByFaves = false;
 
 // requestReturned tracks if we have a pending http request so that we don't receive back the same comments twice
 // tracking.mainLastComment - id tracks last comments we've retrieved for main thread, endOfComments tracks if we've returned all of the comments there are. When we get replies, we will set a key with the comments id and a value of the last loaded reply
+// commentOffset: used for segmented loading in order of descending popularity, since we
+//  can't sort by comment id
 var tracking = {
   requestReturned: true,
   mainLastComment: {
     id: null,
     endOfComments: false
-  }
+  },
+  commentOffset: 0
 };
 
 
@@ -244,6 +247,13 @@ function loadContent(url) {
     isPrivate: privateFeed
   };
 
+  // if sorting by favorites:
+  if (sortByFaves) {
+    tracking.commentOffset = 0;
+    params.orderByHearts = 'DESC';
+    params.commentOffset = tracking.commentOffset;
+  }
+
   var paramString = [];
   for (var key in params) {
     if (params.hasOwnProperty(key)) {
@@ -282,6 +292,10 @@ function loadContent(url) {
       tracking.mainLastComment.endOfComments = true;
     } else {
       tracking.mainLastComment.endOfComments = false;
+    }
+
+    if (sortByFaves) {
+      tracking.commentOffset += msg.comments.length;
     }
 
     // clean the DOM
@@ -429,6 +443,13 @@ function loadMoreComments(destination, url, repliesToId) {
     isPrivate: privateFeed
   };
 
+  // if sorting by favorites:
+  if (sortByFaves) {
+    params.orderByHearts = 'DESC';
+    params.commentOffset = tracking.commentOffset;
+  }
+
+
   if (repliesToId !== undefined) {
     // check if we've received comments, and add to params if we have a lastCommentId to send
     if (tracking[repliesToId] !== undefined) {
@@ -479,6 +500,10 @@ function loadMoreComments(destination, url, repliesToId) {
         tracking.mainLastComment.endOfComments = true;
       } else {
         tracking.mainLastComment.endOfComments = false;
+      }
+
+      if (sortByFaves) {
+        tracking.commentOffset += msg.comments.length;
       }
     } else {
       if (msg.comments.length > 0) {
