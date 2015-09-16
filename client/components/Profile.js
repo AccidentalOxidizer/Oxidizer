@@ -329,6 +329,20 @@ var Profile = React.createClass({
       }
     });
   },
+  // Dismiss all user notifications
+  dismissNotifications: function() {
+    $.ajax({
+      url: window.location.origin + '/api/user/notifications/markread',
+      method: 'GET',
+      contentType: "application/json",
+      success: function(data) {
+        console.log('notifications dismissed')
+      },
+      error: function(xhr, status, err) {
+        console.error(xhr, status, err.message);
+      }
+    })
+  },
 
   render: function() {
     // Optional header with more options if loading our personal profile
@@ -337,14 +351,15 @@ var Profile = React.createClass({
 
     if (isPersonalProfile) {
       optionalHeader = (
-        
+        <div>
             <nav className="navbar navbar-default navbar-comments">
               <div className="container">
                 <div className="navbar-header">
-                  <a className="navbar-brand" href="#">Comment Filter</a>
+                  <p className="navbar-brand" href="#">Comments</p>
                 </div>
                 <div id="navbar" className="navbar-collapse">
-                  <ul className="nav navbar-nav">
+                
+                  <ul className=" nav navbar-nav">
                     <li className="dropdown">
                       <a id="privacy-select" href="#" className="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
                       Privacy <span className="caret"></span></a>
@@ -353,15 +368,48 @@ var Profile = React.createClass({
                         <li><a onClick={this.selectPublicComments} href="#">Show Public Comments</a></li>
                       </ul>
                     </li>
-                    <li><a className="" onClick={this.loadUserFavorites}><i className="fa fa-heart"></i> Load Favorites</a></li>
-                    <li><a className="" onClick={this.loadNewReplies}><i className="fa fa-heart"></i> Load New Replies</a></li>
-                    <li><a className="" onClick={this.loadNewHearts}><i className="fa fa-heart"></i> Load New Hearts</a></li>
-                    <li><a className="" onClick={this.resetComments} href="#"><i className="fa fa-times"></i> Clear Search</a></li>
+                    <li>
+                      <form className="navbar-form " onSubmit={this.handleUrlSearch}>
+                        <div className="input-group">
+                          <input type="text" className="form-control" placeholder="Search for URL" ref="searchUrl" />
+                          <div className="input-group-btn">
+                              <button type="submit" className="btn btn-default btn-success"><i className="fa fa-search"></i></button>
+                          </div>
+                        </div>
+                      </form>
+                    </li>
+                    <li>
+                      <form className="navbar-form" onSubmit={this.handleTextSearch}>
+                      <div className="input-group">
+                          <input type="text" className="form-control" placeholder="Search for Comment Text" ref="searchText" />
+                          <div className="input-group-btn">
+                              <button type="submit" className="btn btn-default btn-success"><i className="fa fa-search"></i></button>
+                          </div>
+                        </div>
+                      </form>
+                    </li>
+                    <li><a className="" onClick={this.resetComments} href="#"><i className="fa fa-times"></i></a></li>
                   </ul>
                 </div>
               </div>
             </nav>
-        
+
+            <nav className="navbar navbar-default navbar-comments">
+              <div className="container">
+                <div className="navbar-header">
+                  <p className="navbar-brand">Reactions</p>
+                </div>
+                <div id="navbar" className="navbar-collapse">
+                  <ul className="nav navbar-nav">
+          
+                    <li><a className="" onClick={this.loadNewReplies}><i className="fa fa-comments-o"></i> New replies received</a></li>
+                    <li><a className="" onClick={this.loadNewHearts}><i className="fa fa-heart"></i> New favorites received</a></li>
+                    <li><a className="" onClick={this.dismissNotifications} href="#"><i className="fa fa-times"></i> Dismiss all</a></li>
+                  </ul>
+                </div>
+              </div>
+            </nav>
+        </div>
       );
     }
 
@@ -374,34 +422,17 @@ var Profile = React.createClass({
 
     return (
       <div className="container">
-      <div className="row">
-        <div className="hidden-xs col-sm-3 col-md-4">
+      <div className="row profile">
+        <div className="hidden-xs col-sm-2 col-md-3">
           <p><img src={this.state.userAvatar + '&s=512'} className="img-thumbnail profile-image" /></p>
           <h2>{this.state.displayName}</h2>
           <p>Total Comments: {this.state.numComments}</p>
         </div>
 
-        <div className="col-xs-12 col-sm-9 col-md-8">
+        <div className="col-xs-12 col-sm-10 col-md-9">
           {optionalHeader}
 
-          <div className="row"> 
-          <form className="col-xs-6" onSubmit={this.handleUrlSearch}>
-            <div className="input-group">
-              <input type="text" className="form-control" placeholder="Search for URL" ref="searchUrl" />
-              <div className="input-group-btn">
-                  <button type="submit" className="btn btn-default btn-success">Search</button>
-              </div>
-            </div>
-          </form>
-          <form className="col-xs-6" onSubmit={this.handleTextSearch}>
-          <div className="input-group">
-              <input type="text" className="form-control" placeholder="Search for Comment Text" ref="searchText" />
-              <div className="input-group-btn">
-                  <button type="submit" className="btn btn-default btn-success">Search</button>
-              </div>
-            </div>
-          </form>
-          </div>
+         
           <div className="row">
           <div className="col-xs-12">
 

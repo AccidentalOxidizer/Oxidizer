@@ -97,6 +97,10 @@
   width:100%;
 }
 
+.profile nav {
+  max-height: 50px;
+}
+
 /* Comments 
 ------------------------ */
 
