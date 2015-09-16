@@ -53,7 +53,7 @@ var remove = function(userId){
 // add one to the new notifications fiels - second argument should be 'replies', 'hearts', or 'flags'
 var incrementNotification = function(userId, stringAttribute){
   var field = stringAttribute + 'ToCheck';
-  console.log()
+
   return User.findOne({where: {id: userId}})
     .then(function(user){
       user.increment(field);
