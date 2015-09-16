@@ -14,6 +14,8 @@
 //    'FlagCount',
 //    'ReplyCount',
 //    ''   
+// offset - if set, indicates the offset by which to load the comments with respect to loading a limited set of comments
+//  (limit and offset are applied after the other query filtering)
 // filterByUser - if true, it will only return comments for the user set at userFilterId - default is requesting user
 // getHeartedByUser - will only returned favorited ids
 // userFilterId -  
@@ -116,6 +118,11 @@ module.exports = function(sequelize, options) {
   // optional limit
   var limit = options.numberOfComments || 25;
   queryString += 'LIMIT ' + limit + ' ';
+
+  // optional offset for limit ...
+  if (options.offset) {
+    queryString += 'OFFSET ' + options.offset + ' ';
+  }
   
   queryString += ';';
 

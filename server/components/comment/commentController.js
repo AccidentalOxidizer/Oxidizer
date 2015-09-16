@@ -4,6 +4,8 @@ var userController = require('../user');
 var buildQueryOptions = function(req, filterByUser) {  
   var options = {};
 
+  // req.query.userId will only be set if we are filtering comments
+  // to be from a single user, and that user is not the logged in user
   options.userId = req.query.userId || req.user.id;
   if (req.query.host) options.host = req.query.host;
 
@@ -18,6 +20,7 @@ var buildQueryOptions = function(req, filterByUser) {
   if (req.query.orderByHearts) options.orderBy = ['HeartCount', req.query.orderByHearts];
   if (req.query.orderByFlags) options.orderBy = ['FlagCount', req.query.orderByFlags];
   if (req.query.orderByReplies) options.orderBy = ['ReplyCount', req.query.orderByReplies];
+  if (req.query.commentOffset) options.offset = req.query.commentOffset;
   if (req.query.filterByUser || filterByUser) options.filterByUser = req.query.filterByUser;
   if (req.query.isPrivate) options.isPrivate = req.query.isPrivate;
 

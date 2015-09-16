@@ -23,8 +23,6 @@ var Comment = React.createClass({
     var hearts = this.props.comment.HeartCount ? this.props.comment.HeartCount : 0;
     var heartClass;
 
-    console.log("Comment: heartedByUser: ", this.props.comment.HeartedByUser);
-
     if (this.props.comment.HeartedByUser) {
       heartClass = "fa fa-heart";
     } else {
