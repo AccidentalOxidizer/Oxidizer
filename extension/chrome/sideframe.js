@@ -33,7 +33,6 @@ document.addEventListener("DOMContentLoaded", function(e) {
   chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
     // DEBUG
     if (request.from === 'contentscript' && request.message === 'debug') {
-      console.log('message events intercepted in iframe:', request);
       sendResponse({
         from: 'iframe',
         message: 'debug'
@@ -112,7 +111,6 @@ document.addEventListener("DOMContentLoaded", function(e) {
 
   // Sort by date or number of faves
   document.getElementById('sort-date').addEventListener('click', function() {
-    console.log('Sort by date selected.');
     sortByFaves = false;
     $('#sort-by-select').parents('.dropdown').find('.dropdown-toggle').html('<i class="fa fa-calendar-check-o"></i> Date <span class="caret"></span>');
 
@@ -120,7 +118,6 @@ document.addEventListener("DOMContentLoaded", function(e) {
     loadContent(url);
   });
   document.getElementById('sort-faves').addEventListener('click', function() {
-    console.log('Sort by faves selected.');
     sortByFaves = true;
     $('#sort-by-select').parents('.dropdown').find('.dropdown-toggle').html('<i class="fa fa-heart-o"></i> Popular <span class="caret"></span>');
 
@@ -134,7 +131,7 @@ document.addEventListener("DOMContentLoaded", function(e) {
 
   document.getElementById('dismiss-notifications').addEventListener('click', function() {
     var request = $.ajax({
-      url: settings.server + '/api/users/markread',
+      url: settings.server + '/api/users/notifications/markread',
       method: "GET",
       contentType: "application/json",
     });
@@ -153,7 +150,6 @@ document.addEventListener("DOMContentLoaded", function(e) {
   // Update the feed privacy setting if the user changes it in the dropdown menu.
   $('#feed-privacy-select li a').click(function() {
     var selectedText = $(this).html();
-    console.log(selectedText);
 
     if (selectedText.endsWith('Private Feed')) {
       privateFeed = true;
@@ -204,13 +200,9 @@ document.addEventListener("DOMContentLoaded", function(e) {
 
   // sends request for new comments when we get to the bottom of comments
   document.querySelector('.panel-content-wrapper').addEventListener('scroll', function(e) {
-
     var commentContainer = document.getElementsByClassName('panel-content-wrapper')[0];
-      
-
     // calculates how much space is left to scroll through the comments
     var spaceLeft = commentContainer.scrollHeight - (commentContainer.clientHeight + commentContainer.scrollTop);
-
     //if we are towards the bottom of the div, and we haven't gotten all comments, and we don't have a pending request
     if (spaceLeft < 300) {
       // toggle requestReturned so that we don't send two requests concurrently
@@ -235,13 +227,11 @@ document.addEventListener("DOMContentLoaded", function(e) {
       message: 'callback'
     },
     function(response) {
-      console.log('iframe callback message:', response);
+      // console.log('iframe callback message:', response);
     });
 });
 
 function loadContent(url) {
-  console.log('getting content from API');
-
   var params = {
     url: encodeURIComponent(url),
     isPrivate: privateFeed
@@ -273,7 +263,8 @@ function loadContent(url) {
   });
 
   request.success(function(msg) {
-    console.log('GET ALL:', msg);
+
+    // set notification alert if we have any new replies or favs on comments
     if (msg.userInfo.heartsToCheck > 0 ||
       msg.userInfo.repliesToCheck > 0) {
       setNotifications(msg.userInfo.heartsToCheck, msg.userInfo.repliesToCheck);
@@ -347,8 +338,6 @@ function postComment(text, repliesToId) {
     // compile and append successfully saved and returned message to DOM
     var html = compileComments(msg);
 
-    console.log('MESSAGE after POST', msg);
-
     if (!repliesToId) {
       $(".cd-panel-content").prepend(html);
     } else {
@@ -357,7 +346,6 @@ function postComment(text, repliesToId) {
       $('#' + repliesToId +' .ReplyCount').html(ReplyCount);
     }
     registerCommentEventListeners();
-
   });
 
   request.fail(function(jqXHR, textStatus) {
@@ -405,9 +393,7 @@ function compileComments(msg) {
         // Since we want to replace all instances of the URL,
         // we need to create a regEx object and tell it to look
         // for all instances that match within the string using the "/g" modifier.
-        
         var replaceURL = new RegExp(imageLink, 'g');
-
         element.text = element.text.replace(replaceURL, '<p align="center"><img src="' + imageLink + '" style="max-width: 450px;"/></p>');
       });
     }
@@ -485,9 +471,7 @@ function loadMoreComments(destination, url, repliesToId) {
   });
 
   request.success(function(msg) {
-    console.log(msg);
     tracking.requestReturned = true;
-
     // set lastLoadedCommentId
     if (repliesToId === undefined) {
       if (msg.comments.length > 0) {
@@ -509,7 +493,6 @@ function loadMoreComments(destination, url, repliesToId) {
       if (msg.comments.length > 0) {
         tracking[repliesToId].id = msg.comments[msg.comments.length - 1].id;
       }
-
       // Same logic regarding comment loads, but for the reply tracking.
       if (msg.comments.length < 25) {
         tracking[repliesToId].endOfComments = true;
@@ -665,9 +648,7 @@ function registerCommentEventListeners(comment) {
   var hearts = document.getElementsByClassName('heart');
   for (var i = 0; i < hearts.length; i++) {
     $(hearts[i]).off('click').on('click', function() {
-      console.log('heart clicked');
       var id = this.getAttribute('data-comment-id');
-      // var faved = this.getAttribute('data-faved-state');
       favePost(id);
     });
   };
@@ -718,7 +699,6 @@ function dismissNotifications() {
 
 function flagPost(commentId) {
   // this function is called when user confirms flagging a comment
-  console.log('Comment to flag:', commentId);
   var data = JSON.stringify({
     CommentId: commentId
   });
@@ -730,7 +710,6 @@ function flagPost(commentId) {
     dataType: 'json'
   });
   request.success(function(msg) {
-    console.log('successfully flagged (or unflagged) comment', msg, commentId);
     $('#' + commentId + ' #flag i').toggleClass('fa-flag-o');
     $('#' + commentId + ' #flag i').toggleClass('fa-flag');
     // set a marker that prevents poping up confirmation for unflags
@@ -741,7 +720,6 @@ function flagPost(commentId) {
 }
 
 function favePost(commentId) {
-  console.log('Comment to favorite:', commentId);
   var data = JSON.stringify({
     CommentId: commentId
   });
@@ -754,7 +732,6 @@ function favePost(commentId) {
   });
 
   request.success(function(msg) {
-    console.log('successfully faved (or unfaved) comment,', msg, commentId);
     $('#' + commentId + ' #heart .HeartCount').html(msg.count);
     $('#' + commentId + ' #heart i').toggleClass('fa-heart-o');
     $('#' + commentId + ' #heart i').toggleClass('fa-heart');
@@ -773,7 +750,6 @@ function deletePost(commentId) {
   });
 
   request.done(function(msg) {
-    console.log('successfully deleted comment,', msg);
     document.getElementById(commentId).remove();
   });
 

@@ -170,3 +170,20 @@
 .leaderboard div div.comment:nth-child(8){
   background-color: rgba(168, 202, 255, .2);
 }
+
+.headline {
+  text-align: center;
+}
+.team {
+  margin-top: 10px;
+  padding-top: 10px;
+  border: 1px solid #EFEFEF;
+}
+.team img{
+  width: 96px;
+  border-radius: 50%;
+}
+
+.team .right {
+  text-align: right;
+}
