@@ -14,6 +14,10 @@ var privateFeed;
 // otherwise sorts from most recent to least. Defaults to sorting by date.
 var sortByFaves = false;
 
+// Boolean: true if sorting comments from most comments to least;
+// Defaults to sorting by date.
+var sortByReplies = false;
+
 // requestReturned tracks if we have a pending http request so that we don't receive back the same comments twice
 // tracking.mainLastComment - id tracks last comments we've retrieved for main thread, endOfComments tracks if we've returned all of the comments there are. When we get replies, we will set a key with the comments id and a value of the last loaded reply
 // commentOffset: used for segmented loading in order of descending popularity, since we
@@ -112,19 +116,31 @@ document.addEventListener("DOMContentLoaded", function(e) {
   // Sort by date or number of faves
   document.getElementById('sort-date').addEventListener('click', function() {
     sortByFaves = false;
+    sortByReplies = false;
     $('#sort-by-select').parents('.dropdown').find('.dropdown-toggle').html('<i class="fa fa-calendar-check-o"></i> Date <span class="caret"></span>');
 
     // reload the feed with the updated setting.
     loadContent(url);
   });
+
   document.getElementById('sort-faves').addEventListener('click', function() {
     sortByFaves = true;
+    sortByReplies = false;
     $('#sort-by-select').parents('.dropdown').find('.dropdown-toggle').html('<i class="fa fa-heart-o"></i> Popular <span class="caret"></span>');
 
     // reload the feed with the updated setting.
     loadContent(url);
   });
 
+  // SORT BY REPLIES
+  document.getElementById('sort-replies').addEventListener('click', function() {
+    sortByFaves = false;
+    sortByReplies = true;
+    $('#sort-by-select').parents('.dropdown').find('.dropdown-toggle').html('<i class="fa fa-commenting-o"></i> Replies <span class="caret"></span>');
+
+    // reload the feed with the updated setting.
+    loadContent(url);
+  });
 
   // close Oxidizer IFrame Window when when clicking close button 
   document.getElementById('close').addEventListener('click', closeOxidizer);
@@ -241,6 +257,13 @@ function loadContent(url) {
   if (sortByFaves) {
     tracking.commentOffset = 0;
     params.orderByHearts = 'DESC';
+    params.commentOffset = tracking.commentOffset;
+  }
+
+  // if sorting by replies:
+  if (sortByReplies) {
+    tracking.commentOffset = 0;
+    params.orderByReplies = 'DESC';
     params.commentOffset = tracking.commentOffset;
   }
 
