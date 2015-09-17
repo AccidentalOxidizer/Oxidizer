@@ -355,9 +355,15 @@ var Profile = React.createClass({
             <nav className="navbar navbar-default navbar-comments">
               <div className="">
                 <div className="navbar-header">
+                <button type="button" className="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar-comments-collapse" aria-expanded="false">
+                  <span className="sr-only">Toggle navigation</span>
+                  <span className="icon-bar"></span>
+                  <span className="icon-bar"></span>
+                  <span className="icon-bar"></span>
+                </button>
                   <p className="navbar-brand" href="#">Comments</p>
                 </div>
-                <div id="navbar" className="navbar-collapse">
+                <div id="navbar" className="navbar-collapse" id="navbar-comments-collapse">
                 
                   <ul className=" nav navbar-nav">
                     <li className="dropdown">
@@ -406,8 +412,8 @@ var Profile = React.createClass({
                 <div id="navbar" className="navbar-collapse">
                   <ul className="nav navbar-nav">
       
-                    <li><a className="" onClick={this.loadNewReplies}><i className="fa fa-comments-o"></i> New replies received</a></li>
-                    <li><a className="" onClick={this.loadNewHearts}><i className="fa fa-heart"></i> New favorites received</a></li>
+                    <li><a className="" onClick={this.loadNewReplies}><i className="fa fa-comments-o"></i> Comments with new replies</a></li>
+                    <li><a className="" onClick={this.loadNewHearts}><i className="fa fa-heart"></i> Comments with new favorites</a></li>
                   </ul>
                   <ul className="nav navbar-nav navbar-right">
                     <li className="dismiss-notifications"><a className="dismiss-notifications" onClick={this.dismissNotifications}><i className="fa fa-times"></i> Dismiss all</a></li>

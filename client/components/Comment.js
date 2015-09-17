@@ -50,6 +50,7 @@ var Comment = React.createClass({
     var userUrl = window.location.origin + '/#/profile?userId=' + this.props.comment.UserId;
     var hearts = this.props.comment.HeartCount ? this.props.comment.HeartCount : 0;
     var heartClass;
+    var replyCount = this.props.comment.ReplyCount ? this.props.comment.ReplyCount : 0;
 
     if (this.props.comment.HeartedByUser) {
       heartClass = "fa fa-heart";
@@ -81,7 +82,7 @@ var Comment = React.createClass({
         <div className="row">
           <div className="col-xs-12 comment-header"> 
           Comment on: <a target="_blank" href={'http://'+this.props.comment.url}>{this.props.comment.url}</a> posted: {moment(this.props.comment.createdAt).fromNow()}
-          
+          {deleteLink}
           </div>
         </div>
        
@@ -91,12 +92,12 @@ var Comment = React.createClass({
         <div className="row">
         <div className="col-xs-12 comment-footer">
           <div className="heart">Received: <i className={heartClass}></i>&nbsp;{hearts} </div>
-          {deleteLink}
-          <div className="replies">Received: <i className={heartClass}></i><a onClick={this.getReplies}>
-            get replies!
+          
+          <div className="replies"><a onClick={this.getReplies}>
+            Show replies to comment
           </a> </div>
         </div>
-        <div>Replies!!!: {replies}</div>
+        <div>{replies}</div>
         </div>
       </div>
     );
