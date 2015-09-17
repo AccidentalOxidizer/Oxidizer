@@ -600,7 +600,14 @@ function registerCommentEventListeners(comment) {
       var repliesToId = $($(this)[0]).attr('data-comment-id');
       var replies = comment.find('.comment-reply');
       var target = comment.find('.reply-container');
-      target.toggleClass('hidden');
+      var loadMore = comment.find('.comment-reply-more');
+
+      if (target.hasClass('hidden')) {
+        target.removeClass('hidden');
+      } else {
+        target.addClass('hidden');
+        loadMore.addClass('hidden');
+      }
 
       // if the target class is moved to be not hidden
       // on this toggle, try loading more comments
