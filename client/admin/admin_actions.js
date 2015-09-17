@@ -1,12 +1,27 @@
-  // Initial vars
-  // Setting this to emtpy so we can do some interesting stuff later.
-  var adminSettings = {
-    currentMode: 'recent', // This can either be 'recent' or 'flagged'
-    url: '',
-    urlId: '',
-    userId: ''
-  };
+// Initial vars
+// Setting this to emtpy so we can do some interesting stuff later.
+var adminSettings = {
+  currentMode: 'recent', // This can either be 'recent' or 'flagged'
+  url: '',
+  urlId: '',
+  userId: '',
+  isAdmin: false
+};
 
+$.ajax({
+  url: window.location.origin + '/api/user/isadmin',
+  method: 'GET',
+  success: function() {
+    $('body').show();
+    console.log('User is Admin!');
+    adminSettings.isAdmin = true;
+
+  },
+  error: function(xhr, status, err) {
+    window.location = window.location.origin;
+    //console.error(xhr, status, err.message);
+  }
+});
 
 $(document).ready(function() {
 
@@ -107,5 +122,4 @@ $(document).ready(function() {
       }
     });
   });
-
 });

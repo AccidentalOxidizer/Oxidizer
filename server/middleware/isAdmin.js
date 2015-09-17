@@ -3,7 +3,9 @@ var User = require('../components/user');
 module.exports = function(req, res, next) {
 
   if (req.user === undefined) {
+    // res.status(403).send('<script>window.location = window.location.origin</script>');
     res.send(403);
+    //res.send('<script>window.location = window.location.origin</script>');
     return;
   }
 
@@ -12,17 +14,18 @@ module.exports = function(req, res, next) {
       if (user.status === 10) {
         // USER IS ADMIN!
         next();
-        return;
+        return true;
       } else {
         // User is not an admin.
         // Get out of here, you dirty scoundrel.
+        //res.redirect('../');
         res.send(403);
-        return;
+        return false;
       }
     })
     .catch(function(){
       res.send(404);
-      return;
+      return false;
     });
 
   //return false;
