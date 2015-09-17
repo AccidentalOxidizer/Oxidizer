@@ -30,7 +30,7 @@ $(document).ready(function() {
     // AJAX call to server to get all users.
     $.ajax({
       type: "GET",
-      url: 'http://localhost:3000/api/users/',
+      url: window.location.origin + '/api/users/',
       data: data,
       contentType: 'application/json', // content type sent to server
       dataType: 'json', //Expected data format from server

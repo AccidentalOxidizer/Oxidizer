@@ -40,7 +40,7 @@ $(document).ready(function() {
     // AJAX call to server to get comments from a particular URL.
     $.ajax({
       type: "GET",
-      url: 'http://localhost:3000/api/comments',
+      url: window.location.origin + '/api/comments',
       data: data,
       contentType: 'application/json', // content type sent to server
       dataType: 'json', //Expected data format from server
