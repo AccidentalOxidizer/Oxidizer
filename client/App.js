@@ -15,7 +15,7 @@ var Footer = require('./components/Footer');
 
 var App = React.createClass({
   componentDidMount: function() {
-    console.log('hi');
+
   },
   render: function() {
     return (
