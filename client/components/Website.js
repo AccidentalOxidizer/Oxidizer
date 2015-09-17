@@ -210,8 +210,6 @@ var Website = React.createClass({
         input = filtered[3];
         
         var check = new RegExp('.*' + input.replace('.', '\\.') + '.*');
-        console.log(input);
-        / input /
 
         // iterate through the pool of strings and for any string that
         // contains the substring and add it to the `matches` array
