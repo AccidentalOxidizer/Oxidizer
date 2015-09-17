@@ -147,7 +147,7 @@ document.addEventListener("DOMContentLoaded", function(e) {
 
   document.getElementById('dismiss-notifications').addEventListener('click', function() {
     var request = $.ajax({
-      url: settings.server + '/api/users/notifications/markread',
+      url: settings.server + '/api/user/notifications/markread',
       method: "GET",
       contentType: "application/json",
     });
