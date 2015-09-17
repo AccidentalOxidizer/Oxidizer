@@ -1,6 +1,7 @@
 $(document).ready(function() {
 
   var commentSort = 'recent'; // This represents two values. 'recent' or 'flags'
+  var lastCommentId = null;
 
   // Listen for User tools selection.
   $('#show-comments').on('click', function() {
@@ -16,8 +17,8 @@ $(document).ready(function() {
   // Basically, our AJAX call will get data back, loop over the array of comments
   // then send each individiaul comment here to build out the comment.
   var buildComments = function(comment) {
-    var commentHTML = '<div class="comment" data-commentid="' + comment.id + '"><p>Comment ID:' + comment.id + '<br/>' + comment.username + ' | ' +
-      comment.createdAt + '<br/><a href="http://' + comment.url + '" target="_blank">http://' + comment.url + '</a><br/>' + comment.text + '<br/>' +
+    var commentHTML = '<div class="comment" data-commentid="' + comment.id + '"><p>Comment ID:' + comment.id + '<br/>Username: ' + comment.username + ' | ' +
+      comment.createdAt + '<br/>Site: <a href="http://' + comment.url + '" target="_blank">http://' + comment.url + '</a><br/>' + comment.text + '<br/>' +
       '<a href="#" class="delete" data-comment-id="' + comment.id + '">DELETE</a> || <a href="#" class="unflag" data-comment-id="' + comment.id + '">REMOVE FLAGS</a> <br/>' +
       'TOTAL FAVS: <span id="faves-' + comment.id + '">' + comment.HeartCount + '</span> || TOTAL FLAGS: <span id="flags-' + comment.id + '">' + comment.FlagCount + '</span></p></div>';
     return commentHTML;
@@ -35,10 +36,19 @@ $(document).ready(function() {
     // Setting this to nothing (e.g., data = {}) returns ALL comments.
     var data = {};
     
+    if (lastCommentId !== null) {
+      data.lastCommentId = lastCommentId;
+    }
+    
     // Check if we're sorting by flags.
     if (commentSort === 'flags') {
       data.orderByFlags = 'DESC';
     }
+
+    // Check if we're sorting by flags.
+    if (commentSort === 'recent') {
+      //data.orderByFlags = 'DESC';
+    }    
 
     if (url) {
       data.url = url;
@@ -54,8 +64,12 @@ $(document).ready(function() {
       success: function(data) {
         $('#comments').html('');
 
-        //console.log('DATA: ', data);
+        var commentData = data['comments'];
+        console.log('DATA: ', data);
+        console.log('LAST COMMENT ID: ', data['comments'][commentData.length-1].id);
         //console.log('DONE!');
+        
+        lastCommentId = data['comments'][commentData.length-1].id
 
         // Set the logged in user's ID so we can pass into fav / flag functions.
         adminSettings.userId = data.userInfo.userId;
@@ -118,6 +132,7 @@ $(document).ready(function() {
   $(document).on('click', '#sort-flags', function(event) {
     // Update Mode:
     commentSort = 'flags';
+    lastCommentId = null;
     adminSettings.currentMode = "flags";
     console.log('Current Sort Mode:', adminSettings.currentMode);
 
@@ -131,12 +146,19 @@ $(document).ready(function() {
   $(document).on('click', '#sort-recent', function(event) {
     // Update Mode:
     commentSort = 'recent';
+    lastCommentId = null;
     adminSettings.currentMode = "recent";
     console.log('Current Sort Mode:', adminSettings.currentMode);
 
     // Reset Comments HTML and get comments again.
     $('#comments').html('');
     getComments();
+  });
+
+  $(document).on('click', '#load-more', function(event) {
+    // Reset Comments HTML and get comments again.
+    $('#comments').html('');
+    getComments();    
   });
 
   // DELETE COMMENT FROM DATABASE!!!!
