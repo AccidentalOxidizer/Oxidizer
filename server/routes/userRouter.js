@@ -56,4 +56,6 @@ module.exports = function(app) {
     res.status(200).send({user:true});
   })
 
+  app.get('/api/user/notifications/markread', jsonParser, auth.isLoggedIn, User.markRead);
+
 };
