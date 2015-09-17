@@ -5,7 +5,7 @@ var jsonParser = bodyParser.json();
 
 module.exports = function(app) {
   app.get('/api/users/', jsonParser, function(req, res, next) {
-    console.log(User);
+
     User.getAll({})
       .then(function(users){
         console.log(users);
@@ -18,30 +18,23 @@ module.exports = function(app) {
 
   // TODO: add isAuthorized
   app.get('/api/users/:userid', jsonParser, function(req, res, next) {
-    var userId = req.params.userid;
-    User.get({id: userId})
-      .then(function(user){
-        res.json(user);
-      })
-      .catch(function(){
-        res.send(404);
-      });
+    if (req.params.userid === 'markread'){
+      User.markRead(req, res, next);
+    } else {
+      var userId = req.params.userid;
+      User.get({id: userId})
+        .then(function(user){
+          res.json(user);
+        })
+        .catch(function(){
+          res.send(404);
+        });
+      }
   });
-
-  app.get('/api/users/markread', jsonParser, function(req, res, next) {
-    var userId = req.user.id;
-    User.markRead({id: userId})
-      .then(function(user){
-        res.json(user);
-      })
-      .catch(function(){
-        res.send(404);
-      });
-  });
-
 
   // TODO: add isAuthorized
-  app.put('/api/users/:userid', jsonParser, function(req, res, next) {
+  // Adding isAdmin right now since the only person who can modify users are administrators.
+  app.put('/api/users/:userid', jsonParser, auth.isAdmin, function(req, res, next) {
     // Updates user!
     var userId = req.params.userid;
     var updates = req.body;
@@ -59,5 +52,14 @@ module.exports = function(app) {
       var userId = req.params.userid;
   });
 
+  app.get('/api/user/loggedin', jsonParser, auth.isLoggedIn, function(req, res, next) {
+    res.status(200).send({user:true});
+  });
+
+  app.get('/api/user/isadmin', jsonParser, auth.isAdmin, function(req, res, next) {
+    res.status(200).send({admin:true});
+  });
+
+  app.get('/api/user/notifications/markread', jsonParser, auth.isLoggedIn, User.markRead);
 
 };

@@ -1,3 +1,7 @@
+// LOAD REQUIRED MODULES
+var Promise = require('bluebird');
+var request = Promise.promisifyAll(require('request'));
+
 /**
  * USER AUTHENTICATION TESTS
  *
@@ -7,9 +11,7 @@
  * your server's environment is set to "development".
  */
 
-// LOAD REQUIRED MODULES
-var Promise = require('bluebird');
-var request = Promise.promisifyAll(require('request'));
+module.exports = function() {
 
 // GLOBAL SETTINGS FOR THIS PARTICULAR TEST
 var testServer = 'http://localhost:3000';
@@ -32,6 +34,14 @@ request.postAsync({
     // server each time we make a new request.
     // This is what keeps our "robot" user authenticated.
     cookie = user[0].headers['set-cookie'][0];
+    etag = user[0].headers['etag'];
+    //console.log('COOKIE!', cookie);
+    
+    return {
+      user: user,
+      cookie: cookie,
+      etag: etag
+    };
 
     // LOGGING / DEBUGGING INFO
     //console.log('COOKIE: ', user[0].headers['set-cookie'][0]);
@@ -40,26 +50,23 @@ request.postAsync({
     //console.log('Attempting to add a new comment');
 
     // Test URL: This could be any valid URL.
-    var testUrl = "http://zombo.com/";
+    //var testUrl = "http://zombo.com/";
 
     // CREATE A NEW COMMENT!
-    return request.postAsync({
-      url: testServer + '/api/comments/add',
-      headers: {
-        'Cookie': cookie
-      },
-      json: {
-        url: testUrl,
-        text: "This is a test comment. There are many like it. But this one is mine.",
-        isPrivate: false
-      }
-    });
-  })
-  .then(function(comment) {
-    var commentResponse = comment[1];
-    //console.log('New Comment Added!\n Comment response:\n', commentResponse);
-
+    // return request.postAsync({
+    //   url: testServer + '/api/comments/add',
+    //   headers: {
+    //     'Cookie': cookie,
+    //     'etag': etag
+    //   },
+    //   json: {
+    //     url: testUrl,
+    //     text: "This is a test comment. There are many like it. But this one is mine.",
+    //     isPrivate: false
+    //   }
+    // });
   })
   .catch(function(err) {
     console.log(err);
   });
+};

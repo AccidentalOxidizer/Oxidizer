@@ -1,122 +1,96 @@
 var React = require('react');
 
 var Home = React.createClass({
-  componentDidMount: function() {
-    this.loadComments()  
-  },
-  
-  loadComments: function(searchObject){
-
-    var query = {};
-    // always search by host
-    query.url = 'develiot.com/'
-
-    $.ajax({
-      url: 'http://localhost:3000/api/comments/url',
-      data: query,
-      method: 'GET',
-      dataType: 'json',
-      success: function(data){
-        console.log('received comments:', data);
-        console.log('received userInfo:', data.userInfo);
-        // this.pendingAjax = false;
-        
-        // var updatedComments; 
-        // if (this.lastCommentId === -1) {  
-        //   updatedComments = data.comments;
-        // } else {
-        //   updatedComments = this.state.comments.concat(data.comments);
-        // }
-
-        // // add new comments so we render the page
-        // if (data.comments.length < 25) {
-        //   // TODO: when do we need to reset this to true?
-        //   this.hasMoreComments = false;
-        //   this.lastCommentId = 0;
-        // } else {
-        //   this.lastCommentId = data.comments[data.comments.length - 1].id;
-        // }
-        // this.count = data.numComments;
-        // this.setState({comments: updatedComments});
-      }.bind(this),
-
-      error: function(xhr, status, err) {
-        console.error(xhr, status, err.message);
-      }
-    });
-  },
-
   render: function() {
-    // TODO: build out actual landing page
     return (
       <div>
-    <div className="jumbotron">
-      <div className="container-fluid">
-      <div className="row">
-      <div className="col-xs-12 col-sm-5">
-      <h1>Oxidizer IO</h1>
-        <p>A unified commenting system for the internet, allowing anyone to annotate any web entity via browser extensions.</p>
-        <p>Get the Chrome Extension now!</p>
-        <p><a className="" href="#" role="button">
-          <img className="img-responsive chrome" src="lib/images/ChromeWebStore_BadgeWBorder_v2_340x96.png" alt=""/></a></p>
-      </div>
-      <div id="myCarousel" className="col-xs-12 col-sm-7 carousel slide" data-ride="carousel" data-interval="4000">
-      <ol className="carousel-indicators">
-        <li data-target="#myCarousel" data-slide-to="0" className="active"></li>
-        <li data-target="#myCarousel" data-slide-to="1" className=""></li>
-      </ol>
-      <div className="carousel-inner" role="listbox">
-        <div className="item active">
-          <img className="first-slide" src="lib/images/screens/1.png" alt="First slide"/>
+      <div>
+        <div className="jumbotron">
           <div className="container">
-            <div className="carousel-caption">
-              <h2>image 1</h2>
+            <div className="row">
+              <div className="col-xs-12">
+                <h1>Oxidizer IO</h1>
+                  <p>A unified commenting system for the internet, allowing anyone to annotate any web entity via browser extensions.</p>
+                  <p>Get the Chrome Extension now!</p>
+                  <p><a className="" href="#" role="button">
+                    <img className="img-responsive chrome" src="lib/images/ChromeWebStore_BadgeWBorder_v2_340x96.png" alt=""/></a></p>
+              </div>
             </div>
           </div>
         </div>
-        <div className="item">
-          <img className="second-slide" src="lib/images/screens/3.png" alt="Second slide"/>
-          <div className="container">
-            <div className="carousel-caption">
-              <h2>image 2</h2>
+        <div className="container">
+          <div className="row">
+            <div className="col-xs-12 col-sm-6">
+              <h2>What and Why?</h2>
+              <p>Oxidizer.io aims to provide <i>a unified commenting system for the internet</i>, allowing anyone to annotate any web entity via browser extensions or other clients, independently from the provider and owner of the web content</p>
+              <p>Why do we think we need it? Because so far: 
+              <ul>
+                <li>if website doesn&#39;t offer commenting, <b>you can&#39;t</b></li>
+                <li>if website want to take down a specific comment, <b>it can</b></li>
+                <li>it&#39;s <b>inconvenient for you</b> to leep siging up and loging in into different commenting systems</li>
+                <li>your comments are <b>not in 1 place</b></li>
+                <li>your comments <b>might be used by 3rd parties</b> without your knowledge</li>
+              </ul>
+              </p>
+            </div>
+            <div className="col-xs-12 col-sm-6">
+              <h2>Open Source</h2>
+              <p>Oxidizer.io is open source. Get it on Github, fork it, or even better .. contribute. Hint: Wouldn&#39;t a Firefox extension be awesome?</p>
+              <p><a className="btn btn-default" target="_blank" href="https://github.com/AccidentalOxidizer/Oxidizer" role="button">Get it on Github</a></p>
             </div>
           </div>
-        </div>
-      </div>
-      <a className="left carousel-control" href="#myCarousel" role="button" data-slide="prev">
-        <span className="glyphicon glyphicon-chevron-left" aria-hidden="true"></span>
-        <span className="sr-only">Previous</span>
-      </a>
-      <a className="right carousel-control" href="#myCarousel" role="button" data-slide="next">
-        <span className="glyphicon glyphicon-chevron-right" aria-hidden="true"></span>
-        <span className="sr-only">Next</span>
-      </a>
-    </div>
+          <div className="row team">
+            <div className="col-xs-12">
+              <div className="col-xs-12 headline">
+                <h2>Who</h2>
+                Oxidizer.io was conceived as a Hackreactor thesis project. <br />Our team <i><a href="https://github.com/AccidentalOxidizer">Accidential Oxidizer</a></i> is made up following amazing .. um .. characters:
+              </div>
+              <div className="col-xs-12 col-sm-6 col-md-6 media">
+                
+                <div className="media-body media-middle right">
+                  <h4 className="media-heading">Dave Schumaker</h4>
+                  <a className="btn btn-default" href="https://github.com/daveschumaker"><i className="fa fa-github"></i> Github</a> 
+                  <a className="btn btn-default" href="https://twitter.com/davely"><i className="fa fa-twitter"></i> Twitter</a>
+                </div>
+                <div className="media-right">
+                    <img className="media-object" src="https://avatars3.githubusercontent.com/u/5395723?v=3&s=460" />
+                </div>
+              </div>
+              <div className="col-xs-12 col-sm-6 col-md-6 media">
+                <div className="media-left">
+                    <img className="media-object" src="https://avatars1.githubusercontent.com/u/8949284?v=3&s=460" />
+                </div>
+                <div className="media-body media-middle">
+                  <h4 className="media-heading">Eliot Winder</h4>
+                  <a className="btn btn-default" href="https://github.com/eliotwinder"><i className="fa fa-github"></i> Github</a>
+                </div>
+              </div>
+              <div className="col-xs-12 col-sm-6 col-md-6 media">
+                
+                <div className="media-body media-middle right">
+                  <h4 className="media-heading">Emily Eng</h4>
+                  <a className="btn btn-default" href="https://github.com/fractal5"><i className="fa fa-github"></i> Github</a>
 
-    </div>
-    </div>
-    </div>
+                </div>
+                <div className="media-right">
+                    <img className="media-object" src="https://avatars2.githubusercontent.com/u/12725623?v=3&s=460" />
+                </div>
+              </div>
+              <div className="col-xs-12 col-sm-6 col-md-6 media">
+                <div className="media-left">
+                    <img className="media-object" src="https://avatars0.githubusercontent.com/u/6237113?v=3&s=460" />
+                </div>
+                <div className="media-body media-middle">
+                  <h4 className="media-heading">Matthias Gattermeier</h4>
+                  <a  className="btn btn-default" href="https://github.com/Gattermeier"><i className="fa fa-github"></i> Github</a> 
+                  <a  className="btn btn-default" href="https://twitter.com/Gattermeier"><i className="fa fa-twitter"></i> Twitter</a>
+                </div>
+              </div>
+            </div>
+          </div>
 
-    <div className="container">
-      <div className="row">
-        <div className="col-md-4">
-          <h2>Heading</h2>
-          <p>Donec id elit non mi porta gravida at eget metus. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus. Etiam porta sem malesuada magna mollis euismod. Donec sed odio dui. </p>
-          <p><a className="btn btn-default" href="#" role="button">View details</a></p>
-        </div>
-        <div className="col-md-4">
-          <h2>Heading</h2>
-          <p>Donec id elit non mi porta gravida at eget metus. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus. Etiam porta sem malesuada magna mollis euismod. Donec sed odio dui. </p>
-          <p><a className="btn btn-default" href="#" role="button">View details</a></p>
        </div>
-        <div className="col-md-4">
-          <h2>Heading</h2>
-          <p>Donec sed odio dui. Cras justo odio, dapibus ac facilisis in, egestas eget quam. Vestibulum id ligula porta felis euismod semper. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus.</p>
-          <p><a className="btn btn-default" href="#" role="button">View details</a></p>
-        </div>
-      </div>
     </div>
-
     </div>
     );
   }

@@ -4,35 +4,100 @@ var moment = require('moment');
 // A Comment component that can be applied to a user profile feed,
 // a url feed, or any other comment list.
 // Comment data will be passed down in this.props.comment.
-//
-// TODO:
-// - Show a delete link if this comment belongs to the logged in user?
-//   How does the comment get deleted from the feed?
-// - Show # Hearts?
-//
 var Comment = React.createClass({
   propTypes: {
     comment: React.PropTypes.object.isRequired,
-    allowDelete: React.PropTypes.bool.isRequired,
-    deleteComment: React.PropTypes.func.isRequired
+    allowDelete: React.PropTypes.bool,
+    deleteComment: React.PropTypes.func
+  },
+
+  getInitialState: function() {
+    return {
+      replies: []
+    };
+  },
+
+  getDefaultProps: function() {
+    return {
+      allowDelete: false,
+      deleteComment: function() {}
+    };
+  },
+
+  getReplies: function(){
+    var query = {
+      repliesToId: this.props.comment.id
+    };
+
+    var context = this;
+
+    $.ajax({
+      url: window.location.origin + '/api/comments/replies',
+      data: query,
+      method: 'GET',
+      dataType: 'json',
+      success: function(data){
+        console.log('received data', data);
+        context.setState({replies: data.comments});
+      },  
+      error: function(err){
+        console.log(error);
+      }
+    });
   },
   
   render: function() {
     var userUrl = window.location.origin + '/#/profile?userId=' + this.props.comment.UserId;
+    var hearts = this.props.comment.HeartCount ? this.props.comment.HeartCount : 0;
+    var heartClass;
 
-    // Optional Delete ...
-    var deleteButton;
+    if (this.props.comment.HeartedByUser) {
+      heartClass = "fa fa-heart";
+    } else {
+      heartClass = "fa fa-heart-o";
+    }
+
+    // Delete Link: only show if allowed.
+    var deleteLink;
 
     if (this.props.allowDelete) {
-      deleteButton = (
-        <p><a onClick={this.props.deleteComment}>Delete Comment</a></p>
+      deleteLink = (
+        <div className="delete">
+          <a onClick={this.props.deleteComment}>
+            Delete Comment
+          </a>
+        </div>
       );
     }
+
+    var isPersonalProfile = false;
+
+    var replies = this.state.replies.map(function(comment, i) {
+      return <Comment key={comment.id} comment={comment}  />;
+    }.bind(this));
+
     return (
-      <div>
-        <p><strong><a href={userUrl}>{this.props.comment.username}</a></strong> | {this.props.comment.url} | {moment(this.props.comment.createdAt).fromNow()}</p>
-        <p>{this.props.comment.text}</p>
-        {deleteButton}
+      <div className="comment">
+        <div className="row">
+          <div className="col-xs-12 comment-header"> 
+          Comment on: <a target="_blank" href={'http://'+this.props.comment.url}>{this.props.comment.url}</a> posted: {moment(this.props.comment.createdAt).fromNow()}
+          
+          </div>
+        </div>
+       
+        <div className="row"> 
+          <div className="col-xs-12 comment-body">{this.props.comment.text}</div>
+        </div>
+        <div className="row">
+        <div className="col-xs-12 comment-footer">
+          <div className="heart">Received: <i className={heartClass}></i>&nbsp;{hearts} </div>
+          {deleteLink}
+          <div className="replies">Received: <i className={heartClass}></i><a onClick={this.getReplies}>
+            get replies!
+          </a> </div>
+        </div>
+        <div>Replies!!!: {replies}</div>
+        </div>
       </div>
     );
   }

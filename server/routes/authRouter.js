@@ -5,7 +5,6 @@ var urlEncodedParser = bodyParser.urlencoded({
 });
 var auth = require('../middleware').auth;
 
-
 module.exports = function(app, passport) {
   app.post('/api/auth/local', jsonParser, passport.authenticate('local', {
     successRedirect: '/',
@@ -62,7 +61,7 @@ module.exports = function(app, passport) {
   });
 
   app.get('/api/auth/chrome/logout', function(req, res, next) {
-    console.log(req.session, req.user);
+    //console.log(req.session, req.user);
     req.logOut();
     req.logout();
     req.session.destroy();

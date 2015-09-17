@@ -489,7 +489,8 @@ h4.comment-username,
 
 .spinner {
     margin: 15px auto;
-    margin-left:10%;
+    margin-left:3px;
+    /*margin-left:10%;*/
     width: 50px;
     display: inline-block;
     text-align: center;
@@ -497,8 +498,8 @@ h4.comment-username,
 }
 
 .spinner > div {
-  width: 14px;
-  height: 14px;
+  width: 8px;
+  height: 8px;
   background-color: #333;
 
   border-radius: 100%;

@@ -142,6 +142,7 @@ var Admin = React.createClass({
     });
 
     return (
+      <div className="container">
       <div className="row">
         <h1>Hello! ADMIN PAGE!</h1>
         <div className="col-md-8">
@@ -164,6 +165,7 @@ var Admin = React.createClass({
           <p>Sort By: <a onClick={this.sortFlags}>FLAGS</a> | <a onClick={this.loadComments}>RECENT</a></p>
           {comments}
         </div>
+      </div>
       </div>
     );
   }

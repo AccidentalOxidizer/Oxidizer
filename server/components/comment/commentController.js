@@ -1,12 +1,13 @@
 var Promise = require('bluebird');
-var parseUrl = require('../../utils/parseUrl');
-
+var parseUrl = require('../../utils/parseURL');
+var userController = require('../user');
 var buildQueryOptions = function(req, filterByUser) {  
   var options = {};
 
-  if (req.user) options.userId = req.user.id;
+  // req.query.userId will only be set if we are filtering comments
+  // to be from a single user, and that user is not the logged in user
+  options.userId = req.query.userId || req.user.id;
   if (req.query.host) options.host = req.query.host;
- 
 
   if (req.query.url) options.url = parseUrl(req.query.url).url;
   if (req.query.urlSearch) options.urlSearch = req.query.urlSearch;
@@ -19,8 +20,10 @@ var buildQueryOptions = function(req, filterByUser) {
   if (req.query.orderByHearts) options.orderBy = ['HeartCount', req.query.orderByHearts];
   if (req.query.orderByFlags) options.orderBy = ['FlagCount', req.query.orderByFlags];
   if (req.query.orderByReplies) options.orderBy = ['ReplyCount', req.query.orderByReplies];
+  if (req.query.commentOffset) options.offset = req.query.commentOffset;
   if (req.query.filterByUser || filterByUser) options.filterByUser = req.query.filterByUser;
   if (req.query.isPrivate) options.isPrivate = req.query.isPrivate;
+  if (req.query.getHeartedByUser) options.getHeartedByUser = true;
 
   return options;
 };
@@ -32,11 +35,11 @@ module.exports.getCommentsForUrl = function(req, res, next) {
   var options = buildQueryOptions(req);
   // getComment and User info for the database
 
-  Promise.all([Comment.getComments(options), User.getUserInfo(req.user.id)]) // TODO add userQuery
+  Promise.all([Comment.getComments(options), User.getUserInfo(options.userId)]) // TODO add userQuery
     .spread(function(comments, user){
       var response = {
         comments: comments[0],
-        userInfo: user[0],
+        userInfo: user[0][0],
         currentTime: new Date()
       };
 
@@ -50,6 +53,69 @@ module.exports.getCommentsForUser = function (req, res, next) {
   var User = req.app.get('models').User;
 
   var options = buildQueryOptions(req, true);
+
+  Promise.all([Comment.getComments(options), User.getUserInfo(options.userId)]) // TODO add userQuery
+    .spread(function(comments, user){
+      var response = {
+        comments: comments[0],
+        userInfo: user[0][0],
+        currentTime: new Date()
+      };
+
+      // res.data.userInfo = 
+      res.send(200, response);
+    })
+    .catch(function(err){
+      console.log(err);
+      res.send(404);
+    });
+};
+
+module.exports.getHeartedCommentsForUser = function(req, res, next){
+  var Comment = req.app.get('models').Comment;
+  var User = req.app.get('models').User;
+    
+  var options = buildQueryOptions(req, true);
+
+  Promise.all([Comment.getComments(options), User.getUserInfo(options.userId)]) // TODO add userQuery
+    .spread(function(comments, user){
+      var response = {
+        comments: comments[0],
+        userInfo: user[0][0],
+        currentTime: new Date()
+      };
+
+      // res.data.userInfo = 
+      res.send(200, response);
+    })
+    .catch(function(err){
+      console.log(err);
+      res.send(404);
+    });
+};
+
+module.exports.getRepliesForComment = function(req, res, next){
+  var Comment = req.app.get('models').Comment;
+  var User = req.app.get('models').User;
+
+  req.user = {
+    id: req.session.passport.user
+  };
+
+  // build query Options
+  var options = buildQueryOptions(req);
+
+  Promise.all([Comment.getComments(options), User.getUserInfo(options.userId)]) // TODO add userQuery
+    .spread(function(comments, user){
+      var response = {
+        comments: comments[0],
+        userInfo: user[0][0],
+        currentTime: new Date()
+      };
+
+      res.send(200, response);
+    });
+
 };
 
 module.exports.addComment = function(req, res, next) {  
@@ -61,31 +127,77 @@ module.exports.addComment = function(req, res, next) {
     text: req.body.text,
     isPrivate: req.body.isPrivate,
     UserId: req.user.id,
-    url: req.body.url,
+    url: parseUrl(req.body.url).url,
     host: parseUrl(req.body.url).host,
     repliesToId: req.body.repliesToId
   })
     .then(function(data){
-
+      newCommentId = data.get('id');
       var newComment = {
         commentId: data.get('id'),
         repliesToId: req.body.repliesToId
       };
 
-      return Promise.all([Comment.getComments(newComment), User.getUserInfo(req.user.id)]);
+      return Promise.all([Comment.getComments(newComment), User.getUserInfo(req.user.id), Comment.getComments({commentId: req.body.repliesToId})]);
     })
-    .spread(function(comments, user) {
+    .spread(function(comments, user, repliesToComment) {
 
       var response = {
         comments: comments[0],
-        userInfo: user[0],
+        userInfo: user[0][0],
         currentTime: new Date()
       };
 
       res.send(201, response);
+
+      if (req.body.repliesToId && repliesToComment[0][0].UserId !== req.user.id) {
+        userController.incrementNotification(repliesToComment[0][0].UserId, 'replies');
+      }
     })
     .catch(function(err){
       console.log(err);
+    });
+};
+
+module.exports.getNewRepliesForUser = function(req, res, next){
+  var Comment = req.app.get('models').Comment;
+  var User = req.app.get('models').User;
+  var userId = req.session.passport.user;
+
+  return Promise.all([Comment.getNewReplies(userId), User.getUserInfo(userId)])
+    .spread(function(comments, user){
+      var response = {
+        comments: comments[0],
+        userInfo: user[0][0],
+        currentTime: new Date()
+      };
+
+      res.send(200, response);
+    })
+    .catch(function(err){
+      console.log('Err loading replies', err);
+    });
+
+
+};
+
+module.exports.getNewHeartsForUser = function(req, res, next){
+  var Comment = req.app.get('models').Comment;
+  var User = req.app.get('models').User;
+  var userId = req.session.passport.user;
+
+  return Promise.all([Comment.getNewHearts(userId), User.getUserInfo(userId)])
+    .spread(function(comments, user){
+      var response = {
+        comments: comments[0],
+        userInfo: user[0][0],
+        currentTime: new Date()
+      };
+
+      res.send(200, response);
+    })
+    .catch(function(err){
+      console.log('Err loading replies', err);
     });
 };
 
@@ -104,6 +216,8 @@ module.exports.remove = function(req, res, next) {
         res.send(500);
       });
 };
+
+
 
 
 

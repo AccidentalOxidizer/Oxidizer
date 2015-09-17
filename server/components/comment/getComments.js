@@ -14,16 +14,19 @@
 //    'FlagCount',
 //    'ReplyCount',
 //    ''   
+// offset - if set, indicates the offset by which to load the comments with respect to loading a limited set of comments
+//  (limit and offset are applied after the other query filtering)
 // filterByUser - if true, it will only return comments for the user set at userFilterId - default is requesting user
-//  TODO!!!! - userFilterId -  
+// getHeartedByUser - will only returned favorited ids
+// userFilterId -  
 // isPrivate - if true, will only return a user's private comments;
 // host - hard search for host
 // 
 module.exports = function(sequelize, options) {
   options = options || {};
 
-  // add more columns here!!
-  var queryString = 'SELECT DISTINCT Comments.id, Comments.UserId, Comments.text, Comments.UrlId, Comments.RepliesToId, Comments.isPrivate, Comments.createdAt, Urls.url, Urls.host, Users.name AS username, Users.avatar AS userAvatar,' +
+  // Adds base
+  var queryString = 'SELECT DISTINCT Comments.id, Comments.UserId, Comments.text, Comments.UrlId, Comments.repliesToId, Comments.isPrivate, Comments.createdAt, Urls.url, Urls.host, Users.name AS username, Users.avatar AS userAvatar,' +
     '(SELECT COUNT(1) AS other FROM Hearts AS h ' +
       'WHERE Comments.id = h.CommentId GROUP BY Comments.id) AS HeartCount, ' +
     '(SELECT COUNT(1) AS other FROM Comments AS c ' +
@@ -55,6 +58,7 @@ module.exports = function(sequelize, options) {
 
   var filters = [];
 
+  filters.push('(SELECT COUNT(1) AS other FROM Flags AS f WHERE Comments.id = f.CommentId) < 5 ');
 
   if (options.url) {
     filters.push('Urls.url = "' + options.url + '" ');
@@ -66,7 +70,7 @@ module.exports = function(sequelize, options) {
   
   if (options.filterByUser) {
     var userToFilter = options.userFilterId || options.userId;
-    filters.push('Users.id = ' + userToFilter + ' ');
+    filters.push('Comments.UserId = ' + userToFilter + ' ');
   }
 
   if (options.commentId) filters.push('Comments.id = ' + options.commentId + ' ');
@@ -78,14 +82,17 @@ module.exports = function(sequelize, options) {
     else filters.push('Comments.isPrivate = 0 ');
   }
 
+  if (options.getHeartedByUser){
+    filters.push('(SELECT COUNT(1) AS other FROM Hearts AS h WHERE Comments.id = h.CommentId AND h.UserId = 1) = 1 ');
+  }
+  // keeps correct user associated with the comment
+  queryString += 'WHERE Users.id = Comments.userId AND Comments.UrlId = Urls.id ';
+
   // // if there are any filters, add them to the query
   if (filters.length > 0){
-    queryString += 'WHERE ';
 
     for (var i = 0; i < filters.length; i++) {
-      if (i > 0){
-        queryString += 'AND ';
-      }
+      queryString += 'AND ';
       queryString += filters[i];
     }
   }
@@ -112,22 +119,17 @@ module.exports = function(sequelize, options) {
   // optional limit
   var limit = options.numberOfComments || 25;
   queryString += 'LIMIT ' + limit + ' ';
+
+  // optional offset for limit ...
+  if (options.offset) {
+    queryString += 'OFFSET ' + options.offset + ' ';
+  }
   
   queryString += ';';
 
+  console.log(queryString);
   return sequelize.query(queryString);
 };
-
-
-
-
-
-
-
-
-
-
-
 
 
 

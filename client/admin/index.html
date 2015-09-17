@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Oxidizer Admin Dashboard</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+  </style>
+</head>
+<body style="display:none">
+  <h1>Oxidizer Low Budget Admin Panel v.1.0</h1>
+  
+  <p>
+    <span id="search-url">URL: <input type="text" name="url" id="url-search"><br/></span>
+    <span id="search-comments">Search comments: <input type="text" name="url" id="comment-search"><br/></span>
+    <span id="search-users">Search users: <input type="text" name="url" id="user-search"></span>
+  </p>
+  
+  <p>Tools: <a href="#" id="show-comments">Comments</a> | <a href="#" id="show-users">Users</a> | <a href="#">Options</a><br/>
+  Sort By: <a href="#" id="sort-flags">FLAGS</a> | <a href="#" id="sort-recent">RECENT</a></p>
+
+  <p id="sort-type">Showing Comments:</p>
+  <div id="comments">
+  </div>
+
+  <div id="users">
+  </div>
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+  <script src="admin_actions.js"></script>
+  <script src="comment_actions.js"></script>
+  <script src="user_actions.js"></script>
+</body>
+</html>

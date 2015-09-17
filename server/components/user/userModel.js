@@ -49,7 +49,14 @@ module.exports = function(sequelize, dataTypes) {
     },
     fbName: dataTypes.STRING,
 
-    status: dataTypes.INTEGER,
+    // Determines whether the user is active, inactive, admin, etc.
+    // 0: default active user.
+    // -1: Inactive user. Can't comment
+    // 10: Admin powers!
+    status: {
+      type: dataTypes.INTEGER,
+      defaultValue: 0
+    },
 
     // user notifications
     repliesToCheck: {
@@ -65,7 +72,10 @@ module.exports = function(sequelize, dataTypes) {
       defaultValue: 0
     },
 
-    lastCheckedUpdates: dataTypes.DATE,
+    lastCheckedUpdates: {
+      type: dataTypes.DATE,
+      defaultValue: sequelize.fn('NOW')
+    },
 
     // additional profile info here
   }, {

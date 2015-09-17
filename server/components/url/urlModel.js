@@ -1,5 +1,5 @@
 module.exports = function(sequelize, dataTypes) {
-  var Comment = sequelize.import(__dirname + '/' + '../comment/commentModel')
+  var Comment = sequelize.import(__dirname + '/' + '../comment/commentModel');
   return sequelize.define('Url', {
     url: {
       type: dataTypes.STRING,
@@ -26,6 +26,11 @@ module.exports = function(sequelize, dataTypes) {
         });
         return result;
       }
+    },
+    getAllUrls: function(){
+      return this.findAll().map(function(url){
+        return url.get('host');
+      });
     }
   });
 };

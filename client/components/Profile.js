@@ -6,7 +6,7 @@ var InfiniteScroll = require('react-infinite-scroll')(React);
 // At the moment, Profile will only be used to display your personal
 // profile, not that of others.
 var Profile = React.createClass({
-  mixins: [Router.State],
+  mixins: [Router.State, Router.Navigation],
 
   getInitialState: function() {
     return {
@@ -42,6 +42,8 @@ var Profile = React.createClass({
 
     // Are we loading the user's favorited comments?
     this.loadFavorites = false;
+
+    this.showNewReplies = false;
   },
 
   // Query fields:
@@ -53,22 +55,40 @@ var Profile = React.createClass({
   //  - url (n/a for this route)
   //  * urlSearch 
   //  * textSearch
+  //  ? numberOfComments: optional value that determines number of 
+  //    comments loaded per call; defaults to 25
   loadComments: function() {
     // Adjust loading API and parameters according to whether we
     // are loading user comments or user favorited comments.
     var url;
     var query;
 
+    
     if (this.loadFavorites) {
-      url = window.location.origin + '/api/comments/faves/getForUser',
-      query = {};
+      url = window.location.origin + '/api/comments/faves/getForUser';
+      query = {
+        getHeartedByUser: true,
+      };
+    } else if (this.showNewHearts){ 
+      url = window.location.origin + '/api/comments/newhearts';
+
+      query = {
+        userId: this.userId,
+      };
+    } else if (this.showNewReplies){
+
+      url = window.location.origin + '/api/comments/newreplies';
+
+      query = {
+        userId: this.userId,
+      };
     } else {
       url = window.location.origin + '/api/comments',
 
       query = {
         filterByUser: true,
         isPrivate: this.privateFeed
-      }
+      };
 
       // To load any user's comments, pass in the userId in a query string
       // e.g. http://localhost:3000/#/profile?userId=1
@@ -103,18 +123,15 @@ var Profile = React.createClass({
       dataType: 'json',
       success: function(data) {
         console.log('Profile: successfully loaded comments');
-
-        // Print user data in the console.
         console.log('USER DATA: ', data);
 
-        // XXX EE: what's the right thing to store here?
-        // For now, if no comments returned, keep it the same as it was.
-        // What if you have comments, but then you run a query -> 0 comments returned?
+        // If we loaded new comments on this iteration, update the value
+        // to store the id of the oldest comment loaded which will be
+        // at the last element of the comments array.
         this.oldestLoadedCommentId = data.comments.length > 0 ?
           data.comments[data.comments.length - 1].id : this.oldestLoadedCommentId;
         console.log('Profile loadComments: oldestLoadedCommentId ' + this.oldestLoadedCommentId);
 
-        // Update the time ...
         this.currentTime = data.currentTime;
 
         // If the number of loaded comments is less than 25 (XXX - should have a 
@@ -122,9 +139,9 @@ var Profile = React.createClass({
         this.hasMoreComments = (data.comments.length < 25) ? false : true;
         console.log('Profile loadComments: comments.length: ' + data.comments.length + ' hasMoreComments? ' + this.hasMoreComments);
 
-        // If reloading for a search query, reset the comments array;
+        // If reloading for a new comment set (e.g. for a search query, 
+        // or for loading favorited comments) reset the comments array;
         // otherwise append older comments now loaded to the end.
-        // Also, only update the numComments total if not querying.
         var updatedComments;
 
         // If loading a comment feed for the first time, intialize the comments; 
@@ -137,9 +154,7 @@ var Profile = React.createClass({
         this.numLoads++;
 
         // Only update the numComments total if not null, i.e. on first load
-        var updatedNumComments = this.state.numComments || data.numComments;
-
-        console.log('Ava', data.userInfo);
+        var updatedNumComments = this.state.numComments || data.userInfo.numComments;
 
         this.setState({
           displayName: data.userInfo.username,
@@ -150,16 +165,26 @@ var Profile = React.createClass({
       }.bind(this),
       error: function(xhr, status, err) {
         console.error(xhr, status, err.message);
-      }
+        
+        // We usually get an error if the user isn't logged in.
+        // Transition to route:
+        this.transitionTo('app');
+      }.bind(this)
     });
+  },
+
+  resetLoadState: function(loadFavorites, showNewReplies, showNewHearts) {
+    this.showNewReplies = showNewReplies || false;
+    this.showNewHearts = showNewHearts || false;
+    this.loadFavorites = loadFavorites;
+    this.oldestLoadedCommentId = 'undefined';
+    this.numLoads = 0;
   },
 
   loadUserComments: function() {
     console.log("Profile: loadUserComments, oldestLoadedCommentId " + this.oldestLoadedCommentId);
 
-    this.loadFavorites = false;
-    this.oldestLoadedCommentId = 'undefined';
-    this.numLoads = 0;
+    this.resetLoadState(false);
 
     // Clear out state for Url and Text search if we are loading all comments
     this.urlSearch = '';
@@ -171,9 +196,7 @@ var Profile = React.createClass({
   loadUserCommentsForUrl: function(url) {
     console.log("Profile: loadUserCommentsForUrl, " + url);
 
-    this.loadFavorites = false;
-    this.oldestLoadedCommentId = 'undefined';
-    this.numLoads = 0;
+    this.resetLoadState(false);
 
     // Only allow search on Url or Text, not both
     this.urlSearch = url;
@@ -185,10 +208,8 @@ var Profile = React.createClass({
   loadUserCommentsForText: function(text) {
     console.log("Profile: loadUserCommentsForText, " + text);
 
-    this.loadFavorites = false;
-    this.oldestLoadedCommentId = 'undefined';
-    this.numLoads = 0;
-
+    this.resetLoadState(false);
+    
     // Only allow search on Url or Text, not both
     this.urlSearch = '';
     this.textSearch = text;
@@ -255,9 +276,31 @@ var Profile = React.createClass({
   loadUserFavorites: function() {
     console.log('Profile: requested loadUserFavorites');
 
-    this.loadFavorites = true;
-    this.oldestLoadedCommentId = 'undefined';
-    this.numLoads = 0;
+    this.resetLoadState(true);
+
+    // Clear out state for Url and Text search for load of favorites
+    this.urlSearch = '';
+    this.textSearch = '';
+
+    this.loadComments();
+  },
+
+  loadNewReplies: function() {
+    console.log('Profile: requested loadNewReplies');
+
+    this.resetLoadState(false, true);
+
+    // Clear out state for Url and Text search for load of favorites
+    this.urlSearch = '';
+    this.textSearch = '';
+
+    this.loadComments();
+  },
+  
+  loadNewHearts: function() {
+    console.log('Profile: requested loadNewHearts');
+
+    this.resetLoadState(false, false, true);
 
     // Clear out state for Url and Text search for load of favorites
     this.urlSearch = '';
@@ -269,8 +312,6 @@ var Profile = React.createClass({
   // Delete the comment at index in the comments array.
   // Optimistically delete the comment from the view.
   deleteComment: function(index) {
-    // var deletedComment = this.state.comments[index];
-    // var updatedComments = this.state.comments.splice(index, 1);
     var deletedComment = this.state.comments.splice(index, 1)[0];
 
     console.log("Profile: requesting delete of comment ", deletedComment);
@@ -288,29 +329,92 @@ var Profile = React.createClass({
       }
     });
   },
+  // Dismiss all user notifications
+  dismissNotifications: function() {
+    $.ajax({
+      url: window.location.origin + '/api/user/notifications/markread',
+      method: 'GET',
+      contentType: "application/json",
+      success: function(data) {
+        console.log('notifications dismissed')
+      },
+      error: function(xhr, status, err) {
+        console.error(xhr, status, err.message);
+      }
+    })
+  },
 
   render: function() {
-
     // Optional header with more options if loading our personal profile
     var optionalHeader;
     var isPersonalProfile = this.userId ? false : true;
 
     if (isPersonalProfile) {
       optionalHeader = (
-        <div className="row">
-          <div className="dropdown">
-            <button className="btn btn-default dropdown-toggle" type="button" id="privacy-select"
-              data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
-              Comment Options <span className="caret"></span>
-            </button>
-            <ul className="dropdown-menu" aria-labelledby="privacy-select">
-              <li><a onClick={this.selectPrivateComments} href="#">Show Private Comments</a></li>
-              <li><a onClick={this.selectPublicComments} href="#">Show Public Comments</a></li>
-            </ul>
-              | <a onClick={this.resetComments} href="#">Clear Search</a>
-              | <a onClick={this.loadUserFavorites}>Load Favorites</a>
-          </div>
-          <hr />
+        <div>
+            <nav className="navbar navbar-default navbar-comments">
+              <div className="">
+                <div className="navbar-header">
+                  <p className="navbar-brand" href="#">Comments</p>
+                </div>
+                <div id="navbar" className="navbar-collapse">
+                
+                  <ul className=" nav navbar-nav">
+                    <li className="dropdown">
+                      <a id="privacy-select" href="#" className="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
+                      Privacy <span className="caret"></span></a>
+                      <ul className="dropdown-menu" aria-labelledby="privacy-select">
+                        <li><a onClick={this.selectPrivateComments} href="#">Show Private Comments</a></li>
+                        <li><a onClick={this.selectPublicComments} href="#">Show Public Comments</a></li>
+                      </ul>
+                    </li>
+                    <li>
+                      <form className="navbar-form " onSubmit={this.handleUrlSearch}>
+                        <div className="input-group">
+                          <input type="text" className="form-control" placeholder="Search for URL" ref="searchUrl" />
+                          <div className="input-group-btn">
+                              <button type="submit" className="btn btn-default btn-success"><i className="fa fa-search"></i></button>
+                          </div>
+                        </div>
+                      </form>
+                    </li>
+                    <li>
+                      <form className="navbar-form" onSubmit={this.handleTextSearch}>
+                      <div className="input-group">
+                          <input type="text" className="form-control" placeholder="Search for Comment Text" ref="searchText" />
+                          <div className="input-group-btn">
+                              <button type="submit" className="btn btn-default btn-success"><i className="fa fa-search"></i></button>
+                          </div>
+                        </div>
+                      </form>
+                    </li>
+                  </ul>
+                  <ul className="nav navbar-nav navbar-right">
+                  
+                    <li className="reset-comment-search"><a className="reset-comment-search" onClick={this.resetComments}><i className="fa fa-times"></i></a></li>
+                  
+                  </ul>
+                </div>
+              </div>
+            </nav>
+
+            <nav className="navbar navbar-default navbar-comments">
+              <div className="">
+                <div className="navbar-header">
+                  <p className="navbar-brand">Reactions</p>
+                </div>
+                <div id="navbar" className="navbar-collapse">
+                  <ul className="nav navbar-nav">
+      
+                    <li><a className="" onClick={this.loadNewReplies}><i className="fa fa-comments-o"></i> New replies received</a></li>
+                    <li><a className="" onClick={this.loadNewHearts}><i className="fa fa-heart"></i> New favorites received</a></li>
+                  </ul>
+                  <ul className="nav navbar-nav navbar-right">
+                    <li className="dismiss-notifications"><a className="dismiss-notifications" onClick={this.dismissNotifications}><i className="fa fa-times"></i> Dismiss all</a></li>
+                  </ul>
+                </div>
+              </div>
+            </nav>
         </div>
       );
     }
@@ -320,38 +424,32 @@ var Profile = React.createClass({
               allowDelete={isPersonalProfile} deleteComment={this.deleteComment.bind(null, i)}  />;
     }.bind(this));
 
+
+
     return (
-      <div className="row">
-        <div className="col-md-4">
-          <p><img src={this.state.userAvatar} width="200px" /></p>
+      <div className="container">
+      <div className="row profile">
+        <div className="hidden-xs col-sm-2 col-md-3">
+          <p><img src={this.state.userAvatar + '&s=512'} className="img-thumbnail profile-image" /></p>
           <h2>{this.state.displayName}</h2>
           <p>Total Comments: {this.state.numComments}</p>
         </div>
 
-        <div className="col-md-8">
+        <div className="col-xs-12 col-sm-10 col-md-9">
           {optionalHeader}
 
-          <form onSubmit={this.handleUrlSearch}>
-            <div className="form-group col-sm-7">
-              <input type="text" className="form-control" placeholder="Search for URL" ref="searchUrl" />
-            </div>
-            <div className="form-group col-sm-5">
-              <button type="submit" className="btn btn-block btn-primary">Search</button>
-            </div>
-          </form>
-          <form onSubmit={this.handleTextSearch}>
-            <div className="form-group col-sm-7">
-              <input type="text" className="form-control" placeholder="Search for Comment Text" ref="searchText" />
-            </div>
-            <div className="form-group col-sm-5">
-              <button type="submit" className="btn btn-block btn-primary">Search</button>
-            </div>
-          </form>
+         
+          <div className="row">
+          <div className="col-xs-12">
+
           <InfiniteScroll pageStart="0" loadMore={this.loadMoreComments} hasMore={this.hasMoreComments} 
               loader={<div className="loader">Loading ...</div>}>
             {comments}
           </InfiniteScroll>
+          </div>
+          </div>
         </div>
+      </div>
       </div>
     );
   }

@@ -55,7 +55,7 @@ module.exports = function(app) {
     var host = encodeURIComponent(req.query.host);
     Url.getPaths(host, function(paths){
       res.send(200, paths);
-    })
+    });
   });
 
   //app.post('/api/urls', jsonParser, auth.isAdmin, function(req, res, next) {
@@ -66,7 +66,7 @@ module.exports = function(app) {
      */
     var urlToSave = {
       path: req.body.url
-    }
+    };
 
     // Encoded URL
     // The ONLY reason this is currently here is for debugging purposes so I can

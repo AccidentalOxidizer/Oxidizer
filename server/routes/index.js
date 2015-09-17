@@ -18,21 +18,21 @@ module.exports = function(express, app, passport) {
 
   app.use(express.static(__dirname + '/../../client/'));
 
-  // setup route for development only
-  // to enable run: NODE_ENV='development' node server/app.js
-  if (process.env.NODE_ENV === 'development') {
-    app.get('/setup', urlEncodedParser, function(req, res, next) {
-      // to populate with dummy data
-      res.sendStatus(200);
-    });
-  }
-
   app.get('/welcome', urlEncodedParser, jsonParser, function(req,res, next){
-    console.log(req);
-    res.status(200).send({
-      loggedin: 'ok'
-    });
-  })
+    //console.log(req);
+    
+    // Determine where the user is logging in from.
+    // referer undefined = Chrome extension.
+
+    if (req.headers['referer'] === undefined) {
+      // This should pass in a script that will automatically close the popup window
+      // created by the Chrome extension.
+      res.status(200).send('<script>window.close();</script>');
+    } else {
+      // Attempting to do a relative JavaScript redirect here.
+      res.status(200).send('<script>window.location = "/#/profile/";</script>'); 
+    }
+  });
 
   // routes
   auth(app, passport);

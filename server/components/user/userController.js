@@ -23,7 +23,7 @@ var post = function(userObject){
 
 // will throw error if no id provided
 var put = function(userid, updatesObject){
-  console.log(updatesObject);
+
   return User.update(updatesObject, {where: {id: userid}})
     .then(function(user){
       return true;
@@ -36,7 +36,7 @@ var put = function(userid, updatesObject){
 var remove = function(userId){
   return User.destroy({where: {id: userId}})
     .then(function(affectedRows){
-      console.log(affectedRows);
+    
       if (affectedRows === 0){
         throw new Error('User not found - delete failed');
       } else if (affectedRows > 1) {
@@ -53,7 +53,7 @@ var remove = function(userId){
 // add one to the new notifications fiels - second argument should be 'replies', 'hearts', or 'flags'
 var incrementNotification = function(userId, stringAttribute){
   var field = stringAttribute + 'ToCheck';
-  console.log(userId);
+
   return User.findOne({where: {id: userId}})
     .then(function(user){
       user.increment(field);
@@ -78,8 +78,9 @@ var decrementNotification = function(userId, stringAttribute){
     });
 };
 
-var markRead = function(userId){
-  return User.findOne({where: {id: userId}})
+var markRead = function(req, res, next){
+
+  return User.findOne({where: {id: req.user.id}})
     .then(function(user){
       user.updateAttributes({
         lastCheckedUpdates: Sequelize.fn('NOW'),
@@ -89,10 +90,14 @@ var markRead = function(userId){
       });
 
       user.save();
-      return {
+
+      res.send(200, {
         repliesToCheck: user.repliesToCheck,
         heartsToCheck: user.heartsToCheck
-      };
+      });
+    })
+    .catch(function(){
+      res.send(404);
     });
 };
 

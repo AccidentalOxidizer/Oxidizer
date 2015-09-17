@@ -25,33 +25,17 @@ module.exports = function(app) {
 
   app.delete('/api/comments/remove/:id', jsonParser, auth.isAuthorized, Comment.remove);
   
-
-  
   // Users marks a specific comment as a new favorite.
-  app.post('/api/comments/fave', jsonParser, function(req, res, next) {
-    Heart.fave({
-        UserId: req.user.id,
-        CommentId: req.body.CommentId
-      })
-      .then(function(result) {
-        console.log('Comment faved!');
-        console.log('Faved result: ', result);
-        // The result returned is the number of favorites for this particular comment.
-        var faveCount = {
-          favs: result.count,
-          faved: result.faved
-        };
-        res.send(faveCount);
+  app.post('/api/comments/fave', jsonParser, Heart.fave);
 
-        return Comment.getUserId(req.body.CommentId)
-          .then(function(userId){
-            return User.updateNotification(userId, 'hearts');
-          });
-      })
-      .catch(function(err) {
-        console.log("Error: Comment not faved...", err);
-      });
-  });
+  // return all replies to a given comment
+  app.get('/api/comments/replies', jsonParser, Comment.getRepliesForComment);
+  
+  // return all comments with new replies 
+  app.get('/api/comments/newreplies', jsonParser, Comment.getNewRepliesForUser);
+  
+  // return all comments that have ben hearted since the last time a user checked
+  app.get('/api/comments/newhearts', jsonParser, Comment.getNewHeartsForUser);
 
   // Count favorites for a specific comment
   app.get('/api/comments/faves/get', jsonParser, function(req, res, next) {
@@ -62,39 +46,7 @@ module.exports = function(app) {
   });
 
   // Get all favorited comments for the logged in user
-  app.get('/api/comments/faves/getForUser', jsonParser, auth.isLoggedIn, function(req, res, next) {
-
-    console.log("Comments faves for user, query: ", req.query);
-
-    HeartModel.getUserFaves(req.user.id, req.query.lastCommentId)
-      .then(function(result) {
-        console.log("getUserFaves, result[0]:");
-        console.log("Comment text: ", result[0].Comment.text);
-        console.log("Comment Url: ", result[0].Comment.Url.url);
-
-        var comments = _.pluck(result, 'Comment');
-
-        res.send({
-          comments: comments,
-          // numComments: result[0].count,
-          currentTime: new Date(), // TODO: Fill this out!
-          userInfo: {
-            userId: req.user.id,
-            username: req.user.name,
-            // repliesToCheck: result[1].repliesToCheck,
-            // heartsToCheck: result[1].heartsToCheck,
-          }
-        });
-      })
-      .catch(function(err) {
-        console.log("Comments get faves for user err: ", err);
-        res.send(500);
-      });
-      
-    var favesToGet = {
-      url: req.body.commentId
-    };
-  });
+  app.get('/api/comments/faves/getForUser', jsonParser, auth.isLoggedIn, Comment.getHeartedCommentsForUser);
 
   // Users marks a specific comment as flagged for bad behavior.
   app.post('/api/comments/flag', jsonParser, function(req, res, next) {
@@ -135,9 +87,4 @@ module.exports = function(app) {
               res.send(200);
             });
   });
-
-
-  // app.put('/api/comments/:id', jsonParser, auth.isAuthorized, function(req, res, next) {
-  //   // Updates a comment!
-  // });
 };

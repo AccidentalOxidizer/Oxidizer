@@ -9,10 +9,14 @@ var Profile = require('./components/Profile');
 var Signup = require('./components/Signup');
 var Login = require('./components/Login');
 var Website = require('./components/Website');
+var Leaderboard = require('./components/Leaderboard');
 var Navigation = require('./components/Navigation');
 var Footer = require('./components/Footer');
 
 var App = React.createClass({
+  componentDidMount: function() {
+    console.log('hi');
+  },
   render: function() {
     return (
       <div className="main-container">
@@ -32,6 +36,7 @@ var routes = (
     <Route name="admin" path="/admin" handler={Admin} />
     <Route name="profile" path="/profile/?:userId?" handler={Profile} />
     <Route name="website" path="/website/:website?" handler={Website} />
+    <Route name="leaderboard" path="/leaderboard" handler={Leaderboard} />
   </Route>
 );
 

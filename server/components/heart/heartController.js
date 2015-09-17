@@ -26,10 +26,15 @@ var get = function(searchObject, userId) {
     });
 };
 
-var fave = function(searchObject) {
+var fave = function(req, res, next) {
   //First: Search
   // if a fave for this particular user and comment combination already exists.
+
   var faved = true;
+  var searchObject ={ 
+    UserId: req.user.id,
+    CommentId: req.body.CommentId
+  };
 
   return Heart.findOne({
       where: searchObject
@@ -51,7 +56,7 @@ var fave = function(searchObject) {
                 model: User,
                 attributes: ['id']
               }]
-            })       
+            });       
           })
           .then(function(comment){
             return userController.incrementNotification(comment.UserId, 'hearts');
@@ -60,7 +65,6 @@ var fave = function(searchObject) {
         faved = false;
         userId = result.get('UserId');
         // User has already faved this item before. Let's remove the fave!
-        console.log('Faved result already found. Removing existing result.');
         return Heart.destroy({
             where: searchObject
           })
@@ -79,13 +83,15 @@ var fave = function(searchObject) {
     .then(function(result) {
       // Return total number of faves found for this comment.
       console.log('GET TOTAL FAVE COUNT!!!!: ', result.count);
-      return {
+      res.send(201, {
         count: result.count, 
         faved: faved
-      };
+      });
+      return;
     })
     .catch(function(err) {
       console.log("Fave error: ", err);
+      res.end();
       return;
     });
 };

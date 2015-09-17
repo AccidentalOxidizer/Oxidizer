@@ -2,7 +2,6 @@
   width:250px;
 }
 
-
 /* JUMBOTRON */
 
 .jumbotron {
@@ -84,4 +83,107 @@
   font-weight: 300;
   line-height: 1;
   letter-spacing: -1px;
+}
+
+.user-menu { 
+  text-align: right;
+}
+
+
+/* Profile 
+------------------------ */
+
+.profile-image {
+  width:100%;
+}
+
+.profile nav {
+  max-height: 50px;
+}
+
+.reset-comment-search {
+  float:right;
+}
+
+.dismiss-notifications {
+  float:right;
+}
+
+/* Comments 
+------------------------ */
+
+.comment {
+  margin-bottom:5px;
+  padding:15px;
+}
+.comment:hover {
+  background-color: rgba(168, 202, 255, .2);
+}
+.comment-header, .comment-footer {
+  color: #808080;
+}
+.heart {
+  float:left;
+  margin-right: 10px;
+}
+.delete {
+  /*float:right;*/
+}
+.navbar-comments {
+/*  position:fixed;
+  top: 60px;*/
+}
+
+/* Website 
+------------------------ */
+.website-search .drill-down {
+  margin-top:2em;
+}
+.website-search .search-results {
+  margin:15px;
+  font-weight: bold;
+}
+
+/* Leaderboard 
+------------------------ */
+.leaderboard div div.comment:nth-child(1){
+  background-color: rgba(168, 202, 255, .9);
+}
+.leaderboard div div.comment:nth-child(2){
+  background-color: rgba(168, 202, 255, .8);
+}
+.leaderboard div div.comment:nth-child(3){
+  background-color: rgba(168, 202, 255, .7);
+}
+.leaderboard div div.comment:nth-child(4){
+  background-color: rgba(168, 202, 255, .6);
+}
+.leaderboard div div.comment:nth-child(5){
+  background-color: rgba(168, 202, 255, .5);
+}
+.leaderboard div div.comment:nth-child(6){
+  background-color: rgba(168, 202, 255, .4);
+}
+.leaderboard div div.comment:nth-child(7){
+  background-color: rgba(168, 202, 255, .3);
+}
+.leaderboard div div.comment:nth-child(8){
+  background-color: rgba(168, 202, 255, .2);
+}
+
+.headline {
+  text-align: center;
+}
+.team {
+  margin-top: 10px;
+  padding-top: 10px;
+  border: 1px solid #EFEFEF;
+}
+.team img{
+  width: 96px;
+  border-radius: 50%;
+}
+
+.team .right {
+  text-align: right;
 }

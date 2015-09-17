@@ -38,13 +38,22 @@
                                     <li><a href="#" id="feed-private"><i class="fa fa-lock"></i> Private Feed</a></li>
                                 </ul>
                             </li>
-                            <li class="dropdown">
+                            <li role="presentation" class="dropdown">
+                                <a class="dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">
+                                    Sort By<span class="caret"></span>
+                                </a>
+                                <ul class="dropdown-menu" id="sort-by-select">
+                                    <li><a href="#" id="sort-date"><i class="fa fa-calendar-check-o"></i> Date</a></li>
+                                    <li><a href="#" id="sort-faves"><i class="fa fa-heart-o"></i> Popular</a></li>
+                                </ul>
+                            </li>
+                            <li class="dropdown link">
                                 <a href="#" id="notifications" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"><i class="fa fa-bell-o"></i>&nbsp;</a>
-                                <ul class="dropdown-menu" style="text-align:right;">
-                                    <li><a target="_blank" href="http://www.oxidizer.io/#/profile" class="replies hidden"><i class="fa fa-commenting-o"></i> You have comment replies</a></li>
-                                    <li><a target="_blank" href="#" class="favs hidden"><i class="fa fa-heart-o"></i> You have comment likes</a></li>
+                                <ul class="dropdown-menu links" style="text-align:right;">
+                                    <li><a target="_blank" href="http://www.oxidizer.io/#/profile" class="replies link hidden"><i class="fa fa-commenting-o"></i> You have comment replies</a></li>
+                                    <li><a href="http://www.oxidizer.io/#/profile" class="favs link hidden"><i class="fa fa-heart-o"></i> You have comment likes</a></li>
                                     <li role="separator" class="divider"></li>
-                                    <li><a href="http://www.oxidizer.io/#/profile" id="dismiss-notifications"><i class="fa fa-check-square-o"></i> Dismiss all</a></li>
+                                    <li><a id="dismiss-notifications"><i class="fa fa-check-square-o"></i> Dismiss all</a></li>
                                 </ul>
                             </li>
                         </ul>
@@ -56,10 +65,10 @@
                     
                     <div id="notification-area" class='hidden'>
                         <h3>Login or Sign-up</h3>
-                        <a target="_blank" href="https://api.oxidizer.io/api/auth/chrome/facebook" id="facebook-login" class="btn btn-social btn-facebook">
+                        <a target="_blank" href="https://www.oxidizer.io/api/auth/chrome/facebook" id="facebook-login" class="btn btn-social btn-facebook">
                             <i class="fa fa-facebook"></i> Login
                         </a>
-                        <a target="_blank" href="https://api.oxidizer.io/api/auth/chrome/google" id="google-login" class="btn btn-social btn-google">
+                        <a target="_blank" href="https://www.oxidizer.io/api/auth/chrome/google" id="google-login" class="btn btn-social btn-google">
                             <i class="fa fa-google"></i> Login
                         </a>
                         <p>then reload :)</p>
@@ -101,14 +110,14 @@
                     <div class="col-xs-10">
                         <div class="media">
                             <div class="media-left">
-                                <a href="#">
+                                <a href={{../host}}/#/profile?userId={{UserId}}>
                                     <img class="media-object avatar" src="{{userAvatar}}" alt="">
                                 </a>
                             </div>
                             <div class="media-body media-middle">
                                 <div class="">
-                                    <h4 class="comment-username media-heading"><a href={{../host}}/#/profile?userId={{UserId}}>{{username}}</a></h4>
-                                    <div class="comment-timestamp">{{dateFormat createdAt format="MMMM YYYY"}} - {{#if repliesToId}} {{Hearts}} like(s){{/if}}
+                                    <h4 class="comment-username media-heading"><a class='link' href={{../host}}/#/profile?userId={{UserId}}>{{username}}</a></h4>
+                                    <div class="comment-timestamp">{{dateFormat createdAt format="MMMM YYYY"}}{{#if repliesToId}} {{#if HeartCount}} - {{HeartCount}} like(s){{/if}}{{/if}}
                                     </div>
                                     {{#if repliesToId}}
                                     <div class="reply-text">{{{text}}}</div>
@@ -152,9 +161,9 @@
                 <div id="comment-engage" class="row " style="">
                     <div class="col-xs-12 comment-engage">
                         <div id="reply" data-comment-id="{{id}}" class="reply" style="float:left;"><i class="fa fa-reply"></i>&nbsp;</div>
-                        <div id="replies" data-comment-id="{{id}}" class="replies" style="float:left;"><i class="fa fa-commenting-o"></i>&nbsp;{{replies}}</div>
+                        <div id="replies" data-comment-id="{{id}}" class="replies" style="float:left;"><i class="fa fa-commenting-o"></i>&nbsp;<span class="ReplyCount">{{ReplyCount}}</span></div>
                         <div id="heart" data-comment-id="{{id}}" class="heart" style="float:left;">
-                            <i class="fa {{#if heartedByUser}} fa-heart{{else}} fa-heart-o{{/if}}"></i>&nbsp;{{Hearts}}</div>
+                            <i class="fa {{#if HeartedByUser}} fa-heart{{else}} fa-heart-o{{/if}}"></i>&nbsp;<span class="HeartCount">{{HeartCount}}</span></div>
                         {{#ifSelf ../userInfo.userId UserId}}
                         <div id="delete" data-comment-id="{{id}}" class="delete" style="float:right; text-align:right;">
                             <i class="fa fa-trash-o"></i>&nbsp; </div>

@@ -50,7 +50,7 @@ var Website = React.createClass({
           return {
             url: url.url,
             commentCount: url.Comments[0].count
-          }
+          };
         });
 
         // this.setState({paths: data});
@@ -71,7 +71,7 @@ var Website = React.createClass({
     query.textSearch = searchObject.textSearch || this.textSearch;
     
     if (this.lastCommentId > -1) {
-      query.lastCommentId = this.lastCommentId
+      query.lastCommentId = this.lastCommentId;
     }
 
     console.log('websiteProfile loading comments:', query);
@@ -170,50 +170,63 @@ var Website = React.createClass({
 
     return (
       <div>
+      <div className="container website-search">
         <div className="row">  
-          <form onSubmit={this.hostSearch}>
-            <input type="text" className="col-md-8 form-control" placeholder="Search for host" ref="searchHost" />
-            <button type="submit" className="col-md-4 btn btn-block btn-primary">Search</button>
+          <form className="col-xs-12 col-sm-3 col-md-4" onSubmit={this.hostSearch}>
+            <div className="input-group">
+              <input type="text" className="form-control" placeholder="Search for Website" ref="searchHost" />
+              <div className="input-group-btn">
+                  <button type="submit" className="btn btn-default btn-success">Search</button>
+              </div>
+            </div>
           </form>
         </div>
-
-        <div className="col-md-4">
-          <h2>{this.host}</h2>
-          <p>Total Comments: {this.count}</p>
-          <div>{paths}</div>
-        </div>  
+        
 
         {(() => {
           if (this.host){
             return (
-              <div className="col-md-8">
-                <div className="row">Searching by: {this.path} {this.textSearch}</div>   
-                <div className="col-md-8">
-                  <form onSubmit={this.urlTextSearch}>
+              <div className="row"> 
+                <div className="col-xs-12 col-sm-3 col-md-4">
+                <form className="drill-down col-xs-12" onSubmit={this.urlTextSearch}>
+                <h3>Finetune your search:</h3>
                     <div className="row">
-                      <div className="form-group col-sm-7">
+                      <div className="form-group">
                         <input type="text" className="form-control" placeholder="Search by path" ref="searchPath" />
                       </div>
                     </div>
                     <div className="row">
-                      <div className="form-group col-sm-7">
+                      <div className="form-group">
                         <input type="text" className="form-control" placeholder="Search for Comment Text" ref="textSearch" />
                       </div>
                     </div>
                     <div className="row">
-                      <button type="submit" className="btn btn-block btn-primary">Search</button>
+                      <div className="form-group">
+                      <button type="submit" className="btn btn-block">Drill down!</button>
+                      </div>
                     </div>
                   </form>
+                 
+                </div>  
+              <div className="col-xs-12 col-sm-9 col-md-8">
+                <div className="search-results">
+                Searching {this.host} 
+               
+               by: {this.path} 
+               {this.textSearch} </div>   
+                <div className="">
+                  
                   <InfiniteScroll pageStart="0" loadMore={this.loadComments} hasMore={this.hasMoreComments && !this.pendingAjax}
                       loader={<div className="loader">Loading ...</div>}>
                     {comments}
                   </InfiniteScroll>
                 </div>
+              </div>
               </div>)
             }
           })()}  
       </div>
-
+      </div>
     );
   }
 });
