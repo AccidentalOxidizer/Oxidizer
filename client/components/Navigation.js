@@ -49,12 +49,6 @@ var Navigation = React.createClass({
                     <li><Link to="website" params={{website: ""}}>Search for Websites</Link></li>
                     <li><Link to="leaderboard">Leaderboard</Link></li>
                     <li className="dropdown">
-                      <a href="#" className="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Testing <span className="caret"></span></a>
-                      <ul className="dropdown-menu">
-                        <li><a href="test/test_favs.html">Test Page</a></li>
-                      </ul>
-                    </li>
-                    <li className="dropdown">
                       <a href="#" className="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
                       <i className="fa fa-user"></i></a>
                       <ul className="dropdown-menu user-menu">
