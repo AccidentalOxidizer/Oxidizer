@@ -3,7 +3,6 @@ var Comment = require('./Comment');
 var Path = require('./Path');
 var InfiniteScroll = require('react-infinite-scroll')(React);
 
-
 // At the moment, Website will only be used to display your personal
 // Website, not that of others.
 // 
@@ -46,14 +45,14 @@ var Website = React.createClass({
   },
 
   getAllHosts: function() {
-
+    var context = this;
     $.ajax({
       url: window.location.origin + '/api/gethosts',
       method: 'GET',
       dataType: 'json',
       success: function(data){
-        console.log('recieved hosts', data);
         this.hosts = data;
+        this.addTypeahead(context);
       }.bind(this),
 
       error: function(xhr, status, err) {
@@ -175,6 +174,49 @@ var Website = React.createClass({
     this.loadComments(query);  
   },
 
+  addTypeahead: function(context){
+
+    var hosts = context.hosts;
+    var inputField = context.refs.searchHost;
+    var substringMatcher = function(strs, context){
+
+      return function findMatches(q, cb) {
+        var input = inputField.getDOMNode().value
+
+        var matches, substringRegex;
+
+        // an array that will be populated with substring matches
+        matches = [];
+
+        // regex used to determine if a string contains the substring `q`
+        var filterRegex = /(http:\/\/)?(https:\/\/)?(www.)?(.+)/;
+
+        var check = new RegExp(filterRegex.exec(input)[4]);
+        console.log('********************',check);
+        // iterate through the pool of strings and for any string that
+        // contains the substring and add it to the `matches` array
+        $.each(strs, function(i, str) {
+          console.log(check, str);
+          if (check.test(str)) {
+            matches.push(str);
+          }
+        });
+
+        cb(matches);
+      };
+    }.bind(this);
+
+    $('.host-typeahead').typeahead({
+      hint: true,
+      highlight: true,
+      minLength: 1
+    },
+    {
+      name: 'hosts',
+      source: substringMatcher(hosts)
+    });
+  }.bind(this),
+
   render: function() {
     var comments = this.state.comments.map(function(comment) {
       return <Comment key={comment.id} comment={comment} />;
@@ -192,7 +234,7 @@ var Website = React.createClass({
         <div className="row">  
           <form className="col-xs-12 col-sm-3 col-md-4" onSubmit={this.hostSearch}>
             <div className="input-group">
-              <input type="text" className="form-control" placeholder="Search for Website" ref="searchHost" />
+              <input type="text" className="form-control host-typeahead" placeholder="Search for Website" ref="searchHost" />
               <div className="input-group-btn">
                   <button type="submit" className="btn btn-default btn-success">Search</button>
               </div>
