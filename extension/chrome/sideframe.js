@@ -418,6 +418,7 @@ function loadMoreComments(destination, url, repliesToId) {
 
   if (repliesToId && tracking[repliesToId]){
     if (tracking[repliesToId].endOfComments || !tracking.requestReturned) {
+      console.log('loadMoreComments: skipping loading.');
       return;
     }
   }
@@ -582,11 +583,21 @@ function registerCommentEventListeners(comment) {
   for (var i = 0; i < showReplies.length; i++) {
     
     $(showReplies[i]).off('click').on('click', function() {
-      var target = $(this).parents('.comment');
+      var comment = $(this).parents('.comment');
       var repliesToId = $($(this)[0]).attr('data-comment-id');
+      var replies = comment.find('.comment-reply');
 
-      var thisComment = $(this).parents('.comment');
-      var replies = thisComment.find('.comment-reply');
+      // Currently just always showing the load more link
+      // if the showReplies button is clicked.
+      // TODO: 
+      // - only show 'load more' if there are > 0 replies
+      // - only show 'load more' if there are more replies to load
+      var loadMore = comment.find('.comment-reply-more');
+      loadMore.toggleClass('hidden');
+      console.log('showReplies: loadMore elt is ', loadMore);
+
+      var target = comment.find('.reply-container');
+      console.log('showReplies: target elt is ', target);
 
       // toggle whether
       if (replies.length > 0) {
@@ -599,6 +610,24 @@ function registerCommentEventListeners(comment) {
       } else {
         loadMoreComments(target, url, repliesToId);
       }
+    });
+  }
+
+  // Listen on clicks to request loading additional replies.
+  var repliesMore = document.getElementsByClassName('replies-more');
+  console.log('Setting event listeners, repliesMore: ', repliesMore);
+
+  for (var i = 0; i < repliesMore.length; i++) {
+    $(repliesMore[i]).off('click').on('click', function() {
+      var comment = $(this).parents('.comment');
+      var repliesToId = comment.attr('id');
+      console.log('repliesMore: parent comment ', comment);
+      console.log('id: ', repliesToId);
+
+      var target = comment.find('.reply-container');
+      console.log('repliesMore: target elt is ', target);
+
+      loadMoreComments(target, url, repliesToId);
     });
   }
 
