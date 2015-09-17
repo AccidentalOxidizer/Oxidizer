@@ -491,14 +491,27 @@ function loadMoreComments(destination, url, repliesToId) {
         tracking.commentOffset += msg.comments.length;
       }
     } else {
+      console.log('loadMoreComments: success loading ' + msg.comments.length + ' replies.');
       if (msg.comments.length > 0) {
         tracking[repliesToId].id = msg.comments[msg.comments.length - 1].id;
       }
       // Same logic regarding comment loads, but for the reply tracking.
+      // Also, if we haven't loaded all the replies yet, show
+      // the link to load additional replies.
+      // Assumes that the reply container is currently visible.
+      //  - true for case coming from 'show reply' click, b/c
+      //    loadMoreComments only called if reply container !hidden
+      //  - true for case coming from 'show more replies' if the
+      //    above holds true, b/c this link only avail if container !hidden
+      var comment = destination.parents('.comment');
+      var loadMore = comment.find('.comment-reply-more');
+
       if (msg.comments.length < 25) {
         tracking[repliesToId].endOfComments = true;
+        loadMore.addClass('hidden');
       } else {
         tracking[repliesToId].endOfComments = false;
+        loadMore.removeClass('hidden');
       }
     }
 
@@ -586,28 +599,12 @@ function registerCommentEventListeners(comment) {
       var comment = $(this).parents('.comment');
       var repliesToId = $($(this)[0]).attr('data-comment-id');
       var replies = comment.find('.comment-reply');
-
-      // Currently just always showing the load more link
-      // if the showReplies button is clicked.
-      // TODO: 
-      // - only show 'load more' if there are > 0 replies
-      // - only show 'load more' if there are more replies to load
-      var loadMore = comment.find('.comment-reply-more');
-      loadMore.toggleClass('hidden');
-      console.log('showReplies: loadMore elt is ', loadMore);
-
       var target = comment.find('.reply-container');
-      console.log('showReplies: target elt is ', target);
+      target.toggleClass('hidden');
 
-      // toggle whether
-      if (replies.length > 0) {
-        if (!$(replies[0]).hasClass('hidden')) {
-          $(replies).addClass('hidden');
-        } else {
-          $(replies).removeClass('hidden');
-          loadMoreComments(target, url, repliesToId);
-        }
-      } else {
+      // if the target class is moved to be not hidden
+      // on this toggle, try loading more comments
+      if (!target.hasClass('hidden')) {
         loadMoreComments(target, url, repliesToId);
       }
     });
@@ -615,7 +612,7 @@ function registerCommentEventListeners(comment) {
 
   // Listen on clicks to request loading additional replies.
   var repliesMore = document.getElementsByClassName('replies-more');
-  console.log('Setting event listeners, repliesMore: ', repliesMore);
+  // console.log('Setting event listeners, repliesMore: ', repliesMore);
 
   for (var i = 0; i < repliesMore.length; i++) {
     $(repliesMore[i]).off('click').on('click', function() {
