@@ -1,5 +1,7 @@
 $(document).ready(function() {
 
+  var commentSort = 'recent'; // This represents two values. 'recent' or 'flags'
+
   // Listen for User tools selection.
   $('#show-comments').on('click', function() {
     $('#users').html('');
@@ -29,10 +31,15 @@ $(document).ready(function() {
     // Default website to show comments from on page load.
     // If this is for a POST request, we need to JSON.stringify() data.
     // If it's for a GET request, we don't need to stringify data.
-    
+
     // Setting this to nothing (e.g., data = {}) returns ALL comments.
     var data = {};
     
+    // Check if we're sorting by flags.
+    if (commentSort === 'flags') {
+      data.orderByFlags = 'DESC';
+    }
+
     if (url) {
       data.url = url;
     }
@@ -110,19 +117,25 @@ $(document).ready(function() {
   // SORT COMMENTS BY NUMBER OF FLAGS
   $(document).on('click', '#sort-flags', function(event) {
     // Update Mode:
+    commentSort = 'flags';
     adminSettings.currentMode = "flags";
     console.log('Current Sort Mode:', adminSettings.currentMode);
+
+    // Reset Comments HTML and get comments again.
+    $('#comments').html('');
+    getComments();
   });
 
 
   // SORT COMMENTS BY WHEN THEY WERE RECENTLY POSTED
   $(document).on('click', '#sort-recent', function(event) {
     // Update Mode:
+    commentSort = 'recent';
     adminSettings.currentMode = "recent";
     console.log('Current Sort Mode:', adminSettings.currentMode);
 
     // Reset Comments HTML and get comments again.
-    $('#comments').html();
+    $('#comments').html('');
     getComments();
   });
 
