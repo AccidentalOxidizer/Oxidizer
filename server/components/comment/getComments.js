@@ -24,7 +24,7 @@
 // 
 module.exports = function(sequelize, options) {
   options = options || {};
-
+  console.log(options);
   // Adds base
   var queryString = 'SELECT DISTINCT Comments.id, Comments.UserId, Comments.text, Comments.UrlId, Comments.repliesToId, Comments.isPrivate, Comments.createdAt, Urls.url, Urls.host, Users.name AS username, Users.avatar AS userAvatar,' +
     '(SELECT COUNT(1) AS other FROM Hearts AS h ' +
@@ -126,8 +126,6 @@ module.exports = function(sequelize, options) {
   }
   
   queryString += ';';
-
-  // console.log('getComments: ', queryString);
 
   return sequelize.query(queryString);
 };

@@ -175,28 +175,47 @@ var Website = React.createClass({
   },
 
   addTypeahead: function(context){
+    var getHost = function(url){
+      var parser = document.createElement('a');
+      parser.href = url;
+
+      return parser.hostname;
+    };
+
+    var getPath = function(url){
+      var parser = document.createElement('a');
+      parser.href = url;
+
+      return parser.path;
+    };
 
     var hosts = context.hosts;
     var inputField = context.refs.searchHost;
     var substringMatcher = function(strs, context){
 
       return function findMatches(q, cb) {
-        var input = inputField.getDOMNode().value
+        var input = inputField.getDOMNode().value;
+
 
         var matches, substringRegex;
 
         // an array that will be populated with substring matches
         matches = [];
-
         // regex used to determine if a string contains the substring `q`
-        var filterRegex = /(http:\/\/)?(https:\/\/)?(www.)?(.+)/;
 
-        var check = new RegExp(filterRegex.exec(input)[4]);
-        console.log('********************',check);
+        var filterRegex = /(https?:\/\/)?(www.)?([0-9A-Za-z\-_\.]*)(\/*)?/;
+        
+        var filtered = filterRegex.exec(input);
+        
+        input = filtered[3];
+        
+        var check = new RegExp('.*' + input.replace('.', '\\.') + '.*');
+        console.log(input);
+        / input /
+
         // iterate through the pool of strings and for any string that
         // contains the substring and add it to the `matches` array
         $.each(strs, function(i, str) {
-          console.log(check, str);
           if (check.test(str)) {
             matches.push(str);
           }
