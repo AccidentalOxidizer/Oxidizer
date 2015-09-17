@@ -1,5 +1,8 @@
 $(document).ready(function() {
 
+  var commentSort = 'recent'; // This represents two values. 'recent' or 'flags'
+  var lastCommentId = null;
+
   // Listen for User tools selection.
   $('#show-comments').on('click', function() {
     $('#users').html('');
@@ -14,8 +17,8 @@ $(document).ready(function() {
   // Basically, our AJAX call will get data back, loop over the array of comments
   // then send each individiaul comment here to build out the comment.
   var buildComments = function(comment) {
-    var commentHTML = '<div class="comment" data-commentid="' + comment.id + '"><p>Comment ID:' + comment.id + '<br/>' + comment.username + ' | ' +
-      comment.createdAt + '<br/><a href="http://' + comment.url + '" target="_blank">http://' + comment.url + '</a><br/>' + comment.text + '<br/>' +
+    var commentHTML = '<div class="comment" data-commentid="' + comment.id + '"><p>Comment ID:' + comment.id + '<br/>Username: ' + comment.username + ' | ' +
+      comment.createdAt + '<br/>Site: <a href="http://' + comment.url + '" target="_blank">http://' + comment.url + '</a><br/>' + comment.text + '<br/>' +
       '<a href="#" class="delete" data-comment-id="' + comment.id + '">DELETE</a> || <a href="#" class="unflag" data-comment-id="' + comment.id + '">REMOVE FLAGS</a> <br/>' +
       'TOTAL FAVS: <span id="faves-' + comment.id + '">' + comment.HeartCount + '</span> || TOTAL FLAGS: <span id="flags-' + comment.id + '">' + comment.FlagCount + '</span></p></div>';
     return commentHTML;
@@ -29,10 +32,24 @@ $(document).ready(function() {
     // Default website to show comments from on page load.
     // If this is for a POST request, we need to JSON.stringify() data.
     // If it's for a GET request, we don't need to stringify data.
-    
+
     // Setting this to nothing (e.g., data = {}) returns ALL comments.
     var data = {};
     
+    if (lastCommentId !== null) {
+      data.lastCommentId = lastCommentId;
+    }
+    
+    // Check if we're sorting by flags.
+    if (commentSort === 'flags') {
+      data.orderByFlags = 'DESC';
+    }
+
+    // Check if we're sorting by flags.
+    if (commentSort === 'recent') {
+      //data.orderByFlags = 'DESC';
+    }    
+
     if (url) {
       data.url = url;
     }
@@ -40,15 +57,19 @@ $(document).ready(function() {
     // AJAX call to server to get comments from a particular URL.
     $.ajax({
       type: "GET",
-      url: 'http://localhost:3000/api/comments',
+      url: window.location.origin + '/api/comments',
       data: data,
       contentType: 'application/json', // content type sent to server
       dataType: 'json', //Expected data format from server
       success: function(data) {
         $('#comments').html('');
 
-        //console.log('DATA: ', data);
+        var commentData = data['comments'];
+        console.log('DATA: ', data);
+        console.log('LAST COMMENT ID: ', data['comments'][commentData.length-1].id);
         //console.log('DONE!');
+        
+        lastCommentId = data['comments'][commentData.length-1].id
 
         // Set the logged in user's ID so we can pass into fav / flag functions.
         adminSettings.userId = data.userInfo.userId;
@@ -110,20 +131,34 @@ $(document).ready(function() {
   // SORT COMMENTS BY NUMBER OF FLAGS
   $(document).on('click', '#sort-flags', function(event) {
     // Update Mode:
+    commentSort = 'flags';
+    lastCommentId = null;
     adminSettings.currentMode = "flags";
     console.log('Current Sort Mode:', adminSettings.currentMode);
+
+    // Reset Comments HTML and get comments again.
+    $('#comments').html('');
+    getComments();
   });
 
 
   // SORT COMMENTS BY WHEN THEY WERE RECENTLY POSTED
   $(document).on('click', '#sort-recent', function(event) {
     // Update Mode:
+    commentSort = 'recent';
+    lastCommentId = null;
     adminSettings.currentMode = "recent";
     console.log('Current Sort Mode:', adminSettings.currentMode);
 
     // Reset Comments HTML and get comments again.
-    $('#comments').html();
+    $('#comments').html('');
     getComments();
+  });
+
+  $(document).on('click', '#load-more', function(event) {
+    // Reset Comments HTML and get comments again.
+    $('#comments').html('');
+    getComments();    
   });
 
   // DELETE COMMENT FROM DATABASE!!!!
