@@ -33,7 +33,8 @@ module.exports = function(app) {
   });
 
   // TODO: add isAuthorized
-  app.put('/api/users/:userid', jsonParser, function(req, res, next) {
+  // Adding isAdmin right now since the only person who can modify users are administrators.
+  app.put('/api/users/:userid', jsonParser, auth.isAdmin, function(req, res, next) {
     // Updates user!
     var userId = req.params.userid;
     var updates = req.body;
@@ -49,12 +50,15 @@ module.exports = function(app) {
 
   app.delete('/api/users/:id', jsonParser, auth.isAuthorized, function(req, res, next) {
       var userId = req.params.userid;
-
   });
 
   app.get('/api/user/loggedin', jsonParser, auth.isLoggedIn, function(req, res, next) {
     res.status(200).send({user:true});
-  })
+  });
+
+  app.get('/api/user/isadmin', jsonParser, auth.isAdmin, function(req, res, next) {
+    res.status(200).send({admin:true});
+  });
 
   app.get('/api/user/notifications/markread', jsonParser, auth.isLoggedIn, User.markRead);
 

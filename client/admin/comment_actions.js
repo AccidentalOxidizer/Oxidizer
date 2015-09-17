@@ -1,13 +1,14 @@
 $(document).ready(function() {
 
-  // Initial vars
-  // Setting this to emtpy so we can do some interesting stuff later.
-  var adminSettings = {
-    currentMode: 'recent', // This can either be 'recent' or 'flagged'
-    url: '',
-    urlId: '',
-    userId: ''
-  };
+  // Listen for User tools selection.
+  $('#show-comments').on('click', function() {
+    $('#users').html('');
+    $('#search-url').show();
+    $('#search-comments').show();
+    $('#search-users').hide();
+    $('#sort-type').text('Showing Comments:');
+    getComments();
+  });
 
   // Use this to build out HTML for individual comments.
   // Basically, our AJAX call will get data back, loop over the array of comments
@@ -24,7 +25,6 @@ $(document).ready(function() {
   // That way we can update the server if I input a new URL to look at in the
   // input box at the top of the screen.
   var getComments = function(url) {
-    console.log('URL?', url);
     adminSettings.url = url || null;
     // Default website to show comments from on page load.
     // If this is for a POST request, we need to JSON.stringify() data.
@@ -55,8 +55,17 @@ $(document).ready(function() {
 
         var commentArrayHTML = '';
         // Render comment HTML
-        console.log('DATA??????', data.comments);
         data.comments.forEach(function(element, index) {
+
+          // Check if Total Flags or Total Hearts is Null set to 0.
+          if (data['comments'][index].FlagCount === null) {
+            data['comments'][index].FlagCount = 0;
+          }
+
+          if (data['comments'][index].HeartCount === null) {
+            data['comments'][index].HeartCount = 0;
+          }
+
           commentArrayHTML = commentArrayHTML.concat(buildComments(data['comments'][index]));
         });
 
