@@ -364,7 +364,17 @@ function postComment(text, repliesToId) {
     if (!repliesToId) {
       $(".cd-panel-content").prepend(html);
     } else {
-      $('#' + repliesToId).append(html);
+      var comment = $('#' + repliesToId);
+      var replies = comment.find('.reply-container');
+      var firstReply = replies.find('.comment-reply:first-child');
+
+      if (firstReply.length > 0) {
+        // prepend to existing replies
+        firstReply.before(html);
+      } else {
+        replies.append(html);
+      }
+
       var ReplyCount = Number($('#' + repliesToId +' .ReplyCount').html())+1;
       $('#' + repliesToId +' .ReplyCount').html(ReplyCount);
     }
