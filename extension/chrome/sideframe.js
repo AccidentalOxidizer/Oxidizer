@@ -364,16 +364,36 @@ function postComment(text, repliesToId) {
     if (!repliesToId) {
       $(".cd-panel-content").prepend(html);
     } else {
+      // If replies are hidden && reply-container has no 
+      // children, we can trigger a click to load any existing
+      // comments + the new one we just made.
+      //
+      // Else if replies are hidden && reply-container *does* 
+      // have children, we can still trigger a click, to make
+      // the reply elements shown; but we also need to prepend
+      // the comment we just made.
+      //
+      // Else, i.e., replies not hidden, just prepend the 
+      // comment we just made.
       var comment = $('#' + repliesToId);
       var replies = comment.find('.reply-container');
       var firstReply = replies.find('.comment-reply:first-child');
 
-      if (firstReply.length > 0) {
-        // prepend to existing replies
-        firstReply.before(html);
-      } else {
-        replies.append(html);
+      if (!replies.hasClass('hidden') || replies.children().length > 0) {
+        console.log('Post Comment: manually display our new reply');
+        if (firstReply.length > 0) {
+          // prepend to existing replies
+          firstReply.before(html);
+        } else {
+          replies.append(html);
+        }
       }
+
+      if (replies.hasClass('hidden')) {
+        var showReplies = comment.find('.replies');
+        console.log('Post Comment: showReplies ', showReplies);
+        showReplies.trigger('click');
+      } 
 
       var ReplyCount = Number($('#' + repliesToId +' .ReplyCount').html())+1;
       $('#' + repliesToId +' .ReplyCount').html(ReplyCount);
@@ -629,6 +649,7 @@ function registerCommentEventListeners(comment) {
   for (var i = 0; i < showReplies.length; i++) {
     
     $(showReplies[i]).off('click').on('click', function() {
+      console.log('Show Replies clicked.');
       var comment = $(this).parents('.comment');
       var repliesToId = $($(this)[0]).attr('data-comment-id');
       var replies = comment.find('.comment-reply');
