@@ -1,13 +1,8 @@
 var settings = {};
 var url = '';
 
-// Boolean: true if commenting privately; false if public.
-// Initialized to 'keepprivate' value set in options; updated according to
-// privacy select option.
-var commentPrivately;
-
-// Boolean: true to see private comment feed; false to see public.
-// Also initialized to 'keepprivate' options value.
+// Boolean: true to see private comment feed and to make private
+// comments; false to see public. Initialized to 'keepprivate' options value.
 var privateFeed;
 
 // Boolean: true if sorting comments from most favorited to least;
@@ -64,10 +59,9 @@ document.addEventListener("DOMContentLoaded", function(e) {
         function(response) {
           // Set default value for comment privacy, public vs private feed,
           // and dropdown selections.
-          commentPrivately = settings.keepprivate;
           privateFeed = settings.keepprivate;
 
-          var privacyText = commentPrivately ? '<i class="fa fa-lock"></i> Private' : '<i class="fa fa-globe"></i> Public';
+          var privacyText = privateFeed ? '<i class="fa fa-lock"></i> Private' : '<i class="fa fa-globe"></i> Public';
           $('#comment-privacy-select').parents('.dropup').find('.btn-privacy').html(privacyText + ' <span class="caret"></span>');
           $('#feed-privacy-select').parents('.dropdown').find('.dropdown-toggle').html(privacyText + ' Feed <span class="caret"></span>');
           $("#comment-submit-button").prop("disabled",true); // Disable the submit button since there is zero content.
@@ -98,18 +92,43 @@ document.addEventListener("DOMContentLoaded", function(e) {
     }
   });
 
-  // Detect if user chooses a different view for feed and update comment box properly.
+
+  /**
+   * The next four listeners coordinate the selections of public vs.
+   * comment posting and display.
+   */
+  var setPublicComments = function() {
+    privateFeed = false;
+    $(document.body).find('.dropdown-privacy').html('<i class="fa fa-globe"></i> Public Feed <span class="caret"></span>');
+    $(document.body).find('.btn-privacy').html('<i class="fa fa-globe"></i> Public <span class="caret"></span>');
+
+    // reload the feed with the updated setting.
+    loadContent(url);
+  };
+
+  var setPrivateComments = function() {
+    privateFeed = true;
+    $(document.body).find('.dropdown-privacy').html('<i class="fa fa-lock"></i> Private Feed <span class="caret"></span>');
+    $(document.body).find('.btn-privacy').html('<i class="fa fa-lock"></i> Private <span class="caret"></span>');
+
+    // reload the feed with the updated setting.
+    loadContent(url);
+  };
+
   document.getElementById('feed-public').addEventListener('click', function() {
-    // console.log('PUBLIC FEED CLICKED!');
-    commentPrivately = false;
-    $(document.body).find('.btn-privacy').html('<a href="#"><i class="fa fa-globe"></i> Public</a>');
+    setPublicComments();
   });
 
-  // Detect if user chooses a different view for feed and update comment box properly.
   document.getElementById('feed-private').addEventListener('click', function() {
-    // console.log('PRIVATE FEED CLICKED!');
-    commentPrivately = true;
-    $(document.body).find('.btn-privacy').html('<a href="#"><i class="fa fa-lock"></i> Private</a>');
+    setPrivateComments();
+  });
+
+  document.getElementById('comment-public').addEventListener('click', function() {
+    setPublicComments();
+  });
+
+  document.getElementById('comment-private').addEventListener('click', function() {
+    setPrivateComments();
   });
 
 
@@ -163,22 +182,6 @@ document.addEventListener("DOMContentLoaded", function(e) {
   // Reigster all elements with class 'link' to ahve click event and open new tab with target href
   registerLinks();
 
-  // Update the feed privacy setting if the user changes it in the dropdown menu.
-  $('#feed-privacy-select li a').click(function() {
-    var selectedText = $(this).html();
-
-    if (selectedText.endsWith('Private Feed')) {
-      privateFeed = true;
-    } else {
-      privateFeed = false;
-    }
-    console.log('feed privacy set to ' + selectedText + ' privateFeed ' + privateFeed);
-    $(this).parents(".dropdown").find('.dropdown-toggle').html(selectedText + ' <span class="caret"></span>');
-
-    // reload the feed with the updated setting.
-    loadContent(url);
-  });
-
   // Post new comment
   document.getElementById('comment-input-field').addEventListener('keydown', function(e) {
     // Check if length is 0 and disable post button.
@@ -195,18 +198,6 @@ document.addEventListener("DOMContentLoaded", function(e) {
       document.getElementById('comment-input-field').value = '';
       $("#comment-submit-button").prop("disabled",true); // Disable the submit button since there is zero content.
     }
-  });
-
-  // Update the privacy setting if the user changes it in the dropup menu.
-  $('#comment-privacy-select li a').click(function() {
-    var selectedText = $(this).html();
-    if (selectedText.endsWith('Private')) {
-      commentPrivately = true;
-    } else {
-      commentPrivately = false;
-    }
-    console.log('comment privacy set to ' + selectedText + ' commentPrivately ' + commentPrivately);
-    $(this).parents(".dropup").find('.btn-privacy').html(selectedText + ' <span class="caret"></span>');
   });
 
   document.getElementById('comment-submit-button').addEventListener('click', function() {
@@ -346,7 +337,7 @@ function postComment(text, repliesToId) {
     url: url,
     text: text,
     repliesToId: repliesToId || undefined,
-    isPrivate: commentPrivately
+    isPrivate: privateFeed
   });
 
   var request = $.ajax({
