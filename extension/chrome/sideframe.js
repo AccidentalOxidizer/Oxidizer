@@ -447,7 +447,7 @@ function compileComments(msg) {
         // we need to create a regEx object and tell it to look
         // for all instances that match within the string using the "/g" modifier.
         var replaceURL = new RegExp(imageLink, 'g');
-        element.text = element.text.replace(replaceURL, '<p align="center"><img src="' + imageLink + '" style="max-width: 450px;"/></p>');
+        element.text = element.text.replace(replaceURL, '<p class="image-display"><img src="' + imageLink + '" style="max-width: 450px;"/></p>');
       });
     }
 
