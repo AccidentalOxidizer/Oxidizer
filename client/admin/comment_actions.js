@@ -9,6 +9,8 @@ $(document).ready(function() {
     $('#search-url').show();
     $('#search-comments').show();
     $('#search-users').hide();
+    $('#load-more-users').hide();
+    $('#load-more-comments').show();
     $('#sort-type').text('Showing Comments:');
     getComments();
   });
@@ -69,7 +71,7 @@ $(document).ready(function() {
         console.log('LAST COMMENT ID: ', data['comments'][commentData.length-1].id);
         //console.log('DONE!');
         
-        lastCommentId = data['comments'][commentData.length-1].id
+        lastCommentId = data['comments'][commentData.length-1].id;
 
         // Set the logged in user's ID so we can pass into fav / flag functions.
         adminSettings.userId = data.userInfo.userId;
@@ -155,10 +157,13 @@ $(document).ready(function() {
     getComments();
   });
 
-  $(document).on('click', '#load-more', function(event) {
+  $(document).on('click', '#load-more-comments', function(event) {
     // Reset Comments HTML and get comments again.
-    $('#comments').html('');
-    getComments();    
+    if (adminSettings.currentMode !== 'users') {
+      $('#comments').html('');
+      $('#users').html('');
+      getComments();    
+    }
   });
 
   // DELETE COMMENT FROM DATABASE!!!!
