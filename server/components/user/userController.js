@@ -1,7 +1,13 @@
 var User = require('../').User;
 var Sequelize = require('sequelize');
 
-var getAll = function(searchObject){
+var getAll = function(getSearchParams){
+  var searchObject = {};
+    
+  if (getSearchParams.orderByRegistered) {
+    searchObject.order = [['id', 'DESC']]; // Yes, we need to double brackets right here! :)
+  }
+
   return User.findAll(searchObject);
 };
 
