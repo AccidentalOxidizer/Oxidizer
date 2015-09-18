@@ -14,9 +14,13 @@ var sortByFaves = false;
 var sortByReplies = false;
 
 // requestReturned tracks if we have a pending http request so that we don't receive back the same comments twice
-// tracking.mainLastComment - id tracks last comments we've retrieved for main thread, endOfComments tracks if we've returned all of the comments there are. When we get replies, we will set a key with the comments id and a value of the last loaded reply
-// commentOffset: used for segmented loading in order of descending popularity, since we
-//  can't sort by comment id
+// tracking.mainLastComment:
+//    - id tracks the id of the last comment we've retrieved for main thread;
+//      only applicable if not sorting by faves or replies
+//    - endOfComments tracks if we've returned all of the comments there are. 
+//      When we get replies, we will set a key with the comments id and a value of the last loaded reply
+// commentOffset: used for segmented loading in order of descending popularity, 
+//    when we can't sort by comment id, when sorting by faves or replies
 var tracking = {
   requestReturned: true,
   mainLastComment: {
@@ -132,7 +136,11 @@ document.addEventListener("DOMContentLoaded", function(e) {
   });
 
 
-  // Sort by date or number of faves
+  /**
+   * The next three listeners handle the selection of order to
+   * sort the comments: date (newest to oldest), popularity (most
+   * favorites to least), replies (most replies to least).
+   */
   document.getElementById('sort-date').addEventListener('click', function() {
     sortByFaves = false;
     sortByReplies = false;
@@ -151,7 +159,6 @@ document.addEventListener("DOMContentLoaded", function(e) {
     loadContent(url);
   });
 
-  // SORT BY REPLIES
   document.getElementById('sort-replies').addEventListener('click', function() {
     sortByFaves = false;
     sortByReplies = true;
@@ -160,6 +167,7 @@ document.addEventListener("DOMContentLoaded", function(e) {
     // reload the feed with the updated setting.
     loadContent(url);
   });
+
 
   // close Oxidizer IFrame Window when when clicking close button 
   document.getElementById('close').addEventListener('click', closeOxidizer);
@@ -186,7 +194,7 @@ document.addEventListener("DOMContentLoaded", function(e) {
   document.getElementById('comment-input-field').addEventListener('keydown', function(e) {
     // Check if length is 0 and disable post button.
     var getTextLength = document.getElementById('comment-input-field').value.length;
-    //console.log('CUR LENGTH: ', getTextLength);
+
     if (getTextLength === 0) {
       $("#comment-submit-button").prop("disabled",true);
     } else {
@@ -238,6 +246,13 @@ document.addEventListener("DOMContentLoaded", function(e) {
     });
 });
 
+
+/**
+ * Handles loading an initial set of comments. Called if any
+ * setting changes that would affect the set or order of 
+ * questions to be displayed (e.g. public v.s. private comments,
+ * sort by date v.s. popularity).
+ */
 function loadContent(url) {
   var params = {
     url: encodeURIComponent(url),
@@ -299,7 +314,7 @@ function loadContent(url) {
       tracking.mainLastComment.endOfComments = false;
     }
 
-    if (sortByFaves) {
+    if (sortByFaves || sortByReplies) {
       tracking.commentOffset += msg.comments.length;
     }
 
@@ -330,7 +345,14 @@ function loadContent(url) {
 
 }
 
-// function to post new comments
+
+/**
+ * Handles posting of both new comments and new replies 
+ * to existing comments.
+ * @param text: required, content of the comment to post.
+ * @param repliesToId: optional, if present, indicates the
+ *    id number of the comment this post is in response to.
+ */
 function postComment(text, repliesToId) {
   toggleSpinner();
   var data = JSON.stringify({
@@ -371,7 +393,6 @@ function postComment(text, repliesToId) {
       var firstReply = replies.find('.comment-reply:first-child');
 
       if (!replies.hasClass('hidden') || replies.children().length > 0) {
-        console.log('Post Comment: manually display our new reply');
         if (firstReply.length > 0) {
           // prepend to existing replies
           firstReply.before(html);
@@ -382,7 +403,6 @@ function postComment(text, repliesToId) {
 
       if (replies.hasClass('hidden')) {
         var showReplies = comment.find('.replies');
-        console.log('Post Comment: showReplies ', showReplies);
         showReplies.trigger('click');
       } 
 
@@ -406,6 +426,10 @@ function postComment(text, repliesToId) {
   });
 }
 
+/**
+ * Prepares the msg content to be fed into the Handlebars
+ * template, and return the templating result.
+ */
 function compileComments(msg) {
   var source = $("#comment-entry-template").html();
   var template = Handlebars.compile(source);
@@ -441,9 +465,6 @@ function compileComments(msg) {
         element.text = element.text.replace(replaceURL, '<p class="image-display"><img src="' + imageLink + '" style="max-width: 450px;"/></p>');
       });
     }
-
-    //console.log('Text Input: ', element.text);
-    //element.text = element.text.replace(imagePattern, '<p align="center"><img src="' + element.text + '" style="max-width: 450px;"/></p>');
   });
 
   // Include access to the host value to build url to link to user profiles.
@@ -452,9 +473,17 @@ function compileComments(msg) {
   return template(msg);
 }
 
-// destination is a jquery object that you want to append to
-function loadMoreComments(destination, url, repliesToId) {
 
+/**
+ * Handles loads of comments, when fetching sets past an initializing set.
+ * Also responsible for all loads of replies.
+ * @param destination: required, jQuery object to append comments to.
+ * @param url: required, the url that we are loading comments for.
+ * @param repliesToId: optional, if present, indic
+ * @param repliesToId: optional, if present, indicates the
+ *    id number of the comment we are loading replies to.
+ */
+function loadMoreComments(destination, url, repliesToId) {
   // if not a reply, don't execute if we are at end of comments, or waiting for a request to return
   if (repliesToId === undefined && (tracking.mainLastComment.endOfComments || !tracking.requestReturned)) {
     return;
@@ -462,7 +491,6 @@ function loadMoreComments(destination, url, repliesToId) {
 
   if (repliesToId && tracking[repliesToId]){
     if (tracking[repliesToId].endOfComments || !tracking.requestReturned) {
-      console.log('loadMoreComments: skipping loading.');
       return;
     }
   }
@@ -480,6 +508,11 @@ function loadMoreComments(destination, url, repliesToId) {
     params.commentOffset = tracking.commentOffset;
   }
 
+  // if sorting by replies:
+  if (sortByReplies) {
+    params.orderByReplies = 'DESC';
+    params.commentOffset = tracking.commentOffset;
+  }
 
   if (repliesToId !== undefined) {
     // check if we've received comments, and add to params if we have a lastCommentId to send
@@ -492,7 +525,10 @@ function loadMoreComments(destination, url, repliesToId) {
     }
     params.repliesToId = repliesToId;
   } else {
-    if (tracking.mainLastComment.id) {
+    // Don't set the lastCommentId if sorting by favorites or replies,
+    // because it incorrectly limits the comments returned to be older than 
+    // the id of the last comment returned.
+    if (tracking.mainLastComment.id && !(sortByFaves || sortByReplies)) {
       params.lastCommentId = tracking.mainLastComment.id;
     }
   }
@@ -531,11 +567,10 @@ function loadMoreComments(destination, url, repliesToId) {
         tracking.mainLastComment.endOfComments = false;
       }
 
-      if (sortByFaves) {
+      if (sortByFaves || sortByReplies) {
         tracking.commentOffset += msg.comments.length;
       }
     } else {
-      console.log('loadMoreComments: success loading ' + msg.comments.length + ' replies.');
       if (msg.comments.length > 0) {
         tracking[repliesToId].id = msg.comments[msg.comments.length - 1].id;
       }
@@ -581,7 +616,6 @@ function loadMoreComments(destination, url, repliesToId) {
     }
   });
 
-
 }
 
 
@@ -602,7 +636,6 @@ function registerCommentEventListeners(comment) {
   }
 
   var replyForms = document.getElementsByClassName('reply-form');
-
   for (var i = 0; i < replyForms.length; i++) {
     var $replyForm = $(replyForms[i]);
 
@@ -634,16 +667,12 @@ function registerCommentEventListeners(comment) {
     });
   }
 
-  // get elements 
+  // Handle clicking to toggle display of a comment's replies.
   var showReplies = document.getElementsByClassName('replies');
-
   for (var i = 0; i < showReplies.length; i++) {
-    
     $(showReplies[i]).off('click').on('click', function() {
-      console.log('Show Replies clicked.');
       var comment = $(this).parents('.comment');
       var repliesToId = $($(this)[0]).attr('data-comment-id');
-      var replies = comment.find('.comment-reply');
       var target = comment.find('.reply-container');
       var loadMore = comment.find('.comment-reply-more');
 
@@ -664,21 +693,16 @@ function registerCommentEventListeners(comment) {
 
   // Listen on clicks to request loading additional replies.
   var repliesMore = document.getElementsByClassName('replies-more');
-  // console.log('Setting event listeners, repliesMore: ', repliesMore);
-
   for (var i = 0; i < repliesMore.length; i++) {
     $(repliesMore[i]).off('click').on('click', function() {
       var comment = $(this).parents('.comment');
       var repliesToId = comment.attr('id');
-      console.log('repliesMore: parent comment ', comment);
-      console.log('id: ', repliesToId);
-
       var target = comment.find('.reply-container');
-      console.log('repliesMore: target elt is ', target);
 
       loadMoreComments(target, url, repliesToId);
     });
   }
+
 
   var removes = document.getElementsByClassName('delete');
   for (var i = 0; i < removes.length; i++) {
@@ -841,7 +865,6 @@ function loginButtons(showLogin) {
     document.getElementById('notification-area').classList.remove('hidden');
   } else {
     document.getElementById('notification-area').classList.add('hidden');
-    // document.getElementById('panel-content').innerHTML = '';
   }
 }
 
