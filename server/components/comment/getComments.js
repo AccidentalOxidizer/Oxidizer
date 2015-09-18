@@ -127,7 +127,6 @@ module.exports = function(sequelize, options) {
   
   queryString += ';';
 
-  console.log(queryString);
   return sequelize.query(queryString);
 };
 

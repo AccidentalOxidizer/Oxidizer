@@ -46,8 +46,8 @@ var Navigation = React.createClass({
               if (user){
                 return (
                   <ul className="nav navbar-nav navbar-right">
-                    <li><Link to="website" params={{website: ""}}>Search for Websites</Link></li>
-                    <li><Link to="leaderboard">Leaderboard</Link></li>
+                    <li><Link to="website" params={{website: ""}}>Search</Link></li>
+                    <li><Link to="leaderboard">Popular</Link></li>
                     <li className="dropdown">
                       <a href="#" className="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
                       <i className="fa fa-user"></i></a>

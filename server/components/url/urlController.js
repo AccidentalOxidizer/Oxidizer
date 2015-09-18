@@ -120,10 +120,23 @@ var getPaths = function(host, callback){
     });
 };
 
+var getAllHosts = function(req, res, next){
+  var Url = req.app.get('models').Url;
 
+  Url.getAllHosts()
+    .then(function(hosts){
+      console.log(hosts);
+      res.send(200, hosts);
+    })
+    .catch(function(err){
+      console.log('Error getting hosts', err);
+      res.end(404);
+    });
+};
 
 exports.get = get;
 exports.save = save;
 exports.remove = remove;
 exports.getId = getId;
 exports.getPaths = getPaths;
+exports.getAllHosts = getAllHosts;

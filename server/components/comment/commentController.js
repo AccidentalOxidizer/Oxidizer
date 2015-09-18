@@ -149,7 +149,7 @@ module.exports.addComment = function(req, res, next) {
       };
 
       res.send(201, response);
-
+      
       if (req.body.repliesToId && repliesToComment[0][0].UserId !== req.user.id) {
         userController.incrementNotification(repliesToComment[0][0].UserId, 'replies');
       }

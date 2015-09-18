@@ -1,18 +1,17 @@
 var settings = {};
 var url = '';
 
-// Boolean: true if commenting privately; false if public.
-// Initialized to 'keepprivate' value set in options; updated according to
-// privacy select option.
-var commentPrivately;
-
-// Boolean: true to see private comment feed; false to see public.
-// Also initialized to 'keepprivate' options value.
+// Boolean: true to see private comment feed and to make private
+// comments; false to see public. Initialized to 'keepprivate' options value.
 var privateFeed;
 
 // Boolean: true if sorting comments from most favorited to least;
 // otherwise sorts from most recent to least. Defaults to sorting by date.
 var sortByFaves = false;
+
+// Boolean: true if sorting comments from most comments to least;
+// Defaults to sorting by date.
+var sortByReplies = false;
 
 // requestReturned tracks if we have a pending http request so that we don't receive back the same comments twice
 // tracking.mainLastComment - id tracks last comments we've retrieved for main thread, endOfComments tracks if we've returned all of the comments there are. When we get replies, we will set a key with the comments id and a value of the last loaded reply
@@ -60,10 +59,9 @@ document.addEventListener("DOMContentLoaded", function(e) {
         function(response) {
           // Set default value for comment privacy, public vs private feed,
           // and dropdown selections.
-          commentPrivately = settings.keepprivate;
           privateFeed = settings.keepprivate;
 
-          var privacyText = commentPrivately ? '<i class="fa fa-lock"></i> Private' : '<i class="fa fa-globe"></i> Public';
+          var privacyText = privateFeed ? '<i class="fa fa-lock"></i> Private' : '<i class="fa fa-globe"></i> Public';
           $('#comment-privacy-select').parents('.dropup').find('.btn-privacy').html(privacyText + ' <span class="caret"></span>');
           $('#feed-privacy-select').parents('.dropdown').find('.dropdown-toggle').html(privacyText + ' Feed <span class="caret"></span>');
           $("#comment-submit-button").prop("disabled",true); // Disable the submit button since there is zero content.
@@ -94,44 +92,81 @@ document.addEventListener("DOMContentLoaded", function(e) {
     }
   });
 
-  // Detect if user chooses a different view for feed and update comment box properly.
+
+  /**
+   * The next four listeners coordinate the selections of public vs.
+   * comment posting and display.
+   */
+  var setPublicComments = function() {
+    privateFeed = false;
+    $(document.body).find('.dropdown-privacy').html('<i class="fa fa-globe"></i> Public Feed <span class="caret"></span>');
+    $(document.body).find('.btn-privacy').html('<i class="fa fa-globe"></i> Public <span class="caret"></span>');
+
+    // reload the feed with the updated setting.
+    loadContent(url);
+  };
+
+  var setPrivateComments = function() {
+    privateFeed = true;
+    $(document.body).find('.dropdown-privacy').html('<i class="fa fa-lock"></i> Private Feed <span class="caret"></span>');
+    $(document.body).find('.btn-privacy').html('<i class="fa fa-lock"></i> Private <span class="caret"></span>');
+
+    // reload the feed with the updated setting.
+    loadContent(url);
+  };
+
   document.getElementById('feed-public').addEventListener('click', function() {
-    // console.log('PUBLIC FEED CLICKED!');
-    commentPrivately = false;
-    $(document.body).find('.btn-privacy').html('<a href="#"><i class="fa fa-globe"></i> Public</a>');
+    setPublicComments();
   });
 
-  // Detect if user chooses a different view for feed and update comment box properly.
   document.getElementById('feed-private').addEventListener('click', function() {
-    // console.log('PRIVATE FEED CLICKED!');
-    commentPrivately = true;
-    $(document.body).find('.btn-privacy').html('<a href="#"><i class="fa fa-lock"></i> Private</a>');
+    setPrivateComments();
+  });
+
+  document.getElementById('comment-public').addEventListener('click', function() {
+    setPublicComments();
+  });
+
+  document.getElementById('comment-private').addEventListener('click', function() {
+    setPrivateComments();
   });
 
 
   // Sort by date or number of faves
   document.getElementById('sort-date').addEventListener('click', function() {
     sortByFaves = false;
+    sortByReplies = false;
     $('#sort-by-select').parents('.dropdown').find('.dropdown-toggle').html('<i class="fa fa-calendar-check-o"></i> Date <span class="caret"></span>');
 
     // reload the feed with the updated setting.
     loadContent(url);
   });
+
   document.getElementById('sort-faves').addEventListener('click', function() {
     sortByFaves = true;
+    sortByReplies = false;
     $('#sort-by-select').parents('.dropdown').find('.dropdown-toggle').html('<i class="fa fa-heart-o"></i> Popular <span class="caret"></span>');
 
     // reload the feed with the updated setting.
     loadContent(url);
   });
 
+  // SORT BY REPLIES
+  document.getElementById('sort-replies').addEventListener('click', function() {
+    sortByFaves = false;
+    sortByReplies = true;
+    $('#sort-by-select').parents('.dropdown').find('.dropdown-toggle').html('<i class="fa fa-commenting-o"></i> Replies <span class="caret"></span>');
+
+    // reload the feed with the updated setting.
+    loadContent(url);
+  });
 
   // close Oxidizer IFrame Window when when clicking close button 
   document.getElementById('close').addEventListener('click', closeOxidizer);
 
   document.getElementById('dismiss-notifications').addEventListener('click', function() {
     var request = $.ajax({
-      url: settings.server + '/api/users/notifications/markread',
+      url: settings.server + '/api/user/notifications/markread',
       method: "GET",
       contentType: "application/json",
     });
@@ -146,22 +181,6 @@ document.addEventListener("DOMContentLoaded", function(e) {
 
   // Reigster all elements with class 'link' to ahve click event and open new tab with target href
   registerLinks();
-
-  // Update the feed privacy setting if the user changes it in the dropdown menu.
-  $('#feed-privacy-select li a').click(function() {
-    var selectedText = $(this).html();
-
-    if (selectedText.endsWith('Private Feed')) {
-      privateFeed = true;
-    } else {
-      privateFeed = false;
-    }
-    console.log('feed privacy set to ' + selectedText + ' privateFeed ' + privateFeed);
-    $(this).parents(".dropdown").find('.dropdown-toggle').html(selectedText + ' <span class="caret"></span>');
-
-    // reload the feed with the updated setting.
-    loadContent(url);
-  });
 
   // Post new comment
   document.getElementById('comment-input-field').addEventListener('keydown', function(e) {
@@ -179,18 +198,6 @@ document.addEventListener("DOMContentLoaded", function(e) {
       document.getElementById('comment-input-field').value = '';
       $("#comment-submit-button").prop("disabled",true); // Disable the submit button since there is zero content.
     }
-  });
-
-  // Update the privacy setting if the user changes it in the dropup menu.
-  $('#comment-privacy-select li a').click(function() {
-    var selectedText = $(this).html();
-    if (selectedText.endsWith('Private')) {
-      commentPrivately = true;
-    } else {
-      commentPrivately = false;
-    }
-    console.log('comment privacy set to ' + selectedText + ' commentPrivately ' + commentPrivately);
-    $(this).parents(".dropup").find('.btn-privacy').html(selectedText + ' <span class="caret"></span>');
   });
 
   document.getElementById('comment-submit-button').addEventListener('click', function() {
@@ -241,6 +248,13 @@ function loadContent(url) {
   if (sortByFaves) {
     tracking.commentOffset = 0;
     params.orderByHearts = 'DESC';
+    params.commentOffset = tracking.commentOffset;
+  }
+
+  // if sorting by replies:
+  if (sortByReplies) {
+    tracking.commentOffset = 0;
+    params.orderByReplies = 'DESC';
     params.commentOffset = tracking.commentOffset;
   }
 
@@ -323,7 +337,7 @@ function postComment(text, repliesToId) {
     url: url,
     text: text,
     repliesToId: repliesToId || undefined,
-    isPrivate: commentPrivately
+    isPrivate: privateFeed
   });
 
   var request = $.ajax({
@@ -341,7 +355,37 @@ function postComment(text, repliesToId) {
     if (!repliesToId) {
       $(".cd-panel-content").prepend(html);
     } else {
-      $('#' + repliesToId).append(html);
+      // If replies are hidden && reply-container has no 
+      // children, we can trigger a click to load any existing
+      // comments + the new one we just made.
+      //
+      // Else if replies are hidden && reply-container *does* 
+      // have children, we can still trigger a click, to make
+      // the reply elements shown; but we also need to prepend
+      // the comment we just made.
+      //
+      // Else, i.e., replies not hidden, just prepend the 
+      // comment we just made.
+      var comment = $('#' + repliesToId);
+      var replies = comment.find('.reply-container');
+      var firstReply = replies.find('.comment-reply:first-child');
+
+      if (!replies.hasClass('hidden') || replies.children().length > 0) {
+        console.log('Post Comment: manually display our new reply');
+        if (firstReply.length > 0) {
+          // prepend to existing replies
+          firstReply.before(html);
+        } else {
+          replies.append(html);
+        }
+      }
+
+      if (replies.hasClass('hidden')) {
+        var showReplies = comment.find('.replies');
+        console.log('Post Comment: showReplies ', showReplies);
+        showReplies.trigger('click');
+      } 
+
       var ReplyCount = Number($('#' + repliesToId +' .ReplyCount').html())+1;
       $('#' + repliesToId +' .ReplyCount').html(ReplyCount);
     }
@@ -394,7 +438,7 @@ function compileComments(msg) {
         // we need to create a regEx object and tell it to look
         // for all instances that match within the string using the "/g" modifier.
         var replaceURL = new RegExp(imageLink, 'g');
-        element.text = element.text.replace(replaceURL, '<p align="center"><img src="' + imageLink + '" style="max-width: 450px;"/></p>');
+        element.text = element.text.replace(replaceURL, '<p class="image-display"><img src="' + imageLink + '" style="max-width: 450px;"/></p>');
       });
     }
 
@@ -418,6 +462,7 @@ function loadMoreComments(destination, url, repliesToId) {
 
   if (repliesToId && tracking[repliesToId]){
     if (tracking[repliesToId].endOfComments || !tracking.requestReturned) {
+      console.log('loadMoreComments: skipping loading.');
       return;
     }
   }
@@ -490,14 +535,27 @@ function loadMoreComments(destination, url, repliesToId) {
         tracking.commentOffset += msg.comments.length;
       }
     } else {
+      console.log('loadMoreComments: success loading ' + msg.comments.length + ' replies.');
       if (msg.comments.length > 0) {
         tracking[repliesToId].id = msg.comments[msg.comments.length - 1].id;
       }
       // Same logic regarding comment loads, but for the reply tracking.
+      // Also, if we haven't loaded all the replies yet, show
+      // the link to load additional replies.
+      // Assumes that the reply container is currently visible.
+      //  - true for case coming from 'show reply' click, b/c
+      //    loadMoreComments only called if reply container !hidden
+      //  - true for case coming from 'show more replies' if the
+      //    above holds true, b/c this link only avail if container !hidden
+      var comment = destination.parents('.comment');
+      var loadMore = comment.find('.comment-reply-more');
+
       if (msg.comments.length < 25) {
         tracking[repliesToId].endOfComments = true;
+        loadMore.addClass('hidden');
       } else {
         tracking[repliesToId].endOfComments = false;
+        loadMore.removeClass('hidden');
       }
     }
 
@@ -582,23 +640,43 @@ function registerCommentEventListeners(comment) {
   for (var i = 0; i < showReplies.length; i++) {
     
     $(showReplies[i]).off('click').on('click', function() {
-      var target = $(this).parents('.comment');
+      console.log('Show Replies clicked.');
+      var comment = $(this).parents('.comment');
       var repliesToId = $($(this)[0]).attr('data-comment-id');
+      var replies = comment.find('.comment-reply');
+      var target = comment.find('.reply-container');
+      var loadMore = comment.find('.comment-reply-more');
 
-      var thisComment = $(this).parents('.comment');
-      var replies = thisComment.find('.comment-reply');
-
-      // toggle whether
-      if (replies.length > 0) {
-        if (!$(replies[0]).hasClass('hidden')) {
-          $(replies).addClass('hidden');
-        } else {
-          $(replies).removeClass('hidden');
-          loadMoreComments(target, url, repliesToId);
-        }
+      if (target.hasClass('hidden')) {
+        target.removeClass('hidden');
       } else {
+        target.addClass('hidden');
+        loadMore.addClass('hidden');
+      }
+
+      // if the target class is moved to be not hidden
+      // on this toggle, try loading more comments
+      if (!target.hasClass('hidden')) {
         loadMoreComments(target, url, repliesToId);
       }
+    });
+  }
+
+  // Listen on clicks to request loading additional replies.
+  var repliesMore = document.getElementsByClassName('replies-more');
+  // console.log('Setting event listeners, repliesMore: ', repliesMore);
+
+  for (var i = 0; i < repliesMore.length; i++) {
+    $(repliesMore[i]).off('click').on('click', function() {
+      var comment = $(this).parents('.comment');
+      var repliesToId = comment.attr('id');
+      console.log('repliesMore: parent comment ', comment);
+      console.log('id: ', repliesToId);
+
+      var target = comment.find('.reply-container');
+      console.log('repliesMore: target elt is ', target);
+
+      loadMoreComments(target, url, repliesToId);
     });
   }
 

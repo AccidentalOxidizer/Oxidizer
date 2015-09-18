@@ -5,10 +5,16 @@ var jsonParser = bodyParser.json();
 
 module.exports = function(app) {
   app.get('/api/users/', jsonParser, function(req, res, next) {
+    
+    var searchObject = {};
 
-    User.getAll({})
+    if (req.query) {
+      searchObject = req.query;
+    }
+
+    User.getAll(searchObject)
       .then(function(users){
-        console.log(users);
+        //console.log(users);
         res.json(users);
       })
       .catch(function(){

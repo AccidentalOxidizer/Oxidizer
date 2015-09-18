@@ -1,7 +1,19 @@
 var User = require('../').User;
 var Sequelize = require('sequelize');
 
-var getAll = function(searchObject){
+var getAll = function(getSearchParams){
+  var searchObject = {};
+    
+  if (getSearchParams.orderByRegistered) {
+    searchObject.order = [['id', 'DESC']]; // Yes, we need to double brackets right here! :)
+  }
+
+  if (getSearchParams.lastUserId)   {
+    searchObject.where = {id: {lte: getSearchParams.lastUserId}}; 
+  }
+
+  searchObject.limit = 25; // Limit number of search objects to 25 at a time.
+  
   return User.findAll(searchObject);
 };
 

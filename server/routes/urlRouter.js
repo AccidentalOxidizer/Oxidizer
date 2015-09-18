@@ -7,6 +7,10 @@ var Url = Promise.promisifyAll(require('../components/url'));
 var jsonParser = bodyParser.json();
 
 module.exports = function(app) {
+  
+  // route to get all hosts to support typeahead on website page
+  app.get('/api/gethosts', jsonParser, Url.getAllHosts);
+
   //app.get('/api/urls', jsonParser, auth.isAuthorized, function(req, res, next) {
   app.get('/api/urls*', jsonParser, function(req, res, next) {
     // Get url info

@@ -21,12 +21,12 @@ module.exports = function(app) {
   // this was handled by including a parameter for 'filterByUser'
   app.get('/api/comments/user/', jsonParser, auth.isLoggedIn, Comment.getCommentsForUser);
 
-  app.post('/api/comments/add', jsonParser, auth.isLoggedIn, Comment.addComment);
+  app.post('/api/comments/add', jsonParser, auth.isLoggedIn, auth.isAuthorized, Comment.addComment);
 
   app.delete('/api/comments/remove/:id', jsonParser, auth.isAuthorized, Comment.remove);
   
   // Users marks a specific comment as a new favorite.
-  app.post('/api/comments/fave', jsonParser, Heart.fave);
+  app.post('/api/comments/fave', jsonParser, auth.isAuthorized, Heart.fave);
 
   // return all replies to a given comment
   app.get('/api/comments/replies', jsonParser, Comment.getRepliesForComment);
@@ -49,7 +49,7 @@ module.exports = function(app) {
   app.get('/api/comments/faves/getForUser', jsonParser, auth.isLoggedIn, Comment.getHeartedCommentsForUser);
 
   // Users marks a specific comment as flagged for bad behavior.
-  app.post('/api/comments/flag', jsonParser, function(req, res, next) {
+  app.post('/api/comments/flag', auth.isAuthorized, jsonParser, function(req, res, next) {
     Flag.flag({
         UserId: req.user.id,
         CommentId: req.body.CommentId

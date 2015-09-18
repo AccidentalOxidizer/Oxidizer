@@ -52,25 +52,6 @@ $(document).ready(function() {
       }
   });
 
-  // SORT COMMENTS BY NUMBER OF FLAGS
-  $(document).on('click', '#sort-flags', function(event) {
-    // Update Mode:
-    adminSettings.currentMode = "flags";
-    console.log('Current Sort Mode:', adminSettings.currentMode);
-  });
-
-
-  // SORT COMMENTS BY WHEN THEY WERE RECENTLY POSTED
-  $(document).on('click', '#sort-recent', function(event) {
-    // Update Mode:
-    adminSettings.currentMode = "recent";
-    console.log('Current Sort Mode:', adminSettings.currentMode);
-
-    // Reset Comments HTML and get comments again.
-    $('#comments').html();
-    getComments();
-  });
-
   // DELETE COMMENT FROM DATABASE!!!!
   $(document).on('click', '.delete', function(event) {
     event.preventDefault();
