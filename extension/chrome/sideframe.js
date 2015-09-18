@@ -14,9 +14,13 @@ var sortByFaves = false;
 var sortByReplies = false;
 
 // requestReturned tracks if we have a pending http request so that we don't receive back the same comments twice
-// tracking.mainLastComment - id tracks last comments we've retrieved for main thread, endOfComments tracks if we've returned all of the comments there are. When we get replies, we will set a key with the comments id and a value of the last loaded reply
-// commentOffset: used for segmented loading in order of descending popularity, since we
-//  can't sort by comment id
+// tracking.mainLastComment:
+//    - id tracks the id of the last comment we've retrieved for main thread;
+//      only applicable if not sorting by faves or replies
+//    - endOfComments tracks if we've returned all of the comments there are. 
+//      When we get replies, we will set a key with the comments id and a value of the last loaded reply
+// commentOffset: used for segmented loading in order of descending popularity, 
+//    when we can't sort by comment id, when sorting by faves or replies
 var tracking = {
   requestReturned: true,
   mainLastComment: {
@@ -310,7 +314,7 @@ function loadContent(url) {
       tracking.mainLastComment.endOfComments = false;
     }
 
-    if (sortByFaves) {
+    if (sortByFaves || sortByReplies) {
       tracking.commentOffset += msg.comments.length;
     }
 
@@ -480,17 +484,13 @@ function compileComments(msg) {
  *    id number of the comment we are loading replies to.
  */
 function loadMoreComments(destination, url, repliesToId) {
-  console.log('loadMoreComments ...');
-
   // if not a reply, don't execute if we are at end of comments, or waiting for a request to return
   if (repliesToId === undefined && (tracking.mainLastComment.endOfComments || !tracking.requestReturned)) {
-      console.log('loadMoreComments: skipping loading 1, endOfComments? ' + tracking.mainLastComment.endOfComments + ' reqReturned? ' + tracking.requestReturned);
     return;
   }
 
   if (repliesToId && tracking[repliesToId]){
     if (tracking[repliesToId].endOfComments || !tracking.requestReturned) {
-      console.log('loadMoreComments: skipping loading 2.');
       return;
     }
   }
@@ -525,7 +525,10 @@ function loadMoreComments(destination, url, repliesToId) {
     }
     params.repliesToId = repliesToId;
   } else {
-    if (tracking.mainLastComment.id) {
+    // Don't set the lastCommentId if sorting by favorites or replies,
+    // because it incorrectly limits the comments returned to be older than 
+    // the id of the last comment returned.
+    if (tracking.mainLastComment.id && !(sortByFaves || sortByReplies)) {
       params.lastCommentId = tracking.mainLastComment.id;
     }
   }
@@ -564,11 +567,10 @@ function loadMoreComments(destination, url, repliesToId) {
         tracking.mainLastComment.endOfComments = false;
       }
 
-      if (sortByFaves) {
+      if (sortByFaves || sortByReplies) {
         tracking.commentOffset += msg.comments.length;
       }
     } else {
-      console.log('loadMoreComments: success loading ' + msg.comments.length + ' replies.');
       if (msg.comments.length > 0) {
         tracking[repliesToId].id = msg.comments[msg.comments.length - 1].id;
       }

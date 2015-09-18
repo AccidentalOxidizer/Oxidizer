@@ -127,6 +127,8 @@ module.exports = function(sequelize, options) {
   
   queryString += ';';
 
+  // console.log('getComments: ', queryString);
+
   return sequelize.query(queryString);
 };
 
