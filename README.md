@@ -40,9 +40,9 @@ npm start
 
 ### Roadmap
 
-View the project roadmap [here](LINK_TO_PROJECT_ISSUES)
+View the project roadmap [here](https://github.com/AccidentalOxidizer/Oxidizer/issues)
 
 
 ## Contributing
 
-See [CONTRIBUTING.md](CONTRIBUTING.md) for contribution guidelines.
+See [CONTRIBUTING.md](https://github.com/AccidentalOxidizer/Oxidizer/blob/development/_CONTRIBUTING.md) for contribution guidelines.
