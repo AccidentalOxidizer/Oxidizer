@@ -26,8 +26,6 @@ var Comment = React.createClass({
 
   findImages: function(text) {
 
-    console.log('TEEEEEXT', text);
-
     // RegEx for matching image URLs
     var imagePattern = /\b(https?:\/\/\S+(?:png|jpe?g|gif)\S*)\b/igm;
 
