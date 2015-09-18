@@ -8,6 +8,12 @@ var getAll = function(getSearchParams){
     searchObject.order = [['id', 'DESC']]; // Yes, we need to double brackets right here! :)
   }
 
+  if (getSearchParams.lastUserId)   {
+    searchObject.where = {id: {lte: getSearchParams.lastUserId}}; 
+  }
+
+  searchObject.limit = 25; // Limit number of search objects to 25 at a time.
+  
   return User.findAll(searchObject);
 };
 

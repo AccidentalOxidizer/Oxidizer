@@ -1,12 +1,18 @@
 $(document).ready(function() {
 
+  var lastUserId = null;
+
   // Listen for User tools selection.
   $('#show-users').on('click', function() {
     $('#comments').html('');
     $('#search-url').hide();
     $('#search-comments').hide();
     $('#search-users').show();
+    $('#load-more-users').show();
+    $('#load-more-comments').hide();
     $('#sort-type').text('Showing Users:');
+    adminSettings.currentMode = 'users';
+    lastUserId = null;
     getUsers();
   });
 
@@ -26,6 +32,16 @@ $(document).ready(function() {
   var getUsers = function() {
     // Setting this to nothing (e.g., data = {}) returns ALL comments.
     var data = {};
+
+    console.log('LAST USER ID: ', lastUserId);
+    if (lastUserId !== null) {
+      data.lastUserId = lastUserId;
+    }
+  
+    //if (orderByRegistered) {
+      data.orderByRegistered = true;
+    //}
+  
     
     // AJAX call to server to get all users.
     $.ajax({
@@ -36,8 +52,10 @@ $(document).ready(function() {
       dataType: 'json', //Expected data format from server
       success: function(data) {
         $('#users').html('');
+        lastUserId = data[data.length-1].id;
 
         console.log('USER DATA: ', data);
+        console.log('USER LAST COMMENT ID', lastUserId);
         //console.log('DONE!');
 
         // Set the logged in user's ID so we can pass into fav / flag functions.
@@ -156,6 +174,15 @@ $(document).ready(function() {
         console.error(xhr, status, err.message);
       }
     });
+  });
+
+  $(document).on('click', '#load-more-users', function(event) {
+    // Reset Comments HTML and get comments again.
+    if (adminSettings.currentMode === 'users') {
+      $('#comments').html('');
+      $('#users').html('');
+      getUsers();    
+    }
   });
 
 });
