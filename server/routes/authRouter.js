@@ -36,10 +36,6 @@ module.exports = function(app, passport) {
     scope: 'email'
   }));
 
-  // Q: Will the below be an issue?
-  // https://github.com/jaredhanson/passport-facebook
-  // "Facebook's OAuth 2.0 implementation has a bug in which the fragment
-  // #_=_ is appended to the callback URL."
   app.get('/api/auth/facebook/callback', urlEncodedParser, jsonParser, passport.authenticate('facebook', {
     successRedirect: '/welcome',
     failureRedirect: '/login'
@@ -61,7 +57,6 @@ module.exports = function(app, passport) {
   });
 
   app.get('/api/auth/chrome/logout', function(req, res, next) {
-    //console.log(req.session, req.user);
     req.logOut();
     req.logout();
     req.session.destroy();

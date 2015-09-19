@@ -56,7 +56,6 @@ var flag = function(searchObject) {
       }
     })
     .then(function() {
-      //console.log(searchObject.CommentId);
       return Flag.findAndCountAll({
         where: {
           CommentId: searchObject.CommentId
@@ -72,28 +71,6 @@ var flag = function(searchObject) {
       console.log("Flag error: ", err);
       return;
     });
-
-
-
-  // console.log("FLAG OBJECT: ", searchObject);
-  // var newFlag = Flag.build(searchObject);
-  // return Flag.findOrCreate({
-  //     where: searchObject
-  //   })
-  //   .then(function(flag) {
-  //     return get({
-  //       CommentId: searchObject.CommentId
-  //     });
-  //   })
-  //   .then(function(flags) {
-  //     // NUMBER OF FAVORITES!
-  //     console.log("GET FLAGS: ", flags.length);
-  //     return flags.length;
-  //   })
-  //   .catch(function(err) {
-  //     console.log('this is the error', err);
-  //     throw err;
-  //   });
 };
 
 exports.get = get;

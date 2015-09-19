@@ -31,10 +31,9 @@ var buildQueryOptions = function(req, filterByUser) {
 module.exports.getCommentsForUrl = function(req, res, next) {
   var Comment = req.app.get('models').Comment;
   var User = req.app.get('models').User;
-  // build query Options
   var options = buildQueryOptions(req);
-  // getComment and User info for the database
 
+  // getComment and User info for the database
   Promise.all([Comment.getComments(options), User.getUserInfo(options.userId)]) // TODO add userQuery
     .spread(function(comments, user){
       var response = {
@@ -43,7 +42,6 @@ module.exports.getCommentsForUrl = function(req, res, next) {
         currentTime: new Date()
       };
 
-      // res.data.userInfo = 
       res.send(200, response);
     });
 };
@@ -62,7 +60,6 @@ module.exports.getCommentsForUser = function (req, res, next) {
         currentTime: new Date()
       };
 
-      // res.data.userInfo = 
       res.send(200, response);
     })
     .catch(function(err){
@@ -85,7 +82,6 @@ module.exports.getHeartedCommentsForUser = function(req, res, next){
         currentTime: new Date()
       };
 
-      // res.data.userInfo = 
       res.send(200, response);
     })
     .catch(function(err){
@@ -115,7 +111,6 @@ module.exports.getRepliesForComment = function(req, res, next){
 
       res.send(200, response);
     });
-
 };
 
 module.exports.addComment = function(req, res, next) {  
@@ -177,8 +172,6 @@ module.exports.getNewRepliesForUser = function(req, res, next){
     .catch(function(err){
       console.log('Err loading replies', err);
     });
-
-
 };
 
 module.exports.getNewHeartsForUser = function(req, res, next){
@@ -216,18 +209,3 @@ module.exports.remove = function(req, res, next) {
         res.send(500);
       });
 };
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

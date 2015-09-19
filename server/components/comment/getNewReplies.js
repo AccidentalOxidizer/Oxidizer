@@ -19,14 +19,14 @@ module.exports = function(sequelize, userid){
       '(SELECT COUNT(1) AS other FROM Flags AS f WHERE Comments.id = f.CommentId AND f.UserId =  ' +  userid + ') AS FlaggedByUser, ' +
       '(SELECT COUNT(1) AS other FROM Comments AS c WHERE Comments.id = c.RepliesToId AND c.UserId =  ' +  userid + ') AS RepliesToUser, ' +
       '(CASE WHEN Comments.UserId = ' +  userid + ' THEN "true" ELSE NULL END) AS isUser ' +
-    'FROM Comments, Comments AS Replies, Users ' + 
-    'INNER JOIN Urls ' +
-    'WHERE Comments.id = Replies.repliesToId ' +
+      'FROM Comments, Comments AS Replies, Users ' + 
+      'INNER JOIN Urls ' +
+      'WHERE Comments.id = Replies.repliesToId ' +
         'AND Comments.UserId = ' + userid + ' ' +
         'AND Replies.createdAt > "' + lastChecked + '" ' +
-    'GROUP BY Comments.id ' +
-    'ORDER BY Comments.id ' +
-    ';';
+      'GROUP BY Comments.id ' +
+      'ORDER BY Comments.id ' +
+      ';';
 
     return sequelize.query(queryString); 
   });
