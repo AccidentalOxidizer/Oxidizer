@@ -5,7 +5,6 @@ var comment = require('./commentRouter');
 var group = require('./groupRouter');
 var error = require('./errorRouter');
 var bodyParser = require('body-parser');
-var dummy = require('./dummyDataRouter');
 var stress = require('./stressTestRouter');
 
 var urlEncodedParser = bodyParser.urlencoded({
@@ -37,7 +36,6 @@ module.exports = function(express, app, passport) {
   url(app);
   comment(app);
   group(app);
-  dummy(app);
   stress(app);
   // error handling
   error(app);
