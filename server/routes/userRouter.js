@@ -14,7 +14,6 @@ module.exports = function(app) {
 
     User.getAll(searchObject)
       .then(function(users){
-        //console.log(users);
         res.json(users);
       })
       .catch(function(){

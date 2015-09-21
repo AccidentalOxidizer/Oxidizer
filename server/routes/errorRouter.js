@@ -1,10 +1,4 @@
 module.exports = function(app) {
-
-  // app.use(function(err, req, res, next) {
-  //   console.error(err.stack);
-  //   next(err);
-  // })
-
   // 404s
   app.use(function(req, res, next) {
     res.status(404);
@@ -19,6 +13,4 @@ module.exports = function(app) {
     res.type('txt');
     res.send("Oops, we made a bit of a boo boo.");
   })
-
-
-}
+};

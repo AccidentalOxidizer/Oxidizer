@@ -6,12 +6,16 @@ var Url = Promise.promisifyAll(require('../components/url'));
 
 var jsonParser = bodyParser.json();
 
+/**
+ * Handle loading of URL information. Currently only used for
+ * searching for comments by website on the client webapp, so
+ * does not require being logged in.
+ */
 module.exports = function(app) {
   
   // route to get all hosts to support typeahead on website page
   app.get('/api/gethosts', jsonParser, Url.getAllHosts);
 
-  //app.get('/api/urls', jsonParser, auth.isAuthorized, function(req, res, next) {
   app.get('/api/urls*', jsonParser, function(req, res, next) {
     // Get url info
     var url_parts = urlParser.parse(req.url, true);
@@ -26,11 +30,8 @@ module.exports = function(app) {
         res.send(200, url);
       });
 
-    //res.send(200, "Should return list of all urls.");
   });
 
-  //  app.get('/api/urls/:id', jsonParser, auth.isLoggedIn, function(req, res, next) {
-  //app.get('/api/urls/:url', jsonParser, function(req, res, next) {
   /**
    * Get individual url as part of the query string.
    * NOTE: When using this method, we must first
@@ -62,7 +63,6 @@ module.exports = function(app) {
     });
   });
 
-  //app.post('/api/urls', jsonParser, auth.isAdmin, function(req, res, next) {
   app.post('/api/urls', jsonParser, function(req, res, next) {
     /**
      * This is setup as an object since we specifically ask
@@ -94,7 +94,6 @@ module.exports = function(app) {
     // Updates url!
   });
 
-  //app.delete('/api/urls/:id', jsonParser, auth.isAdmin, function(req, res, next) {
   app.delete('/api/urls/:url', jsonParser, function(req, res, next) {
     // Delete a url!
     var urlToDelete = {

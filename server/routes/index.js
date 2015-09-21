@@ -19,11 +19,8 @@ module.exports = function(express, app, passport) {
   app.use(express.static(__dirname + '/../../client/'));
 
   app.get('/welcome', urlEncodedParser, jsonParser, function(req,res, next){
-    //console.log(req);
-    
     // Determine where the user is logging in from.
     // referer undefined = Chrome extension.
-
     if (req.headers['referer'] === undefined) {
       // This should pass in a script that will automatically close the popup window
       // created by the Chrome extension.
