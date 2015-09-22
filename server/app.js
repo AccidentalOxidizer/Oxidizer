@@ -87,7 +87,7 @@ sequelize.sync().then(function() {
   }
 
   // add all our models to the app so they are always on the request
-  app.set('models', models)
+  app.set('models', models);
 
   routes(express, app, passport);
   http.createServer(app).listen(port);

@@ -1,4 +1,7 @@
-// Options has the following optional properties:
+// This function takes a sequelize instance and an options object to build a query
+// that returns all the info we need for a comment object
+// 
+// Options has the following properties - all are optional, i.e. if you don't pass options, you will just get all comments:
 // commentId - will return an arrray with one comment
 // userId - will add columns to let you know if this user has flagged or hearted the comment, and whether this comment was written by user
 // url - filters by a url ** only supports either url or urlSearch - urlSearch will not work is url is present 
@@ -18,91 +21,135 @@
 //  (limit and offset are applied after the other query filtering)
 // filterByUser - if true, it will only return comments for the user set at userFilterId - default is requesting user
 // getHeartedByUser - will only returned favorited ids
-// userFilterId -  
+// userFilterId -  if true, will return comments that were written by the user passed with options.userId
 // isPrivate - if true, will only return a user's private comments;
 // host - hard search for host
 // 
 module.exports = function(sequelize, options) {
   options = options || {};
-  console.log(options);
+
+  // for variables, always push a question mark to the query string, and the variable to the replacements string
+  // so we protect against sql injection
+  var queryString = [];
+  var replacements = [];
+
   // Adds base
-  var queryString = 'SELECT DISTINCT Comments.id, Comments.UserId, Comments.text, Comments.UrlId, Comments.repliesToId, Comments.isPrivate, Comments.createdAt, Urls.url, Urls.host, Users.name AS username, Users.avatar AS userAvatar,' +
-    '(SELECT COUNT(1) AS other FROM Hearts AS h ' +
-      'WHERE Comments.id = h.CommentId GROUP BY Comments.id) AS HeartCount, ' +
-    '(SELECT COUNT(1) AS other FROM Comments AS c ' +
-      'WHERE Comments.id = c.RepliesToId GROUP BY Comments.id) AS ReplyCount, ' +
-    '(SELECT COUNT(1) AS other FROM Flags AS f ' +
-      'WHERE Comments.id = f.CommentId GROUP BY Comments.id) AS FlagCount ';
+  queryString.push('SELECT DISTINCT Comments.id, Comments.UserId, Comments.text, Comments.UrlId, Comments.repliesToId, Comments.isPrivate, Comments.createdAt, Urls.url, Urls.host, Users.name AS username, Users.avatar AS userAvatar,',
+    // counts how many hearts each comment has
+    '(SELECT COUNT(1) AS other FROM Hearts AS h ',
+      'WHERE Comments.id = h.CommentId GROUP BY Comments.id) AS HeartCount, ',
+    // counts how many replies each comment has
+    '(SELECT COUNT(1) AS other FROM Comments AS c ',
+      'WHERE Comments.id = c.RepliesToId GROUP BY Comments.id) AS ReplyCount, ',
+    // counts how many flags each comment has
+    '(SELECT COUNT(1) AS other FROM Flags AS f ',
+      'WHERE Comments.id = f.CommentId GROUP BY Comments.id) AS FlagCount ');
     
   //if there's a userid, check if it was hearted, flagged, or replied to by that user
   if (options.userFilterId || options.userId) {
     // add comma so we don't break sequel
-    queryString += ',';
+    queryString.push(',');
 
-    queryString += 
-      '(SELECT COUNT(1) AS other FROM Hearts AS h ' +
-        'WHERE Comments.id = h.CommentId ' +
-        'AND h.UserId = ' + options.userId + ') AS HeartedByUser, ' +
-      '(SELECT COUNT(1) AS other FROM Flags AS f ' +
-        'WHERE Comments.id = f.CommentId ' +
-        'AND f.UserId = ' + options.userId + ') AS FlaggedByUser, ' +
-      '(SELECT COUNT(1) AS other FROM Comments AS c ' +
-        'WHERE Comments.id = c.RepliesToId ' +
-        'AND c.UserId = ' + options.userId + ') AS RepliesToUser, ' +
-      '(CASE WHEN Comments.UserId = ' + options.userId + ' THEN "true" ELSE NULL END) AS isUser ';
+    // check if the user we are looking up for has hearted this commented
+    queryString.push( 
+      '(SELECT COUNT(1) AS other FROM Hearts AS h ',
+        'WHERE Comments.id = h.CommentId ',
+        'AND h.UserId = ', '?', ') AS HeartedByUser, ');
+    replacements.push(options.userId);
+    
+    // check if the user we are looking up for has flagged this commented
+    queryString = queryString.concat('(SELECT COUNT(1) AS other FROM Flags AS f ',
+        'WHERE Comments.id = f.CommentId ',
+        'AND f.UserId = ', '?', ') AS FlaggedByUser, ');
+    replacements.push(options.userId);
+
+    // check if the user we are looking up for has replied to this commented
+    queryString.push('(SELECT COUNT(1) AS other FROM Comments AS c ',
+        'WHERE Comments.id = c.RepliesToId ',
+        'AND c.UserId = ', '?', ' ) AS RepliesToUser, ');
+    replacements.push(options.userId);
+    
+    // check if this comment belongs to the user we are returning to  
+    queryString.push('(CASE WHEN Comments.UserId = ', ' ? ', ' THEN "true" ELSE NULL END) AS isUser ');
+    replacements.push(options.userId);
   }
   
-  queryString += 
-    'FROM Comments, Users ' +
-    'INNER JOIN Urls ';
+  queryString.push( 
+    'FROM Comments, Users ',
+    'INNER JOIN Urls ');
 
+  // object to hold all of the filters we will be using based on the options object
   var filters = [];
 
+  // don't send comments that have been flagged more than 5 times
   filters.push('(SELECT COUNT(1) AS other FROM Flags AS f WHERE Comments.id = f.CommentId) < 5 ');
 
   if (options.url) {
-    filters.push('Urls.url = "' + options.url + '" ');
+    // if we are searching for a particular url
+    filters.push('Urls.url = "',' ? ','" ');
+    replacements.push(options.url);
   } else if (options.urlSearch) {
-    filters.push('Urls.url LIKE "%' + options.urlSearch +'%" ');
+    filters.push('Urls.url LIKE "%?%" ');
+    replacements.push(options.urlSearch);
   }
 
-  if (options.textSearch) filters.push('Comments.text LIKE "%' + options.textSearch + '%"');
+  if (options.textSearch) {
+    filters.push('Comments.text LIKE "%?%"');
+    replacements.push(options.textSearch);
+  }
   
   if (options.filterByUser) {
     var userToFilter = options.userFilterId || options.userId;
-    filters.push('Comments.UserId = ' + userToFilter + ' ');
+    filters.push('Comments.UserId = ?');
+    replacements.push(userToFilter); 
   }
 
-  if (options.commentId) filters.push('Comments.id = ' + options.commentId + ' ');
-  if (options.lastCommentId) filters.push('Comments.id < ' + options.lastCommentId + ' ');
-  if (options.repliesToId) filters.push('Comments.repliesToId = ' + options.repliesToId + ' ');
-  if (options.host) filters.push('Urls.host = "' + options.host + '" ');
+  if (options.commentId) {
+    filters.push('Comments.id = ?');
+    replacements.push(options.commentId);
+  }
+  if (options.lastCommentId) {
+    filters.push('Comments.id < ?');
+    replacements.push(options.lastCommentId);
+  }
+  if (options.repliesToId) {
+    filters.push('Comments.repliesToId = ?');
+    replacements.push(options.repliesToId);
+  }
+  if (options.host) {
+    filters.push('Urls.host = ?');
+    replacements.push(options.host);
+  }
   if (options.isPrivate !== undefined) {
-    if (options.isPrivate === 'true') filters.push('Comments.isPrivate = 1 ');
-    else filters.push('Comments.isPrivate = 0 ');
+    if (options.isPrivate === 'true') {
+      filters.push('Comments.isPrivate = 1 ');
+    } else {
+      filters.push('Comments.isPrivate = 0 ');
+    }
   }
 
   if (options.getHeartedByUser){
     filters.push('(SELECT COUNT(1) AS other FROM Hearts AS h WHERE Comments.id = h.CommentId AND h.UserId = 1) = 1 ');
   }
-  // keeps correct user associated with the comment
-  queryString += 'WHERE Users.id = Comments.userId AND Comments.UrlId = Urls.id ';
 
-  // // if there are any filters, add them to the query
+  // keeps correct user associated with the comment
+  queryString.push('WHERE Users.id = Comments.userId AND Comments.UrlId = Urls.id ');
+
+  // if there are any filters, add them to the query
   if (filters.length > 0){
 
     for (var i = 0; i < filters.length; i++) {
-      queryString += 'AND ';
-      queryString += filters[i];
+      queryString.push('AND ');
+      queryString.push(filters[i]);
     }
   }
   
   // makes sure we have only 1 row per comment
-  queryString  += 'GROUP BY Comments.id ';
+  queryString.push('GROUP BY Comments.id ');
 
   // if there is a repliesToId, add it to the query string, w comma to add to above WHERE
   if (!options.repliesToId) {
-    queryString += 'HAVING Comments.repliesToId IS NULL ';
+    queryString.push('HAVING Comments.repliesToId IS NULL ');
   }
 
   // optional order by property - see above for accepted strings
@@ -110,24 +157,27 @@ module.exports = function(sequelize, options) {
   var orderByDirection = 'DESC';
   
   if (options.orderBy){
-    orderByParam = options.orderBy[0] || 'Comments.id';
-    orderByDirection = options.orderBy[1] || 'DESC';
+    orderByParam = options.orderBy[0];
+    orderByDirection = options.orderBy[1];
   }
 
-  queryString += 'ORDER BY ' + orderByParam + ' ' + orderByDirection + ' ';
+  queryString.push('ORDER BY ? ?');
+  replacements.push(orderByParam, orderByDirection);
 
   // optional limit
   var limit = options.numberOfComments || 25;
-  queryString += 'LIMIT ' + limit + ' ';
+  replacements.push(limit);
+  queryString.push('LIMIT ?');
 
   // optional offset for limit ...
   if (options.offset) {
-    queryString += 'OFFSET ' + options.offset + ' ';
+    queryString += ('OFFSET ?') ;
+    replacements.push(options.offset);
   }
   
-  queryString += ';';
+  queryString.push(';');
 
-  return sequelize.query(queryString);
+  return sequelize.query(queryString.join(' '), {replacements: replacements});
 };
 
 
