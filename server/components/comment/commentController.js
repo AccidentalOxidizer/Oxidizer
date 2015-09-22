@@ -178,7 +178,7 @@ module.exports.getNewHeartsForUser = function(req, res, next){
   var Comment = req.app.get('models').Comment;
   var User = req.app.get('models').User;
   var userId = req.session.passport.user;
-
+  
   return Promise.all([Comment.getNewHearts(userId), User.getUserInfo(userId)])
     .spread(function(comments, user){
       var response = {
