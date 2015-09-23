@@ -86,7 +86,7 @@ module.exports = function(sequelize, options) {
 
   if (options.url) {
     // if we are searching for a particular url
-    filters.push('Urls.url = "',' ? ','" ');
+    filters.push('Urls.url = ? ');
     replacements.push(options.url);
   } else if (options.urlSearch) {
     filters.push('Urls.url LIKE "%?%" ');
@@ -161,22 +161,22 @@ module.exports = function(sequelize, options) {
     orderByDirection = options.orderBy[1];
   }
 
-  queryString.push('ORDER BY ? ?');
+  queryString.push('ORDER BY ? ? ');
   replacements.push(orderByParam, orderByDirection);
 
   // optional limit
   var limit = options.numberOfComments || 25;
   replacements.push(limit);
-  queryString.push('LIMIT ?');
+  queryString.push('LIMIT ? ');
 
   // optional offset for limit ...
   if (options.offset) {
-    queryString += ('OFFSET ?') ;
+    queryString += ('OFFSET ? ') ;
     replacements.push(options.offset);
   }
   
   queryString.push(';');
-
+  console.log(queryString.join(''));
   return sequelize.query(queryString.join(' '), {replacements: replacements});
 };
 
