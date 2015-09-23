@@ -12,7 +12,7 @@ var Home = React.createClass({
                 <h1>Oxidizer IO</h1>
                   <p>A universal commenting system for the internet, allowing anyone to annotate any web entity via browser extensions.</p>
                   <p>Get the Chrome Extension now!</p>
-                  <p><a className="" href="#" role="button">
+                  <p><a className="" href="https://chrome.google.com/webstore/detail/oxidizer/mjfdkgkfbceiiakhblgkcofjfoninggj" role="button">
                     <img className="img-responsive chrome" src="lib/images/ChromeWebStore_BadgeWBorder_v2_340x96.png" alt=""/></a></p>
               </div>
             </div>
