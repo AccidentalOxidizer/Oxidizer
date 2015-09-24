@@ -170,8 +170,7 @@ module.exports = function(sequelize, options) {
 
   // optional offset for limit ...
   if (options.offset) {
-    queryString += ('OFFSET ? ') ;
-    replacements.push(options.offset);
+    queryString.push('OFFSET ' + options.offset);
   }
   
   queryString.push(';');
