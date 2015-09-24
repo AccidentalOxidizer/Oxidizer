@@ -123,6 +123,7 @@ module.exports = function(sequelize, options) {
   if (options.isPrivate !== undefined) {
     if (options.isPrivate === 'true') {
       filters.push('Comments.isPrivate = 1 ');
+      filters.push('Comments.UserId = ' + options.userId);
     } else {
       filters.push('Comments.isPrivate = 0 ');
     }
@@ -135,9 +136,10 @@ module.exports = function(sequelize, options) {
   // keeps correct user associated with the comment
   queryString.push('WHERE Users.id = Comments.userId AND Comments.UrlId = Urls.id ');
 
+  // filter for a users private comments
+
   // if there are any filters, add them to the query
   if (filters.length > 0){
-
     for (var i = 0; i < filters.length; i++) {
       queryString.push('AND ');
       queryString.push(filters[i]);
