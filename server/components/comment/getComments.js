@@ -161,8 +161,7 @@ module.exports = function(sequelize, options) {
     orderByDirection = options.orderBy[1];
   }
 
-  queryString.push('ORDER BY ? ? ');
-  replacements.push(orderByParam, orderByDirection);
+  queryString.push('ORDER BY ' + orderByParam + ' ' + orderByDirection);
 
   // optional limit
   var limit = options.numberOfComments || 25;
@@ -176,9 +175,8 @@ module.exports = function(sequelize, options) {
   }
   
   queryString.push(';');
-  console.log(queryString.join(''));
+
   return sequelize.query(queryString.join(' '), {replacements: replacements});
 };
-
 
 
