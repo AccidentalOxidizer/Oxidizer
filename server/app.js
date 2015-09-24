@@ -40,9 +40,11 @@ require('./components/user/passport')(passport, config);
 
 // ROUTES
 var routes = require('./routes');
+
 // add all our models to the app so they are always on the request
 var models = require('./components');
-app.models = models;
+app.set('models', models);
+
 
 if (process.env.NODE_ENV === 'production') {
   var nullfunc = function() {};
