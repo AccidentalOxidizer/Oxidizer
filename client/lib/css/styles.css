@@ -119,10 +119,14 @@
 .comment:hover {
   background-color: rgba(168, 202, 255, .2);
 }
+
+.comment:hover .replies-list {
+  background: white;
+}
 .comment-header, .comment-footer {
   color: #808080;
 }
-.heart {
+.heart, .replies {
   float:left;
   margin-right: 10px;
 }
@@ -169,6 +173,32 @@
 }
 .leaderboard div div.comment:nth-child(8){
   background-color: rgba(168, 202, 255, .2);
+}
+
+.leaderboard .replies {
+  display: none;
+}
+
+.replies-list .replies {
+  display: none;
+}
+
+.replies-list {
+  margin:0;
+  padding:0;
+}
+
+.replies-list, .replies-list .comment:hover, .replies-list .comment {
+  background: white;
+}
+
+.replies-list .posted-on {
+  display: none;
+}
+
+.replies-list .comment {
+  margin-left: 30px;
+  padding-bottom: 0px;
 }
 
 .headline {
