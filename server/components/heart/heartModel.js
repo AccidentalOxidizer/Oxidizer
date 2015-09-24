@@ -16,16 +16,9 @@ module.exports = function(sequelize, dataTypes) {
     classMethods: {
       toggleHeart: function(){
         var faved = true;
-        
       },
 
-      // TODO:
-      //  - limit the query results like other comment loads? would need
-      //    to also sort the results here.
-      //  x filter on isPrivate? If a user was able to fav a comment, it
-      //    should either be a public comment or the user's comment
       getUserFaves: function(userId, lastCommentId) {
-
         var comment = {
           model: Comment,
           attributes: ['id', 'text', 'createdAt'],
@@ -54,7 +47,6 @@ module.exports = function(sequelize, dataTypes) {
         };
 
         // limit the number of comments we send to the user
-        // XXX: should be a constant.
         query.limit = 25;
 
         // return in ascending order of heart id

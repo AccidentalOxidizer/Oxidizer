@@ -29,7 +29,6 @@ module.exports = function(unparsedURL) {
   
   if (parsedURL.query !== null) {
     var parsedQuery = JSON.parse('{"' + decodeURI(parsedURL.query).replace(/"/g, '\\"').replace(/&/g, '","').replace(/=/g,'":"') + '"}');
-    // console.log('QUERY PARAMS: ', parsedQuery);
 
     //Build query string for FIRST parameter
     var firstQuery = false;
@@ -40,9 +39,6 @@ module.exports = function(unparsedURL) {
         firstQuery = true;
       }
     }
-    
-    // console.log('FIRST QUERY: ', getQuery);
-    // console.log('------>\n\nPARSED URL: ', parsedURL);
   }
 
   

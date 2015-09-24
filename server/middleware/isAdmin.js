@@ -18,7 +18,6 @@ module.exports = function(req, res, next) {
       } else {
         // User is not an admin.
         // Get out of here, you dirty scoundrel.
-        //res.redirect('../');
         res.send(403);
         return false;
       }
@@ -27,6 +26,4 @@ module.exports = function(req, res, next) {
       res.send(404);
       return false;
     });
-
-  //return false;
 };

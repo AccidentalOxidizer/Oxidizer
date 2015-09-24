@@ -99,7 +99,7 @@ var Comment = React.createClass({
       deleteLink = (
         <div className="delete">
           <a onClick={this.props.deleteComment}>
-            Delete Comment
+            Delete Comment <i className="fa fa-trash"></i>
           </a>
         </div>
       );
@@ -117,8 +117,7 @@ var Comment = React.createClass({
       <div className="comment">
         <div className="row">
           <div className="col-xs-12 comment-header"> 
-          Comment on: <a target="_blank" href={'http://'+this.props.comment.url}>{this.props.comment.url}</a> posted: {moment(this.props.comment.createdAt).fromNow()}
-          {deleteLink}
+          <span className="posted-on">Posted on: <a target="_blank" href={'http://'+this.props.comment.url}>{this.props.comment.url}</a></span> {moment(this.props.comment.createdAt).fromNow()} <span className="username">by {this.props.comment.username}</span>
           </div>
         </div>
        
@@ -130,10 +129,11 @@ var Comment = React.createClass({
           <div className="heart">Received: <i className={heartClass}></i>&nbsp;{hearts} </div>
           
           <div className="replies"><a onClick={this.getReplies}>
-            Show replies to comment
+            Replies: <i className="fa fa-comments-o"></i>&nbsp;{replyCount}
           </a> </div>
+          {deleteLink}
         </div>
-        <div>{replies}</div>
+        <div className="col-xs-12 replies-list">{replies}</div>
         </div>
       </div>
     );
